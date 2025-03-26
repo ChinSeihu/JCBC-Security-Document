@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  userId    String    @unique  //clerk userId
+  firstName String    @db.VarChar(255)
+  lastName  String    @db.VarChar(255)
+  delFlag   Boolean   @default(false)
+
+  Document  Document[]
+}
+
+model Document {
+  id                String     @id @default(uuid())
+  fileName          String     @db.VarChar(255)
+  pathName          String     @unique
+  fileType          String     @db.VarChar(255)
+  filesize          Int
+  description       String?    @db.Text
+  isPublic          Boolean    @default(false)
+  delFlag           Boolean    @default(false)
+  createdAt         String
+  createdDate       DateTime   @default(now())
+  lastModifiedAt    String?
+  lastModifiedDate  DateTime?  @default(now())
+  
+  // 外键关联声明
+  user User @relation(fields: [createdAt], references: [userId], onDelete: Cascade)
+}
+
+model Question {
+  id                String     @id @default(uuid())
+  content           String     @db.VarChar(255)
+  documentId        String     
+  answer            String     @db.VarChar(255)
+  isUsing           Boolean    @default(false)
+  description       String?    @db.Text
+  delFlag           Boolean    @default(false)
+  createdAt         String
+  createdDate       DateTime   @default(now())
+  lastModifiedAt    String?
+  lastModifiedDate  DateTime?  @default(now())
+  
+  // 外键关联声明
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+}
+
+model Option {
+  id                String     @id @default(uuid())
+  content           String     @db.VarChar(255)
+  questionId        String     
+  isUsing           Boolean    @default(false)
+  description       String?    @db.Text
+  delFlag           Boolean    @default(false)
+  createdAt         String
+  createdDate       DateTime   @default(now())
+  lastModifiedAt    String?
+  lastModifiedDate  DateTime?  @default(now())
+
+  user Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+}
+
+enum UserSex {
+  MALE
+  FEMALE
+}
+
+enum Day {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+}

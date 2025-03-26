@@ -1,0 +1,217 @@
+#
+# There is insufficient memory for the Java Runtime Environment to continue.
+# Native memory allocation (mmap) failed to map 67108864 bytes for G1 virtual space
+# Possible reasons:
+#   The system is out of physical RAM or swap space
+#   The process is running with CompressedOops enabled, and the Java Heap may be blocking the growth of the native heap
+# Possible solutions:
+#   Reduce memory load on the system
+#   Increase physical memory or swap space
+#   Check if swap backing store is full
+#   Decrease Java heap size (-Xmx/-Xms)
+#   Decrease number of Java threads
+#   Decrease Java thread stack sizes (-Xss)
+#   Set larger code cache with -XX:ReservedCodeCacheSize=
+#   JVM is running with Unscaled Compressed Oops mode in which the Java heap is
+#     placed in the first 4GB address space. The Java Heap base address is the
+#     maximum limit for the native heap growth. Please use -XX:HeapBaseMinAddress
+#     to set the Java Heap base and to place the Java Heap above 4GB virtual address.
+# This output file may be truncated or incomplete.
+#
+#  Out of Memory Error (os_windows.cpp:3548), pid=20680, tid=12688
+#
+# JRE version:  (17.0.12+8) (build )
+# Java VM: Java HotSpot(TM) 64-Bit Server VM (17.0.12+8-LTS-286, mixed mode, sharing, tiered, compressed oops, compressed class ptrs, g1 gc, windows-amd64)
+# No core dump will be written. Minidumps are not enabled by default on client versions of Windows
+#
+
+---------------  S U M M A R Y ------------
+
+Command Line: -DRHDA_TOKEN=c3867adb-390f-43a5-840e-3bb154c6804c -DRHDA_SOURCE=vscode -DEXHORT_SYFT_PATH=syft -DEXHORT_SKOPEO_PATH=skopeo -DEXHORT_DOCKER_PATH=docker -DEXHORT_PODMAN_PATH=podman c:\Users\user\.vscode\extensions\redhat.fabric8-analytics-0.9.5\dist/../javaApiAdapter/exhort-java-api-adapter-1.0-SNAPSHOT-jar-with-dependencies.jar json node:18
+
+Host: Intel(R) Core(TM) i3-7100U CPU @ 2.40GHz, 4 cores, 3G,  Windows 10 , 64 bit Build 19041 (10.0.19041.5438)
+Time: Tue Mar 25 13:30:43 2025  Windows 10 , 64 bit Build 19041 (10.0.19041.5438) elapsed time: 1.557996 seconds (0d 0h 0m 1s)
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x000001b3ef47c070):  JavaThread "Unknown thread" [_thread_in_vm, id=12688, stack(0x0000004105400000,0x0000004105500000)]
+
+Stack: [0x0000004105400000,0x0000004105500000]
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+V  [jvm.dll+0x67a04a]
+V  [jvm.dll+0x7da4ed]
+V  [jvm.dll+0x7dbe33]
+V  [jvm.dll+0x7dc4a3]
+V  [jvm.dll+0x24508f]
+V  [jvm.dll+0x677089]
+V  [jvm.dll+0x66bd32]
+V  [jvm.dll+0x301fa6]
+V  [jvm.dll+0x309546]
+V  [jvm.dll+0x359d2e]
+V  [jvm.dll+0x359f5f]
+V  [jvm.dll+0x2d9078]
+V  [jvm.dll+0x2d9fe4]
+V  [jvm.dll+0x7aca21]
+V  [jvm.dll+0x367591]
+V  [jvm.dll+0x78b999]
+V  [jvm.dll+0x3ec83f]
+V  [jvm.dll+0x3ee471]
+C  [jli.dll+0x5297]
+C  [ucrtbase.dll+0x21bb2]
+C  [KERNEL32.DLL+0x17374]
+C  [ntdll.dll+0x4cc91]
+
+
+---------------  P R O C E S S  ---------------
+
+Threads class SMR info:
+_java_thread_list=0x00007fff201c7a18, length=0, elements={
+}
+
+Java Threads: ( => current thread )
+
+Other Threads:
+  0x000001b3ef4b3580 GCTaskThread "GC Thread#0" [stack: 0x0000004105500000,0x0000004105600000] [id=13220]
+  0x000001b3ef4bc210 ConcurrentGCThread "G1 Main Marker" [stack: 0x0000004105600000,0x0000004105700000] [id=5264]
+  0x000001b3ef4bdc30 ConcurrentGCThread "G1 Conc#0" [stack: 0x0000004105700000,0x0000004105800000] [id=17456]
+
+[error occurred during error reporting (printing all threads), id 0xc0000005, EXCEPTION_ACCESS_VIOLATION (0xc0000005) at pc=0x00007fff1f9f9b67]
+
+VM state: not at safepoint (not fully initialized)
+
+VM Mutex/Monitor currently owned by a thread:  ([mutex/lock_event])
+[0x000001b3ef47a500] Heap_lock - owner thread: 0x000001b3ef47c070
+
+Heap address: 0x00000000c1600000, size: 1002 MB, Compressed Oops mode: 32-bit
+
+CDS archive(s) mapped at: [0x0000000000000000-0x0000000000000000-0x0000000000000000), size 0, SharedBaseAddress: 0x0000000800000000, ArchiveRelocationMode: 1.
+Narrow klass base: 0x0000000000000000, Narrow klass shift: 0, Narrow klass range: 0x0
+
+GC Precious Log:
+<Empty>
+
+Heap:
+ garbage-first heap   total 0K, used 0K [0x00000000c1600000, 0x0000000100000000)
+  region size 1024K, 0 young (0K), 0 survivors (0K)
+
+[error occurred during error reporting (printing heap information), id 0xc0000005, EXCEPTION_ACCESS_VIOLATION (0xc0000005) at pc=0x00007fff1fde3859]
+
+GC Heap History (0 events):
+No events
+
+Deoptimization events (0 events):
+No events
+
+Classes unloaded (0 events):
+No events
+
+Classes redefined (0 events):
+No events
+
+Internal exceptions (0 events):
+No events
+
+VM Operations (0 events):
+No events
+
+Events (1 events):
+Event: 1.115 Loaded shared library C:\Program Files\Java\jdk-17\bin\java.dll
+
+
+Dynamic libraries:
+0x00007ff6436c0000 - 0x00007ff6436d0000 	C:\Program Files\Java\jdk-17\bin\java.exe
+0x00007fff73430000 - 0x00007fff73628000 	C:\WINDOWS\SYSTEM32\ntdll.dll
+0x00007fff71a90000 - 0x00007fff71b52000 	C:\WINDOWS\System32\KERNEL32.DLL
+0x00007fff71120000 - 0x00007fff7141f000 	C:\WINDOWS\System32\KERNELBASE.dll
+0x00007fff6d660000 - 0x00007fff6d6f4000 	C:\WINDOWS\SYSTEM32\apphelp.dll
+0x00007fff70b90000 - 0x00007fff70c90000 	C:\WINDOWS\System32\ucrtbase.dll
+0x00007fff68d60000 - 0x00007fff68d79000 	C:\Program Files\Java\jdk-17\bin\jli.dll
+0x00007fff72e30000 - 0x00007fff72edf000 	C:\WINDOWS\System32\ADVAPI32.dll
+0x00007fff72f60000 - 0x00007fff72ffe000 	C:\WINDOWS\System32\msvcrt.dll
+0x00007fff73240000 - 0x00007fff732df000 	C:\WINDOWS\System32\sechost.dll
+0x00007fff725f0000 - 0x00007fff72713000 	C:\WINDOWS\System32\RPCRT4.dll
+0x00007fff70fb0000 - 0x00007fff70fd7000 	C:\WINDOWS\System32\bcrypt.dll
+0x00007fff717d0000 - 0x00007fff7196d000 	C:\WINDOWS\System32\USER32.dll
+0x00007fff71420000 - 0x00007fff71442000 	C:\WINDOWS\System32\win32u.dll
+0x00007fff72720000 - 0x00007fff7274b000 	C:\WINDOWS\System32\GDI32.dll
+0x00007fff70e90000 - 0x00007fff70faa000 	C:\WINDOWS\System32\gdi32full.dll
+0x00007fff70df0000 - 0x00007fff70e8d000 	C:\WINDOWS\System32\msvcp_win.dll
+0x00007fff5bff0000 - 0x00007fff5c28a000 	C:\WINDOWS\WinSxS\amd64_microsoft.windows.common-controls_6595b64144ccf1df_6.0.19041.4355_none_60b8b9eb71f62e16\COMCTL32.dll
+0x00007fff66290000 - 0x00007fff6629a000 	C:\WINDOWS\SYSTEM32\VERSION.dll
+0x00007fff68d40000 - 0x00007fff68d5b000 	C:\Program Files\Java\jdk-17\bin\VCRUNTIME140.dll
+0x00007fff73000000 - 0x00007fff7302f000 	C:\WINDOWS\System32\IMM32.DLL
+0x00007fff6a6c0000 - 0x00007fff6a6cc000 	C:\Program Files\Java\jdk-17\bin\vcruntime140_1.dll
+0x00007fff54510000 - 0x00007fff5459e000 	C:\Program Files\Java\jdk-17\bin\msvcp140.dll
+0x00007fff1f710000 - 0x00007fff202f0000 	C:\Program Files\Java\jdk-17\bin\server\jvm.dll
+0x00007fff71450000 - 0x00007fff71458000 	C:\WINDOWS\System32\PSAPI.DLL
+0x00007fff63d60000 - 0x00007fff63d69000 	C:\WINDOWS\SYSTEM32\WSOCK32.dll
+0x00007fff72570000 - 0x00007fff725db000 	C:\WINDOWS\System32\WS2_32.dll
+0x00007fff60e30000 - 0x00007fff60e57000 	C:\WINDOWS\SYSTEM32\WINMM.dll
+0x00007fff6f2e0000 - 0x00007fff6f2f2000 	C:\WINDOWS\SYSTEM32\kernel.appcore.dll
+0x00007fff6a0b0000 - 0x00007fff6a0ba000 	C:\Program Files\Java\jdk-17\bin\jimage.dll
+0x00007fff6efb0000 - 0x00007fff6f194000 	C:\WINDOWS\SYSTEM32\DBGHELP.DLL
+0x00007fff66a30000 - 0x00007fff66a64000 	C:\WINDOWS\SYSTEM32\dbgcore.DLL
+0x00007fff71090000 - 0x00007fff71112000 	C:\WINDOWS\System32\bcryptPrimitives.dll
+0x00007fff68c40000 - 0x00007fff68c65000 	C:\Program Files\Java\jdk-17\bin\java.dll
+
+dbghelp: loaded successfully - version: 4.0.5 - missing functions: none
+symbol engine: initialized successfully - sym options: 0x614 - pdb path: .;C:\Program Files\Java\jdk-17\bin;C:\WINDOWS\SYSTEM32;C:\WINDOWS\WinSxS\amd64_microsoft.windows.common-controls_6595b64144ccf1df_6.0.19041.4355_none_60b8b9eb71f62e16;C:\Program Files\Java\jdk-17\bin\server
+
+VM Arguments:
+jvm_args: -DRHDA_TOKEN=c3867adb-390f-43a5-840e-3bb154c6804c -DRHDA_SOURCE=vscode -DEXHORT_SYFT_PATH=syft -DEXHORT_SKOPEO_PATH=skopeo -DEXHORT_DOCKER_PATH=docker -DEXHORT_PODMAN_PATH=podman 
+java_command: c:\Users\user\.vscode\extensions\redhat.fabric8-analytics-0.9.5\dist/../javaApiAdapter/exhort-java-api-adapter-1.0-SNAPSHOT-jar-with-dependencies.jar json node:18
+java_class_path (initial): c:\Users\user\.vscode\extensions\redhat.fabric8-analytics-0.9.5\dist/../javaApiAdapter/exhort-java-api-adapter-1.0-SNAPSHOT-jar-with-dependencies.jar
+Launcher Type: SUN_STANDARD
+
+[Global flags]
+     intx CICompilerCount                          = 3                                         {product} {ergonomic}
+     uint ConcGCThreads                            = 1                                         {product} {ergonomic}
+     uint G1ConcRefinementThreads                  = 4                                         {product} {ergonomic}
+   size_t G1HeapRegionSize                         = 1048576                                   {product} {ergonomic}
+    uintx GCDrainStackTargetSize                   = 64                                        {product} {ergonomic}
+   size_t InitialHeapSize                          = 67108864                                  {product} {ergonomic}
+   size_t MarkStackSize                            = 4194304                                   {product} {ergonomic}
+   size_t MaxHeapSize                              = 1050673152                                {product} {ergonomic}
+   size_t MinHeapDeltaBytes                        = 1048576                                   {product} {ergonomic}
+   size_t MinHeapSize                              = 8388608                                   {product} {ergonomic}
+    uintx NonNMethodCodeHeapSize                   = 5832780                                {pd product} {ergonomic}
+    uintx NonProfiledCodeHeapSize                  = 122912730                              {pd product} {ergonomic}
+    uintx ProfiledCodeHeapSize                     = 122912730                              {pd product} {ergonomic}
+    uintx ReservedCodeCacheSize                    = 251658240                              {pd product} {ergonomic}
+     bool SegmentedCodeCache                       = true                                      {product} {ergonomic}
+   size_t SoftMaxHeapSize                          = 1050673152                             {manageable} {ergonomic}
+     bool UseCompressedClassPointers               = true                           {product lp64_product} {ergonomic}
+     bool UseCompressedOops                        = true                           {product lp64_product} {ergonomic}
+     bool UseG1GC                                  = true                                      {product} {ergonomic}
+     bool UseLargePagesIndividualAllocation        = false                                  {pd product} {ergonomic}
+
+Logging:
+Log output configuration:
+ #0: stdout all=warning uptime,level,tags
+ #1: stderr all=off uptime,level,tags
+
+Environment Variables:
+PATH=C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\iCLS\;C:\Program Files\Intel\Intel(R) Management Engine Components\iCLS\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\Microsoft SQL Server\150\Tools\Binn\;C:\ProgramData\chocolatey\bin;C:\Program Files\WireGuard\;C:\Program Files\Git\cmd;C:\Program Files\nodejs\;C:\Users\user\AppData\Local\Programs\Python\Python39\Scripts\;C:\Users\user\AppData\Local\Programs\Python\Python39\;C:\Users\user\AppData\Local\Programs\Python\Python312\Scripts\;C:\Users\user\AppData\Local\Programs\Python\Python312\;C:\Users\user\AppData\Local\Microsoft\WindowsApps;C:\Users\user\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\user\AppData\Local\JetBrains\PyCharm 2023.2.1\bin;;C:\Program Files\sf\bin;C:\Program Files\apache-maven-3.9.9-bin\apache-maven-3.9.9\bin;C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2024.2.1\bin;;C:\Program Files\Java\jdk-17\bin;C:\Users\user\AppData\Roaming\npm
+USERNAME=user
+OS=Windows_NT
+PROCESSOR_IDENTIFIER=Intel64 Family 6 Model 142 Stepping 9, GenuineIntel
+
+
+
+---------------  S Y S T E M  ---------------
+
+OS:
+ Windows 10 , 64 bit Build 19041 (10.0.19041.5438)
+OS uptime: 7 days 19:57 hours
+Hyper-V role detected
+
+CPU: total 4 (initial active 4) (2 cores per cpu, 2 threads per core) family 6 model 142 stepping 9 microcode 0xb4, cx8, cmov, fxsr, ht, mmx, 3dnowpref, sse, sse2, sse3, ssse3, sse4.1, sse4.2, popcnt, lzcnt, tsc, tscinvbit, avx, avx2, aes, erms, clmul, bmi1, bmi2, adx, fma, vzeroupper, clflush, clflushopt, hv
+
+Memory: 4k page, system-wide physical 4005M (95M free)
+TotalPageFile size 16293M (AvailPageFile size 65M)
+current process WorkingSet (physical memory assigned to process): 10M, peak: 10M
+current process commit charge ("private bytes"): 51M, peak: 115M
+
+vm_info: Java HotSpot(TM) 64-Bit Server VM (17.0.12+8-LTS-286) for windows-amd64 JRE (17.0.12+8-LTS-286), built on Jun  5 2024 06:46:59 by "mach5one" with MS VC++ 17.6 (VS2022)
+
+END.
