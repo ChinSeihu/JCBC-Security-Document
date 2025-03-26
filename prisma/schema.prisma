@@ -9,12 +9,14 @@ datasource db {
 
 model User {
   id        String    @id @default(uuid())
-  userId    String    @unique  //clerk userId
+  userId    String    @unique
   firstName String    @db.VarChar(255)
   lastName  String    @db.VarChar(255)
   delFlag   Boolean   @default(false)
 
-  Document  Document[]
+  Document         Document[]
+  ReadStatuses    DocumentStatus[]
+  QuizResults     QuizResult[]
 }
 
 model Document {
@@ -31,52 +33,75 @@ model Document {
   lastModifiedAt    String?
   lastModifiedDate  DateTime?  @default(now())
   
-  // 外键关联声明
-  user User @relation(fields: [createdAt], references: [userId], onDelete: Cascade)
+  user        User              @relation(fields: [createdAt], references: [userId])
+  ReadStatuses UserDocumentStatus[]
+}
+
+// 新增阅读状态表
+model DocumentStatus {
+  userId     String
+  documentId String
+  isRead     Boolean  @default(false)
+  user       User     @relation(fields: [userId], references: [userId])
+  document   Document @relation(fields: [documentId], references: [id])
+  
+  @@id([userId, documentId])
 }
 
 model Question {
-  id                String     @id @default(uuid())
-  content           String     @db.VarChar(255)
-  documentId        String     
-  answer            String     @db.VarChar(255)
-  isUsing           Boolean    @default(false)
-  description       String?    @db.Text
-  delFlag           Boolean    @default(false)
-  createdAt         String
-  createdDate       DateTime   @default(now())
-  lastModifiedAt    String?
-  lastModifiedDate  DateTime?  @default(now())
+  id           String          @id @default(uuid())
+  questionType QuestionType
+  content      String          @db.Text
+  order        Int
+  document   Document   @relation(fields: [documentId], references: [id])
+  documentId String     @unique
   
-  // 外键关联声明
-  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  answerOptions QuesOption[]
+  userAnswers  UserQuizAnswer[]
 }
 
-model Option {
-  id                String     @id @default(uuid())
-  content           String     @db.VarChar(255)
-  questionId        String     
-  isUsing           Boolean    @default(false)
-  description       String?    @db.Text
-  delFlag           Boolean    @default(false)
-  createdAt         String
-  createdDate       DateTime   @default(now())
-  lastModifiedAt    String?
-  lastModifiedDate  DateTime?  @default(now())
-
-  user Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-
+enum QuestionType {
+  SINGLE_CHOICE
+  MULTIPLE_CHOICE
 }
 
-enum UserSex {
-  MALE
-  FEMALE
+model QuesOption {
+  id          String    @id @default(uuid())
+  question    Question  @relation(fields: [questionId], references: [id])
+  questionId  String
+  content     String    @db.Text
+  isCorrect   Boolean   @default(false)
+  order       Int
 }
 
-enum Day {
-  MONDAY
-  TUESDAY
-  WEDNESDAY
-  THURSDAY
-  FRIDAY
+model QuizResult {
+  id              String     @id @default(uuid())
+  user            User       @relation(fields: [userId], references: [userId])
+  userId          String
+  question            Question       @relation(fields: [questionId], references: [id])
+  questionId          String
+  score           Float       // 正确率（正确题数/总题数）
+  totalQuestions  Int
+  correctAnswers  Int
+  completedAt     DateTime    @default(now())
+  
+  answers UserQuizAnswer[]
+}
+
+model QuizAnswer {
+  id             String         @id @default(uuid())
+  result         QuizResult @relation(fields: [resultId], references: [id])
+  resultId       String
+  question       Question       @relation(fields: [questionId], references: [id])
+  questionId     String
+  selectedOptions SelectedOption[]
+}
+
+// 多选答案中间表
+model SelectedOption {
+  answerId       String         @id @default(uuid())
+  userAnswerId   String
+  optionId       String
+  userAnswer     QuizAnswer @relation(fields: [userAnswerId], references: [id])
+  quesOption     QuesOption   @relation(fields: [optionId], references: [id])
 }

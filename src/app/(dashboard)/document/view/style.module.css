@@ -15,8 +15,12 @@
 }
 
 .pagination {
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
 	margin: 0 auto;
 	margin-top: 20px;
+	padding: 2px 4px;
 	position: sticky;
 	bottom: 0;
 	width: max-content;
