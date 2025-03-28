@@ -34,7 +34,7 @@ export async function getQuestionOptions(params: ListQuesOptionsParams): Promise
     return questionOption
   } catch (error) {
     console.log('問題の選択項目の抽出に失敗しました:' ,error)
-    throw new Error('データ作成に失敗しました')
+    throw new Error('データ抽出に失敗しました')
   }
 }
 
@@ -83,7 +83,7 @@ export async function createQuizAnswer(params: ListQuesOptionsParams & QuizAswer
     const quizAnswerData = aswerList.map((item: any) => ({
       resultId: quizResult.id as string,
       questionId: item.questionId,
-      selectedOptions: item.answer,
+      selectedOptions: item?.answer,
     }))
 
     //  回答を作成
@@ -118,21 +118,21 @@ export async function createTestStatus(params: TestStstusParam): Promise<void> {
 
     await prisma.testStatus.upsert({
       create: {
-        quizResultIds: record?.quizResultIds,
+        quizResultIds: record?.quizResultIds || [quizResultId],
         userId,
         documentId,
         isCompleted: true
       },
       update: {
-        quizResultIds: record?.quizResultIds,
+        quizResultIds: record?.quizResultIds || [quizResultId],
         userId,
         documentId,
         isCompleted: true
       },
-      where: { id: record?.id }
+      where: { id: record?.id, user_document_tenant: { userId, documentId } }
     })
   } catch (error) {
-    console.log('テストステータスの作成に失敗しました:' ,error)
+    console.log('テストステータスの作成に失敗しました:', error)
     throw new Error('データ作成に失敗しました')
   }
 }

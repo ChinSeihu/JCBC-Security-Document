@@ -1,42 +1,38 @@
 "use client";
 
-import { useMemo } from "react"
+import { useCallback, useMemo } from "react"
 import { useUser } from "@clerk/nextjs"
 import { Menu } from "antd";
 import { AppstoreOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
+import { routeAccessMap } from "@/lib/settings";
 
 const menuItems = [
   {
     key: "0",
     icon: <AppstoreOutlined />,
     label: "Home",
-    visible: ["admin", "employee"],
     href: '/home'
   },
   {
     key: "1",
-    icon: <AppstoreOutlined />,
+    icon: <AppstoreOutlined />, 
     label: "Menu",
-    visible: ["admin", "employee"],
     children: [
       {
         key: "document-list",
         href: "/document/list",
         label: "ドキュメント一覧",
-        visible: ["admin"],
       },
       {
         key: "document-view",
         href: "/document/view",
         label: "ドキュメント閲覧",
-        visible: ["admin", "employee"],
       },
       {
         key: "question-list",
         href: "/question/list",
         label: "問題集",
-        visible: ["admin"],
       },
     ],
   },
@@ -46,16 +42,21 @@ const SideMenu = () => {
   const { user } = useUser();
   const router = useRouter();
   const role = user?.publicMetadata.role as string;
-  console.log(user, 'role>>>>>>>')
+  console.log(role, 'role>>>>>>>')
 
-  const viewMenu = useMemo(() => menuItems.filter(it => {
-    if (!it.visible.includes(role)) return false
-
-    if (it?.children?.length) {
-      it?.children?.filter(child => child.visible.includes(role))
-    }
-    return true
-  }), [role])
+  const getMemu = () => {
+    return menuItems.filter(it => {
+      const permissionList = routeAccessMap[it.href as string]
+      if (permissionList && !permissionList?.includes(role)) return false
+  
+      if (it?.children?.length) {
+        it.children = it?.children?.filter(child => {
+          return routeAccessMap[child.href]?.includes(role)
+        })
+      }
+      return true
+    })
+  }
 
   const handleMemuClick = (handler: any ) => {
     const { item } = handler;
@@ -65,7 +66,7 @@ const SideMenu = () => {
 
   return (
     <div className="mt-4 text-sm">
-      <Menu onClick={handleMemuClick} mode="inline" defaultSelectedKeys={['0']} items={viewMenu} />
+      <Menu onClick={handleMemuClick} mode="inline" defaultSelectedKeys={['0']} items={getMemu()} />
     </div>
   );
 };

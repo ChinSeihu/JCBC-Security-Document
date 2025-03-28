@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { get, post, postJson } from '@/lib';
-import { App, Button, Checkbox, Divider, Drawer, Empty, Form, Input, List , Modal, Radio, Row, Space, Spin, Tag, Typography } from 'antd';
+import { get, postJson } from '@/lib';
+import { App, Button, Checkbox, Drawer, Form, FormInstance, List, Radio, Row, Space, Spin, Typography } from 'antd';
 import Style from './style.module.css'
 import { QUESTION_TYPE_EUNM } from '@/constants';
+import QuizResult from '../QuizResult';
 
 const style: React.CSSProperties = {
   display: 'flex',
@@ -10,21 +11,32 @@ const style: React.CSSProperties = {
   gap: 8,
 };
 
-const QuestionDrawer = (props: any) => {
-  const { documentId, formRef, isOpen, setOpen } = props
+interface ITestStatus {
+  id: string;
+  isCompleted: boolean;
+}
+
+interface IProps {
+  documentId: string;
+  isOpen: boolean;
+  setOpen: (p: boolean) => void;
+  testStatus: ITestStatus;
+  onCancel?: () => void;
+}
+
+const QuestionDrawer = (props: IProps) => {
+  const { documentId, isOpen, setOpen, testStatus } = props
   const [questionList, setQuestionList] = useState<any>([]);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [sendLoading, setSendLoading] = useState(false)
   const { message } = App.useApp();
 
-  useEffect(() => {
-    if (formRef?.current) formRef.current.form = form;
-  }, [formRef])
+  console.log(testStatus, 'testStatus')
 
 	useEffect(() => {
-    if (isOpen && !questionList?.length) getQuestionList()
-	}, [isOpen, questionList])
+    if (documentId) getQuestionList()
+	}, [documentId])
 
   const getQuestionList = async () => {
     try {
@@ -39,19 +51,6 @@ const QuestionDrawer = (props: any) => {
     setLoading(false)
   }
 
-
-	const handleCancel = () => {
-		return Modal.confirm({
-			title: 'キャンセル確認',
-			content: 'アップロード中のですが、キャンセルしますか？',
-			onCancel: () => {},
-			onOk: () => {
-				setOpen(false);
-				props?.onCancel?.();
-			}
-		})
-	}
-
 	const onClose = () => {
 		setOpen(false);
 		props?.onCancel?.();
@@ -60,7 +59,7 @@ const QuestionDrawer = (props: any) => {
   const handleSubmitAswer = async (values: any) => {
     try {
       setSendLoading(true);
-      values?.questions?.forEach((it: any) => {it.answer = String(it.answer?.join?.(',') ?? it.answer)})
+      values?.questions?.forEach((it: any) => it.answer = Array.isArray(it.answer) ? it.answer : [it.answer])
       const response = await postJson('/api/quiz/submitAwser', {
         aswerList: values.questions,
         documentId
@@ -77,13 +76,13 @@ const QuestionDrawer = (props: any) => {
     form.validateFields().then(values => {
       handleSubmitAswer(values)
     }).catch(e => {
-      message.error(e?.message)
+      console.log(e)
     })
   }
 
 	return (
   <Drawer
-    title={<span style={{ float: 'left'}}>テスト問題</span>}
+    title={<span style={{ float: 'left'}}>テスト</span>}
     width={450}
     mask={false}
     onClose={onClose}
@@ -91,47 +90,62 @@ const QuestionDrawer = (props: any) => {
     getContainer={() => document.getElementsByClassName("document-view-draw-container")[0]}
     open={isOpen}
     extra={
-      <Space>
+      !testStatus?.isCompleted && <Space>
         <Button onClick={onClose}>キャンセル</Button>
-        <Button loading={sendLoading} onClick={handleSubmit} type="primary">送信</Button>
+        <Button 
+          loading={sendLoading} 
+          onClick={handleSubmit} 
+          type="primary"
+          disabled={!questionList?.length}  
+        >送信</Button>
       </Space>
     }
   >
     <Spin spinning={loading}>
-      <Form form={form}>
-        <List
-          itemLayout="horizontal"
-          // bordered
-          dataSource={questionList}
-          locale={{
-            emptyText: '問題はまだ用意されていない'
-          }}
-          renderItem={({ content, id, quesOptions = [], questionType}: any, index: number) => 
-            <List.Item style={{ display: 'block' }}>
-              <Form.List name="questions">
-              {() => (
-                <>
-                  <Form.Item style={{textAlign: 'left'}} initialValue={id} name={[index, "questionId"]} > 
-                    <Typography.Text>{index + 1}、{content}</Typography.Text>
-                  </Form.Item>
-                  <Form.Item name={[index, "answer"]} rules={[{ required: true, message: "この質問をご回答ください" }]}>
-                    {
-                      questionType === QUESTION_TYPE_EUNM.MULTIPLE_CHOICE 
-                      ? <RenderMultiple disabled={sendLoading} quesOptions={quesOptions} />
-                      : <RenderSingle disabled={sendLoading} quesOptions={quesOptions} />
-                    }
-                  </Form.Item>
-                </>
-              )}
-              </Form.List>
-            </List.Item>
-          }
-        />
-      </Form>
+    {testStatus?.isCompleted ? <QuizResult documentId={documentId} /> : <RenderTestForm disabled={sendLoading} questionList={questionList} form={form}/>}
     </Spin>
   </Drawer>
 	);
 };
+
+const RenderTestForm = ({
+   form, questionList, disabled 
+  }: {
+    form: FormInstance<any>, questionList: any[], disabled: boolean
+  }) => {
+  return (
+    <Form form={form}>
+      <List
+        itemLayout="horizontal"
+        // bordered
+        dataSource={questionList}
+        locale={{
+          emptyText: '問題はまだ用意されていない'
+        }}
+        renderItem={({ content, id, quesOptions = [], questionType}: any, index: number) => 
+          <List.Item style={{ display: 'block' }}>
+            <Form.List name="questions">
+            {() => (
+              <>
+                <Form.Item style={{textAlign: 'left'}} initialValue={id} name={[index, "questionId"]} > 
+                  <Typography.Text>{index + 1}、{content}</Typography.Text>
+                </Form.Item>
+                <Form.Item name={[index, "answer"]} rules={[{ required: true, message: "この質問をご回答ください" }]}>
+                  {
+                    questionType === QUESTION_TYPE_EUNM.MULTIPLE_CHOICE 
+                    ? <RenderMultiple disabled={disabled} quesOptions={quesOptions} />
+                    : <RenderSingle disabled={disabled} quesOptions={quesOptions} />
+                  }
+                </Form.Item>
+              </>
+            )}
+            </Form.List>
+          </List.Item>
+        }
+      />
+    </Form>
+  )
+}
 
 
 const RenderMultiple = (props: any) => {

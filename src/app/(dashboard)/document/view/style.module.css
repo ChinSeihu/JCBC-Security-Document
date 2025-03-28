@@ -21,17 +21,16 @@
 	align-items: center;
 	margin: 0 auto;
 	margin-top: 20px;
-	padding: 2px 4px;
+	padding: 0px 8px 0px 0px;
 	position: sticky;
 	bottom: 0;
 	width: max-content;
 	z-index: 99;
 	background-color: rgba(255, 255, 255, 1);
-	border-radius: 12px;
-
+	border-radius: 8px;
 }
 .pagination button {
-	border-radius: 6px;
+	/* border-radius: 6px; */
 }
 
 .pdf-page-content {

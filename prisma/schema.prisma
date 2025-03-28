@@ -78,11 +78,12 @@ enum QuestionType {
 }
 
 model QuesOption {
-  id         String   @id @default(uuid())
-  questionId String
-  content    String   @db.Text
-  isCorrect  Boolean  @default(false)
-  order      Int
+  id            String   @id @default(uuid())
+  questionId    String
+  content       String   @db.Text
+  isCorrect     Boolean  @default(false)
+  order         Int
+
   question   Question @relation(fields: [questionId], references: [id])
 }
 
@@ -106,7 +107,7 @@ model QuizAnswer {
   id              String     @id @default(uuid())
   resultId        String
   questionId      String
-  selectedOptions String
+  selectedOptions Int[]
   question        Question   @relation(fields: [questionId], references: [id])
   result          QuizResult @relation(fields: [resultId], references: [id])
 }

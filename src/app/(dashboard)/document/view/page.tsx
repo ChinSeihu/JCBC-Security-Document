@@ -18,7 +18,6 @@ const PDFViewer = () => {
   const [loading, setLoading] = useState(false);
   const [isOpen, setOpen] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
-  const formRef = useRef()
   const { message } = App.useApp();
   
   // PDF 加载成功回调
@@ -29,7 +28,7 @@ const PDFViewer = () => {
   const getFileStream = async () => {
     try {
       setLoading(true)
-      const fileResponse = await get('/api/document/getFilePath')
+      const fileResponse = await get('/api/document/getFileInfo')
       setFileInfo(fileResponse);
     }catch (e: any) {
       message.error(e?.message)
@@ -45,7 +44,7 @@ const PDFViewer = () => {
     setPageNumber(page);
   }
 
-  const handleModalCancel = (isUploaded: boolean) => {
+  const handleModalCancel = () => {
     setOpen(false);
   }
 
@@ -77,16 +76,15 @@ const PDFViewer = () => {
       <QuestionDrawer 
         onCancel={handleModalCancel} 
         isOpen={isOpen} 
-        isTesting={isTesting} 
         documentId={fileInfo.id} 
-        formRef={formRef}
+        testStatus={fileInfo?.testStatus || {}}
         setOpen={setOpen}
       />
       <div className="document-view-draw-container"/>
       {numPages && (
         <div className={Style["pagination"]}>
           <Pagination onChange={handlePageChange} total={numPages} pageSize={1}/>
-          <Button onClick={handleToTest} type="primary" size="small" className="ml-4px mr-4px">試験へ</Button>
+          <Button onClick={handleToTest} type="primary" size="small" className="ml-4px mr-4px">試験</Button>
         </div>
       )}
     </div>

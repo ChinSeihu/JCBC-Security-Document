@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import { getPublicFilePath } from './server';
+import { getPublicFileInfo, getUserTestStatus } from './server';
 import { HttpStatusCode } from 'axios';
 
 export async function GET() {
@@ -16,7 +16,7 @@ export async function GET() {
     //     { status: 400 }
     //   );
     // }
-    const fileInfo = await getPublicFilePath();
+    const fileInfo = await getPublicFileInfo();
     // 构建文件路径
     const filePath = path.join(
       process.cwd(), 
@@ -32,9 +32,11 @@ export async function GET() {
       );
     }
 
+    const testStatus = await getUserTestStatus(fileInfo);
+
     // 返回 PDF 数据流
     return NextResponse.json({
-      data: {...fileInfo, success: true},
+      data: {...fileInfo, success: true, testStatus },
       status: HttpStatusCode.Ok
     });
 
