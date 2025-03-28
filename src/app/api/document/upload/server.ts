@@ -1,3 +1,4 @@
+import { FILE_TYPE } from "@/constants";
 import prisma from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 
@@ -18,14 +19,14 @@ export const documentCreate = async (params: DocumentParams) => {
       data: {
         // 必填字段
         fileName: params.filename,
-        fileType: "1",
+        fileType: FILE_TYPE.PDF,
         filesize: params.fileSize, // 2MB
         pathName: params.pathName,
         description: params.description,
-        userId: user.id,
         lastModifiedAt: user.id,
         lastModifiedDate: new Date(),
-        createAt: new Date()
+        createdAt: user.id,
+        createdDate: new Date()
       }
     })
 

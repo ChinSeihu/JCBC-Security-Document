@@ -6,6 +6,7 @@
 	padding-top: 0;
 	text-align: center;
 	margin-bottom: 0;
+	position: relative;
 }
 
 .pdf-container {
@@ -24,8 +25,13 @@
 	position: sticky;
 	bottom: 0;
 	width: max-content;
+	z-index: 99;
 	background-color: rgba(255, 255, 255, 1);
 	border-radius: 12px;
+
+}
+.pagination button {
+	border-radius: 6px;
 }
 
 .pdf-page-content {

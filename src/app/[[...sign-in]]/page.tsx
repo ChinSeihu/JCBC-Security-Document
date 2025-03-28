@@ -4,17 +4,17 @@ import * as Clerk from "@clerk/elements/common";
 import * as SignIn from "@clerk/elements/sign-in";
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
 const LoginPage = () => {
-  const { isLoaded, isSignedIn, user } = useUser();
-
+  const { isLoaded, isSignedIn } = useUser();
   const router = useRouter();
+  const form = useSearchParams()?.get('from') || '/home'
 
   useEffect(() => {
-    router.push(`/home`);
-  }, [router]);
+    if (isSignedIn) router.push(form);
+  }, [router, isSignedIn, form]);
 
   return (
     <div className="h-screen flex items-center justify-center bg-lamaSkyLight">

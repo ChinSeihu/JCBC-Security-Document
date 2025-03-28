@@ -10,7 +10,7 @@ const messageMap: any = {
 axios.defaults.headers.post['Content-Type'] =
   'application/x-www-form-urlencoded; charset=utf-8'
 axios.defaults.withCredentials = true
-// axios.defaults.timeout = 30 * 1000
+axios.defaults.timeout = 30 * 1000
 // 拦截器
 axios.interceptors.request.use(function(config) {
   return config
@@ -20,7 +20,7 @@ function request(config: any = {}) {
   config = Object.assign(
     {
       withCredentials: true,
-      // timeout: 30 * 1000,
+      timeout: 30 * 1000,
     },
     config,
   )
@@ -28,6 +28,7 @@ function request(config: any = {}) {
   return axios(config)
     .then(response => {
       const { status, data, message: msg } = response.data || {}
+      console.log(response.data, 'response')
       // 接受一个可定制响应的方式
       if (config._customResponse) return response
 
@@ -38,11 +39,12 @@ function request(config: any = {}) {
       }
     })
     .catch(err => {
-      if (messageMap[err.message]) {
-        message.error(messageMap[err.message])
-      } else {
-        message.error(err.message)
-      }
+      throw new Error(err.message || 'request error')
+      // if (messageMap[err.message]) {
+      //   message.error(messageMap[err.message])
+      // } else {
+      //   message.error(err.message)
+      // }
     })
 }
 

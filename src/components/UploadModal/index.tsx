@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { post } from '@/lib';
-import { Upload,Button, UploadProps, message ,UploadFile, GetProp, Modal } from 'antd';
+import { Upload,Button, UploadProps ,UploadFile, GetProp, Modal, App } from 'antd';
 import { InboxOutlined } from '@ant-design/icons'
 const { Dragger } = Upload;
 
@@ -11,6 +11,7 @@ const UploadModal = (props: any) => {
 	const [uploading, setUploading] = useState(false);
 	const [isOpen, setOpen] = useState(false);
 	const [isUploaded, setIsUploaded] = useState(false);
+	const { message } = App.useApp();
 
 	useEffect(() => {
 		setOpen(props.isOpen);
@@ -78,27 +79,27 @@ const UploadModal = (props: any) => {
 			destroyOnClose
 			okButtonProps={{ hidden: true }}
 		>
-				<Dragger  
-					{...uploadProps}
-				>
-					<p className="ant-upload-drag-icon">
-						<InboxOutlined />
-					</p>
-					<p className="ant-upload-text">Click or drag file to this area to upload</p>
-					<p className="ant-upload-hint">
-						Support for a single or bulk upload. Strictly prohibited from uploading company data or other
-						banned files.
-					</p>
-				</Dragger>
-				<Button
-					type="primary"
-					onClick={handleUpload}
-					disabled={!file}
-					loading={uploading}
-					style={{ marginTop: 16 }}
-				>
-					アップロード
-				</Button>
+			<Dragger  
+				{...uploadProps}
+			>
+				<p className="ant-upload-drag-icon">
+					<InboxOutlined />
+				</p>
+				<p className="ant-upload-text">Click or drag file to this area to upload</p>
+				<p className="ant-upload-hint">
+					Support for a single or bulk upload. Strictly prohibited from uploading company data or other
+					banned files.
+				</p>
+			</Dragger>
+			<Button
+				type="primary"
+				onClick={handleUpload}
+				disabled={!file}
+				loading={uploading}
+				style={{ marginTop: 16 }}
+			>
+				アップロード
+			</Button>
 		</Modal>
 	);
 };

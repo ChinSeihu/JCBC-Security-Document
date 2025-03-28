@@ -58,14 +58,14 @@ export async function listDocuments(params: ListDocumentsParams): Promise<Pagina
       prisma.document.findMany({
         select: {
           id: true,
-          userId: true,
+          createdAt: true,
+          createdDate: true,
           delFlag: true,
           fileName: true,
           pathName: true,
           fileType: true,
           filesize: true,
           description: true,
-          createAt: true,
           isPublic: true,
           lastModifiedAt: true,
           lastModifiedDate: true,

@@ -18,14 +18,8 @@ const menuItems = [
     key: "1",
     icon: <AppstoreOutlined />,
     label: "Menu",
-    visible: ["admin"],
+    visible: ["admin", "employee"],
     children: [
-      {
-        key: "admin",
-        href: "/admin",
-        label: "Admin",
-        visible: ["admin"],
-      },
       {
         key: "document-list",
         href: "/document/list",
@@ -37,6 +31,12 @@ const menuItems = [
         href: "/document/view",
         label: "ドキュメント閲覧",
         visible: ["admin", "employee"],
+      },
+      {
+        key: "question-list",
+        href: "/question/list",
+        label: "問題集",
+        visible: ["admin"],
       },
     ],
   },

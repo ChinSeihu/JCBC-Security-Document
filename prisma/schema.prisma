@@ -4,60 +4,72 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id        String    @id @default(uuid())
-  userId    String    @unique
-  firstName String    @db.VarChar(255)
-  lastName  String    @db.VarChar(255)
-  delFlag   Boolean   @default(false)
+  id        String  @id @default(uuid())
+  userId    String  @unique
+  firstName String  @db.VarChar(255)
+  lastName  String  @db.VarChar(255)
+  delFlag   Boolean @default(false)
 
-  Document         Document[]
-  ReadStatuses    DocumentStatus[]
-  QuizResults     QuizResult[]
+  question    Question[]
+  document    Document[]
+  testStatus  TestStatus[]
+  quizResults QuizResult[]
 }
 
 model Document {
-  id                String     @id @default(uuid())
-  fileName          String     @db.VarChar(255)
-  pathName          String     @unique
-  fileType          String     @db.VarChar(255)
-  filesize          Int
-  description       String?    @db.Text
-  isPublic          Boolean    @default(false)
-  delFlag           Boolean    @default(false)
-  createdAt         String
-  createdDate       DateTime   @default(now())
-  lastModifiedAt    String?
-  lastModifiedDate  DateTime?  @default(now())
-  
-  user        User              @relation(fields: [createdAt], references: [userId])
-  ReadStatuses UserDocumentStatus[]
+  id               String    @id @default(uuid())
+  fileName         String    @db.VarChar(255)
+  pathName         String    @unique
+  fileType         String    @db.VarChar(255)
+  filesize         Int
+  description      String?   @db.Text
+  isPublic         Boolean   @default(false)
+  delFlag          Boolean   @default(false)
+  createdAt        String
+  createdDate      DateTime  @default(now())
+  lastModifiedAt   String?
+  lastModifiedDate DateTime? @default(now())
+
+  user              User         @relation(fields: [createdAt], references: [userId])
+  testStatus        TestStatus[]
+  quesOptionuestion Question[]
+  quizResult        QuizResult[]
 }
 
-// 新增阅读状态表
-model DocumentStatus {
-  userId     String
-  documentId String
-  isRead     Boolean  @default(false)
-  user       User     @relation(fields: [userId], references: [userId])
-  document   Document @relation(fields: [documentId], references: [id])
-  
-  @@id([userId, documentId])
+// テスト状态
+model TestStatus {
+  id           String       @id @default(uuid())
+  userId       String
+  documentId   String
+  isCompleted  Boolean      @default(false)
+  quizResultIds String[]
+
+  user       User         @relation(fields: [userId], references: [userId])
+  document   Document     @relation(fields: [documentId], references: [id])
+  quizResult QuizResult[]
+
+  @@unique([userId, documentId], name: "user_document_tenant")
 }
 
 model Question {
-  id           String          @id @default(uuid())
-  questionType QuestionType
-  content      String          @db.Text
-  order        Int
-  document   Document   @relation(fields: [documentId], references: [id])
-  documentId String     @unique
-  
-  answerOptions QuesOption[]
-  userAnswers  UserQuizAnswer[]
+  id               String       @id @default(uuid())
+  questionType     QuestionType
+  content          String       @db.Text
+  documentId       String
+  delFlag          Boolean      @default(false)
+  createdAt        String
+  createdDate      DateTime     @default(now())
+  lastModifiedAt   String?
+  lastModifiedDate DateTime?    @default(now())
+
+  user        User         @relation(fields: [createdAt], references: [userId])
+  document    Document     @relation(fields: [documentId], references: [id])
+  quesOptions QuesOption[]
+  quizAnswers QuizAnswer[]
 }
 
 enum QuestionType {
@@ -66,42 +78,35 @@ enum QuestionType {
 }
 
 model QuesOption {
-  id          String    @id @default(uuid())
-  question    Question  @relation(fields: [questionId], references: [id])
-  questionId  String
-  content     String    @db.Text
-  isCorrect   Boolean   @default(false)
-  order       Int
+  id         String   @id @default(uuid())
+  questionId String
+  content    String   @db.Text
+  isCorrect  Boolean  @default(false)
+  order      Int
+  question   Question @relation(fields: [questionId], references: [id])
 }
 
 model QuizResult {
-  id              String     @id @default(uuid())
-  user            User       @relation(fields: [userId], references: [userId])
-  userId          String
-  question            Question       @relation(fields: [questionId], references: [id])
-  questionId          String
-  score           Float       // 正确率（正确题数/总题数）
-  totalQuestions  Int
-  correctAnswers  Int
-  completedAt     DateTime    @default(now())
-  
-  answers UserQuizAnswer[]
+  id             String   @id @default(uuid())
+  userId         String
+  documentId     String
+  score          Float // 正确率（正确题数/总题数）
+  totalQuestions Int
+  correctAnswers Int
+  completedAt    DateTime @default(now())
+  testStatusId   String?
+
+  document             Document     @relation(fields: [documentId], references: [id])
+  user                 User         @relation(fields: [userId], references: [userId])
+  quizAnswers          QuizAnswer[]
+  testStatus           TestStatus?  @relation(fields: [testStatusId], references: [id])
 }
 
 model QuizAnswer {
-  id             String         @id @default(uuid())
-  result         QuizResult @relation(fields: [resultId], references: [id])
-  resultId       String
-  question       Question       @relation(fields: [questionId], references: [id])
-  questionId     String
-  selectedOptions SelectedOption[]
-}
-
-// 多选答案中间表
-model SelectedOption {
-  answerId       String         @id @default(uuid())
-  userAnswerId   String
-  optionId       String
-  userAnswer     QuizAnswer @relation(fields: [userAnswerId], references: [id])
-  quesOption     QuesOption   @relation(fields: [optionId], references: [id])
+  id              String     @id @default(uuid())
+  resultId        String
+  questionId      String
+  selectedOptions String
+  question        Question   @relation(fields: [questionId], references: [id])
+  result          QuizResult @relation(fields: [resultId], references: [id])
 }

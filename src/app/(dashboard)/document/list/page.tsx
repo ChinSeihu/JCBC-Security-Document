@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { get, postJson } from '@/lib';
-import { Badge, Button, message, Popconfirm, Space, Table } from 'antd';
+import { App, Badge, Button, Popconfirm, Table } from 'antd';
 import { IPagination } from '@/constants/type'
 import { FILE_TYPE_TEXT, FILE_TYPE } from '@/constants';
 import UploadModal from '@/components/UploadModal';
@@ -21,7 +21,8 @@ const FileUploadPage = () => {
   const [documentList, setDocumentList] = useState([]);
   const [pagination, setPagination] = useState<IPagination>(initPagination);
   const [isOpen, setOpen] = useState(false);
-
+  const { message } = App.useApp();
+  
   const getFileInfoList = async () => {
     try {
       seTableLoading(true);
@@ -76,8 +77,14 @@ const FileUploadPage = () => {
       render: (name: string, record: any) => <a href={record.pathName} target='_blank'>{name}</a>
     },
     {
+      title: 'ファイルId',
+      dataIndex: 'id',
+      key: 'fileId',
+      ellipsis: true,
+    },
+    {
       title: '書類タイプ',
-      width: '10%',
+      width: '12%',
       dataIndex: 'fileType',
       key: 'fileType',
       render: (v: FILE_TYPE) => FILE_TYPE_TEXT[v]
@@ -91,8 +98,9 @@ const FileUploadPage = () => {
     },
     {
       title: '作成日時',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
+      dataIndex: 'createdDate',
+      key: 'createdDate',
+      width:150,
       render: (v: string) => dayjs(v).format('YYYY-MM-DD HH:mm:ss')
     },
     {
@@ -118,9 +126,9 @@ const FileUploadPage = () => {
           <Popconfirm
             title="ファイル公開"
             description="当該のファイルを公開しますか?"
-            onConfirm={() => handleOperation(r, true)}
+            onConfirm={() => {handleOperation(r, true)}}
             onCancel={() => {}}
-            okText="公開"
+            okText="はい"
             cancelText="キャンセル"
           >
             {!r.isPublic && <Button type='link' style={{marginRight: 6 }} size='small'>公開</Button>}
@@ -128,9 +136,9 @@ const FileUploadPage = () => {
           <Popconfirm
             title="ファイルの公開を取り下げ"
             description="公開中のファイルを取り下げますか?"
-            onConfirm={() => handleOperation(r, false)}
+            onConfirm={() => {handleOperation(r, false)}}
             onCancel={() => {}}
-            okText="取り下げ"
+            okText="はい"
             cancelText="キャンセル"
           >
             {r.isPublic && <Button type='link' size='small'>取り下げ</Button>}
@@ -147,7 +155,6 @@ const FileUploadPage = () => {
 
   return (
     <div className="container">
-      
       <UploadModal onCancel={handleModalCancel} isOpen={isOpen}/>
       <Button onClick={() => setOpen(true)} style={{ marginBottom: 12 }}>アップロード</Button>
       <Table 

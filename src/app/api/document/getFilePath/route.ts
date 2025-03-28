@@ -16,17 +16,16 @@ export async function GET() {
     //     { status: 400 }
     //   );
     // }
-    const fuleInfo = await getPublicFilePath();
-
+    const fileInfo = await getPublicFilePath();
     // 构建文件路径
     const filePath = path.join(
       process.cwd(), 
       'public/',
-      fuleInfo.pathName
+      fileInfo?.pathName || ''
     );
 
     // 检查文件是否存在
-    if (!fs.existsSync(filePath)) {
+    if (!fileInfo || !fs.existsSync(filePath)) {
       return NextResponse.json(
         { error: 'File not found' },
         { status: HttpStatusCode.NotFound }
@@ -35,7 +34,7 @@ export async function GET() {
 
     // 返回 PDF 数据流
     return NextResponse.json({
-      data: {...fuleInfo, success: true},
+      data: {...fileInfo, success: true},
       status: HttpStatusCode.Ok
     });
 

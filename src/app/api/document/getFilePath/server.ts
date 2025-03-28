@@ -7,7 +7,7 @@ interface FilePathResponse {
 }
 
 // ドキュメント公開状態更新
-export async function getPublicFilePath(): Promise<FilePathResponse> {
+export async function getPublicFilePath(): Promise<FilePathResponse | null> {
 	try {
 		const result = await prisma.document.findFirst({
 			select: {
@@ -20,10 +20,6 @@ export async function getPublicFilePath(): Promise<FilePathResponse> {
 			},
 			orderBy: [{lastModifiedDate: "desc"}]
 		})
-
-		if (!result) {
-			throw new Error('ファイルの取得に失敗しました')
-		}
 
 		console.log("取得に成功:", result?.id)
 		return result

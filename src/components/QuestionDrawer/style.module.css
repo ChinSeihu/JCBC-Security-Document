@@ -1,0 +1,10 @@
+.radio-option {
+    width: 25px;
+    height: 25px;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+}

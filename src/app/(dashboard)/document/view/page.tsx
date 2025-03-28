@@ -1,11 +1,12 @@
 "use client"
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import Style from './style.module.css'
 import { get } from '@/lib';
-import { Button, message, Pagination, Spin } from 'antd';
+import { Affix, App, Button, FloatButton, Pagination, Spin } from 'antd';
+import QuestionDrawer from '@/components/QuestionDrawer';
 
 // 配置 PDF worker
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.min.mjs`;
@@ -13,9 +14,13 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/l
 const PDFViewer = () => {
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState(1);
-  const [filePath, setFilePath] = useState<string | File | null>(null);
+  const [fileInfo, setFileInfo] = useState<any>({});
   const [loading, setLoading] = useState(false);
-
+  const [isOpen, setOpen] = useState(false);
+  const [isTesting, setIsTesting] = useState(false);
+  const formRef = useRef()
+  const { message } = App.useApp();
+  
   // PDF 加载成功回调
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
@@ -23,10 +28,9 @@ const PDFViewer = () => {
 
   const getFileStream = async () => {
     try {
-
       setLoading(true)
       const fileResponse = await get('/api/document/getFilePath')
-      setFilePath(fileResponse.pathName);
+      setFileInfo(fileResponse);
     }catch (e: any) {
       message.error(e?.message)
     }
@@ -41,12 +45,22 @@ const PDFViewer = () => {
     setPageNumber(page);
   }
 
+  const handleModalCancel = (isUploaded: boolean) => {
+    setOpen(false);
+  }
+
+  const handleToTest = () => {
+    setOpen(true);
+    setIsTesting(true);
+  }
+
   return (
     <div className={Style["container"]}>
       <div className={Style["pdf-container"]}>
         <Spin spinning={loading}>
+          {isTesting && <FloatButton type="primary" onClick={() => setOpen(true)}/>}
           <Document
-            file={filePath}
+            file={fileInfo?.pathName}
             onLoadSuccess={onDocumentLoadSuccess}
             loading={<div>Loading PDF...</div>}
             error={<div>Failed to load PDF!</div>}
@@ -54,17 +68,25 @@ const PDFViewer = () => {
             <Page
               className={Style["pdf-page-content"]}
               pageNumber={pageNumber} 
-              width={800}
+              width={795}
               loading={<div>Loading page...</div>}
             />
           </Document>
         </Spin>
       </div>
-
+      <QuestionDrawer 
+        onCancel={handleModalCancel} 
+        isOpen={isOpen} 
+        isTesting={isTesting} 
+        documentId={fileInfo.id} 
+        formRef={formRef}
+        setOpen={setOpen}
+      />
+      <div className="document-view-draw-container"/>
       {numPages && (
         <div className={Style["pagination"]}>
           <Pagination onChange={handlePageChange} total={numPages} pageSize={1}/>
-          <Button type="primary" size="small" className="ml-4px mr-4px rounded-xl">既読にする</Button>
+          <Button onClick={handleToTest} type="primary" size="small" className="ml-4px mr-4px">試験へ</Button>
         </div>
       )}
     </div>

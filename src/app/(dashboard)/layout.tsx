@@ -21,6 +21,7 @@ export default function DashboardLayout({
     <Layout style={{ height: '100%' }}>
       <Sider
         theme="light"
+        collapsible
         breakpoint="sm"
         collapsedWidth="0"
         onBreakpoint={(broken) => {
@@ -54,7 +55,7 @@ export default function DashboardLayout({
             {children}
           </div>
         </Content>
-        <Footer style={{ textAlign: 'center', padding: '12px 50px' }}>
+        <Footer style={{ textAlign: 'center', padding: '6px 50px' }}>
           JCBC ©{new Date().getFullYear()} Created by xxx
         </Footer>
       </Layout>

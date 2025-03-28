@@ -2,10 +2,10 @@
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { get, postJson } from '@/lib';
-import { Badge, Button, message, Popconfirm, Space, Table } from 'antd';
+import { App, Button, Table } from 'antd';
 import { IPagination } from '@/constants/type'
-import { FILE_TYPE_TEXT, FILE_TYPE } from '@/constants';
-import UploadModal from '@/components/UploadModal';
+import {  QUESTION_TYPE } from '@/constants';
+import QuesFormModal from '@/components/QuesFormModal';
 
 import Style from './style.module.css';
 
@@ -18,16 +18,17 @@ const initPagination: IPagination  = {
 
 const FileUploadPage = () => {
   const [tableLoading, seTableLoading] = useState(false);
-  const [documentList, setDocumentList] = useState([]);
+  const [questionList, setQuestionList] = useState([]);
   const [pagination, setPagination] = useState<IPagination>(initPagination);
   const [isOpen, setOpen] = useState(false);
+	const { message } = App.useApp();
 
-  const getFileInfoList = async () => {
+  const getQuestionList = async () => {
     try {
       seTableLoading(true);
-      const response = await get('/api/document/list');
-      console.log(response, 'getFileInfoList')
-      setDocumentList(response?.data || []);
+      const response = await get('/api/quiz/list');
+      console.log(response, 'getQuestionList')
+      setQuestionList(response?.data || []);
       setPagination({...pagination, ...(response?.pagination || {})});
     } catch (error: any) {
       console.log(error, "error>>>>")
@@ -37,27 +38,9 @@ const FileUploadPage = () => {
   }
 
   useEffect(() => {
-    getFileInfoList();
+    getQuestionList();
   }, [])
   
-  const handleOperation = async (record: any, status: boolean) => {
-    try {
-      const { success, message: msg} = await postJson('/api/document/statusUpdate', {
-        id: record.id,
-        isPublic: status
-      })
-      
-      console.log(success, msg, 'handleOperation')
-
-      if (success) {
-        getFileInfoList();
-        return message.success(msg)
-      }
-      message.warning(msg)
-    } catch (e: any) {
-      message.error(e?.message)
-    }
-  }
 
   const columns = [
     {
@@ -68,31 +51,35 @@ const FileUploadPage = () => {
       render: (_:any, __:any, index: number) => (pagination.page - 1) * pagination.pageSize + index + 1
     },
     {
-      title: 'ファイル名',
-      dataIndex: 'fileName',
-      key: 'fileName',
-      className: 'fileName-cell',
+      title: '関連ドキュメント',
+      dataIndex: 'document',
+      key: 'document',
       ellipsis: true,
-      render: (name: string, record: any) => <a href={record.pathName} target='_blank'>{name}</a>
+      render: (document: any, record: any) => document.fileName
     },
     {
-      title: '書類タイプ',
+      title: 'ドキュメントID',
+      dataIndex: 'documentId',
+      key: 'documentId',
+      ellipsis: true
+    },
+    {
+      title: '問題タイプ',
       width: '10%',
-      dataIndex: 'fileType',
-      key: 'fileType',
-      render: (v: FILE_TYPE) => FILE_TYPE_TEXT[v]
+      dataIndex: 'questionType',
+      key: 'questionType',
+      render: (v: "SINGLE_CHOICE" | "MULTIPLE_CHOICE") => QUESTION_TYPE[v]
     },
     {
-      title: 'サイズ',
-      dataIndex: 'filesize',
-      key: 'filesize',
-      width: 80,
-      render: (v: number) => v ? Math.ceil(v / 1024) + 'KB' : '-'
+      title: '問題内容',
+      dataIndex: 'content',
+      key: 'content',
+      ellipsis: true,
     },
     {
       title: '作成日時',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
+      dataIndex: 'createdDate',
+      key: 'createdDate',
       render: (v: string) => dayjs(v).format('YYYY-MM-DD HH:mm:ss')
     },
     {
@@ -100,59 +87,21 @@ const FileUploadPage = () => {
       dataIndex: 'userName',
       key: 'userName',
       render: (_: string, r: any) => `${r.user.firstName} ${r.user.lastName}`
-    },
-    {
-      title: '公開状態',
-      dataIndex: 'isPublic',
-      key: 'isPublic',
-      render: (v: boolean) => <Badge status={v ? 'success' : 'default'} text={v ? '公開中' : '未公開'}/>
-    },
-    {
-      title: '操作',
-      dataIndex: 'operate',
-      // fixed: 'right',
-      key: 'operate',
-      width: 160,
-      render: (_: string, r: any) => (
-        <div>
-          <Popconfirm
-            title="ファイル公開"
-            description="当該のファイルを公開しますか?"
-            onConfirm={() => handleOperation(r, true)}
-            onCancel={() => {}}
-            okText="公開"
-            cancelText="キャンセル"
-          >
-            {!r.isPublic && <Button type='link' style={{marginRight: 6 }} size='small'>公開</Button>}
-          </Popconfirm>
-          <Popconfirm
-            title="ファイルの公開を取り下げ"
-            description="公開中のファイルを取り下げますか?"
-            onConfirm={() => handleOperation(r, false)}
-            onCancel={() => {}}
-            okText="取り下げ"
-            cancelText="キャンセル"
-          >
-            {r.isPublic && <Button type='link' size='small'>取り下げ</Button>}
-          </Popconfirm>
-        </div>
-      )
-    },
+    }
   ];
 
-  const handleModalCancel = (isUploaded: boolean) => {
-    if (isUploaded) getFileInfoList();
+  const handleModalCancel = (msg?: string) => {
+    if (msg?.length) message.success(msg)
     setOpen(false);
   }
 
   return (
     <div className="container">
-      
-      <UploadModal onCancel={handleModalCancel} isOpen={isOpen}/>
+      <QuesFormModal onCancel={handleModalCancel} isOpen={isOpen} onSuccess={getQuestionList}/>
       <Button onClick={() => setOpen(true)} style={{ marginBottom: 12 }}>新規追加</Button>
       <Table 
         rowKey="id" 
-        dataSource={documentList} 
+        dataSource={questionList} 
         columns={columns}
         pagination={pagination}
         loading={tableLoading}
