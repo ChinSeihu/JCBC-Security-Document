@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { get, post, postJson } from '@/lib';
-import { Button, Modal, Form, Radio, Input, Select, Row, Checkbox, Tag, App, Typography } from 'antd';
+import { Button, Modal, Form, Radio, Input, Select, Row, Checkbox, Tag, App, Typography, Tooltip } from 'antd';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import Style from './style.module.css'
 
@@ -9,7 +9,7 @@ const requiredRule = (msg: string) => [
     required: true,
     message: `${msg}を入力ください`
   }
-]
+];
 
 const QuesFormModal = (props: any) => {
 	const [isOpen, setOpen] = useState(false);
@@ -69,12 +69,11 @@ const QuesFormModal = (props: any) => {
       const hasCorrect = values?.quesOptions?.some((it: any) => it.isCorrect);
               
       if (!hasCorrect) {
-        return message.warning('少なくとも 1 つの正解項目をチェックインしてください');
+        return message.warning('少なくとも1つの正解項目をチェックインしてください');
       }
       handleCreateQues(values)
     }).catch((error) => {
       console.log(error, 'handleSubmit error')
-      message.error(error?.message)
     });
   }
 
@@ -87,6 +86,7 @@ const QuesFormModal = (props: any) => {
 		<Modal
 			title="問題新規" 
 			cancelText="キャンセル" 
+      okText="保存"
 			open={isOpen} 
       width={700}
       maskClosable={false}
@@ -113,14 +113,14 @@ const QuesFormModal = (props: any) => {
 				))}
 				</Select>
 			</Form.Item>
-			<Form.Item rules={requiredRule('問題タイプ')} label="問題タイプ" initialValue={"SINGLE_CHOICE"} name="questionType">
+			<Form.Item rules={requiredRule('問題のタイプ')} label="問題のタイプ" initialValue={"SINGLE_CHOICE"} name="questionType">
 				<Radio.Group>
 					<Radio.Button value="SINGLE_CHOICE">単一選択</Radio.Button>
 					<Radio.Button value="MULTIPLE_CHOICE">多肢選択</Radio.Button>
 				</Radio.Group>
 			</Form.Item>
 			<Form.Item label="問題内容" rules={requiredRule('問題内容')} name="content">
-				<Input.TextArea placeholder="問題内容を入力ください" />
+				<Input.TextArea placeholder="問題の内容を入力ください" />
 			</Form.Item>
 			<Form.Item 
         label="選択肢" 
@@ -135,7 +135,7 @@ const QuesFormModal = (props: any) => {
             {
               validator: async (_, quesOption) => {
                 if (!quesOption || quesOption.length < 1) {
-                  return Promise.reject(new Error('少なくとも 1 つのオプションを追加してください'));
+                  return Promise.reject(new Error('少なくとも1 つのオプションを追加してください'));
                 }
               },
             },
@@ -176,7 +176,9 @@ const QuesFormModal = (props: any) => {
                     initialValue={false}
                     valuePropName="checked"
                   >
-                    <Checkbox title='正解に設定する'/>
+                    <Tooltip title="正解に設定する">
+                      <Checkbox />
+                    </Tooltip>
                   </Form.Item>
                   {fields.length > 1 ? (
                     <MinusCircleOutlined

@@ -5,7 +5,7 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import Style from './style.module.css'
 import { get } from '@/lib';
-import { Affix, App, Button, FloatButton, Pagination, Spin } from 'antd';
+import { App, Button, Empty, FloatButton, Pagination, Spin } from 'antd';
 import QuestionDrawer from '@/components/QuestionDrawer';
 
 // 配置 PDF worker
@@ -58,19 +58,21 @@ const PDFViewer = () => {
       <div className={Style["pdf-container"]}>
         <Spin spinning={loading}>
           {isTesting && <FloatButton type="primary" onClick={() => setOpen(true)}/>}
-          <Document
-            file={fileInfo?.pathName}
-            onLoadSuccess={onDocumentLoadSuccess}
-            loading={<div>Loading PDF...</div>}
-            error={<div>Failed to load PDF!</div>}
+          {fileInfo?.pathName ? 
+            <Document
+              file={fileInfo?.pathName}
+              onLoadSuccess={onDocumentLoadSuccess}
+              loading={<div>Loading PDF...</div>}
+              error={<div>Failed to load PDF!</div>}
             >
-            <Page
-              className={Style["pdf-page-content"]}
-              pageNumber={pageNumber} 
-              width={795}
-              loading={<div>Loading page...</div>}
-            />
-          </Document>
+              <Page
+                className={Style["pdf-page-content"]}
+                pageNumber={pageNumber} 
+                width={795}
+                loading={<div>Loading page...</div>}
+              />
+            </Document>
+            : <Empty style={{ marginTop: '20%' }}/>}
         </Spin>
       </div>
       <QuestionDrawer 

@@ -1,6 +1,7 @@
 "use client"
 import React from 'react';
-import { Image, Layout, theme, Typography } from 'antd';
+import { Layout, theme, Typography } from 'antd';
+import Image from "next/image";
 import Navbar from '@/components/Navbar';
 import SideMenu from '@/components/Menu';
 

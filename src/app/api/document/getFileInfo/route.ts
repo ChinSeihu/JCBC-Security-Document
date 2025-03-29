@@ -27,8 +27,11 @@ export async function GET() {
     // 检查文件是否存在
     if (!fileInfo || !fs.existsSync(filePath)) {
       return NextResponse.json(
-        { error: 'File not found' },
-        { status: HttpStatusCode.NotFound }
+        { 
+          data: null, 
+          message: '公開されているファイルを見つけません',
+          status: HttpStatusCode.NotFound 
+        }
       );
     }
 

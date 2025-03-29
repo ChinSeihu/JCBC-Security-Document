@@ -62,8 +62,8 @@ const QuizResult = (props: any) => {
           renderItem={(item, index: number) => 
             <List.Item key={index} style={{ display: 'block' }}>
               <Row><Typography.Text style={{textAlign: 'left'}}>{item.questionText}</Typography.Text></Row>
-              {getWrongOptions(item.selectedInfos).map((it) => (
-                <Space style={{ width: '100%', marginTop: 4 }}>
+              {getWrongOptions(item.selectedInfos).map((it, idx) => (
+                <Space style={{ width: '100%', marginTop: 4 }} key={idx}>
                   <Typography.Text type="danger">{String.fromCharCode(65 + it.order)}</Typography.Text>
                   <Typography.Text style={{textAlign: 'left'}} type="danger">{it.content}</Typography.Text>
                 </Space>

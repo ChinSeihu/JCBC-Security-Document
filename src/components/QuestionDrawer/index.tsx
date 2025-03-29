@@ -154,8 +154,8 @@ const RenderMultiple = (props: any) => {
   return (
     <Checkbox.Group style={style} onChange={onChange} disabled={disabled}>
       {
-        quesOptions.map((it: any) => (
-        <Form.Item noStyle>
+        quesOptions.map((it: any, idx: number) => (
+        <Form.Item noStyle key={idx}>
           <Row gutter={8} style={{flexWrap: 'nowrap'}}>
             <Checkbox style={{ borderRadius: '50%'}} className={Style["radio-option"]} value={it.order}>
               {String.fromCharCode(65 + it.order)}
@@ -177,8 +177,8 @@ const RenderSingle = (props: any) => {
   return (
     <Radio.Group optionType="button" style={style} onChange={onChange} disabled={disabled}>
       {
-        quesOptions.map((it: any) => (
-        <Form.Item noStyle>
+        quesOptions.map((it: any, idx: number) => (
+        <Form.Item noStyle key={idx}>
           <Row gutter={8} style={{flexWrap: 'nowrap'}}>
             <Radio.Button style={{ borderRadius: '50%'}} className={Style["radio-option"]} value={it.order}>
               {String.fromCharCode(65 + it.order)}
