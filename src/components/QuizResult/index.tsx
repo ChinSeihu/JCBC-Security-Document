@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { get } from '@/lib';
-import { App, Button , List, Result,  Row,  Space,  Spin, Typography } from 'antd';
+import { App, Button , List, Result,  Row,  Space,  Spin, Tag, Typography } from 'antd';
 import Style from './style.module.css'
 import { IQuizResultResponse } from '@/app/api/quiz/result/server';
+import { CloseCircleFilled, CloseCircleOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
 
 const QuizResult = (props: any) => {
   const { documentId } = props
@@ -33,47 +35,68 @@ const QuizResult = (props: any) => {
     return list.filter(it => !it.isCorrect)
   } 
 
-  const getWrongQues = (list: any[] = []) => {
-    return list?.filter(it => it?.selectedInfos?.some?.((op: any) => !op.isCorrect))
-  }
-  
+  const wrongQues = useMemo(() => 
+    quizResult?.quizAnswers?.filter(it => it?.selectedInfos?.some?.((op: any) => !op.isCorrect))
+  , [quizResult])
 
   console.log(quizResult, 'quizResult>>>>>>')
 
 	return (
     <Spin spinning={loading}>
-      <Result
-        status={isPass ? "success" : "error"}
-        title="テストの結果が出ていました！"
-        subTitle="Please check and modify the following information before resubmitting."
-        extra={(
-          <>
-          {!isPass && <Button type="primary">再テスト</Button>}
-          <Button onClick={getQuizResult}>リフレッシュ</Button>
-          </>
-          )}
-      >
-      </Result>
-        <List
-          itemLayout="horizontal"
-          bordered
-          dataSource={getWrongQues(quizResult?.quizAnswers)}
-          // locale={}
-          renderItem={(item, index: number) => 
-            <List.Item key={index} style={{ display: 'block' }}>
-              <Row><Typography.Text style={{textAlign: 'left'}}>{item.questionText}</Typography.Text></Row>
-              {getWrongOptions(item.selectedInfos).map((it, idx) => (
-                <Space style={{ width: '100%', marginTop: 4 }} key={idx}>
-                  <Typography.Text type="danger">{String.fromCharCode(65 + it.order)}</Typography.Text>
-                  <Typography.Text style={{textAlign: 'left'}} type="danger">{it.content}</Typography.Text>
-                </Space>
-              ))}
-            </List.Item>
-          }
-        />
+      {isPass && <RenderResult isPass={isPass} quizResult={quizResult} wrongQues={wrongQues as any[]}/>}
+      <List
+        itemLayout="horizontal"
+        bordered
+        size="small"
+        dataSource={wrongQues}
+        // locale={}
+        renderItem={(item, index: number) => 
+          <List.Item key={index} className={Style["list-item"]}>
+            <Row><Typography.Text style={{textAlign: 'left'}}>{item.questionText}</Typography.Text></Row>
+            {getWrongOptions(item.selectedInfos).map((it, idx) => (
+              <Space className={Style["answer-option"]} key={idx}>
+                <Typography.Text type="danger">{String.fromCharCode(65 + it.order)}</Typography.Text>
+                <Typography.Text type="danger">{it.content}</Typography.Text>
+              </Space>
+            ))}
+          </List.Item>
+        }
+      />
     </Spin>
 	);
 };
+
+
+
+const RenderResult = (props: {
+  isPass: boolean;
+  quizResult?: IQuizResultResponse;
+  wrongQues: any[]
+}) => {
+  const { isPass, quizResult, wrongQues } = props
+  return (
+    <Result
+      status={isPass ? "success" : "error"}
+      className={Style["result-container"]}
+      title={<Typography.Title level={5} style={{ textAlign: 'left'}}><CloseCircleFilled style={{ color: "red"}} /> テストの結果が出ていました！</Typography.Title>}
+      subTitle={
+        <div style={{textAlign: 'left'}}>
+          今回のテストの正解率: <Tag bordered={false} color='success'>{quizResult?.score.toFixed(2)}%</Tag>
+          ({(quizResult?.totalQuestions || 0) - (wrongQues?.length || 0)}/{quizResult?.totalQuestions})<br/>
+          提出時間: <Tag bordered={false} color='default'>{dayjs(quizResult?.completedAt).format('YYYY-MM-DD HH:mm:ss')}</Tag> 
+        </div>
+      }
+      icon={null}
+      extra={(
+        <span>
+        {!isPass && <Button type="primary" size="small" style={{fontSize: 12}}>再テスト</Button>}
+        {/* <Button onClick={getQuizResult}>リフレッシュ</Button> */}
+        </span>
+        )}
+    >
+    </Result>
+  )
+}
 
 
 export default QuizResult;

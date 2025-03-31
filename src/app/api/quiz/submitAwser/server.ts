@@ -12,6 +12,7 @@ interface QuestionResponse {
     id: string;
     isCorrect: boolean;
     order: number;
+    questionId: string;
 }
 
 export async function getQuestionOptions(params: ListQuesOptionsParams): Promise<QuestionResponse[]> {
@@ -27,7 +28,8 @@ export async function getQuestionOptions(params: ListQuesOptionsParams): Promise
         select: {
           isCorrect: true,
           order: true,
-          id: true
+          id: true,
+          questionId: true,
         }
       })
 
@@ -50,9 +52,11 @@ export async function createQuizResult(params: ListQuesOptionsParams & QuizResul
     const { aswerList, userId, prisma, documentId, questionOption } = params
 
     const mistakeList = aswerList.filter((it: any) => {
-        const option = questionOption.find(item => item.id === it.id)
-        return !option?.isCorrect
+      // TODO 
+        return questionOption.filter(item => item.questionId === it.questionId).every(option => option.isCorrect)
       })
+
+      console.log(mistakeList.length, aswerList.length, 'createQuizResult>>>')
 
       // 回答結果
       const quizResult = await prisma.quizResult.create({

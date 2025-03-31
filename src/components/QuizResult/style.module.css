@@ -1,10 +1,27 @@
-.radio-option {
-    width: 25px;
-    height: 25px;
-    padding: 0;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-shrink: 0;
+.result-container {
+    padding-top: 0;
+    background-color: #f5f5f5;
+    padding-bottom: 16px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+}
+
+.answer-option {
+    width: 100%; 
+    margin-top: 4px;
+    text-align: left;
+    align-items: flex-start;
+}
+
+.list-item {
+    display: block !important;
+}
+
+.list-item * {
+    font-size: 12px;
+}
+
+.result-container :global(.ant-result-extra) {
+    text-align: left;
+    margin-top: 8px;
 }

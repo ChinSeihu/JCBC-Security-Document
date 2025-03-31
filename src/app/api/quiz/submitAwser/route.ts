@@ -22,7 +22,7 @@ export async function POST(request: Request) {
       if (!user?.id) throw new Error('userId is not defined...')
 
       const questionOption = await getQuestionOptions({ aswerList, prisma: prismaClient });
-
+      console.log(questionOption, 'questionOption>')
       // 回答結果
       const quizResult = await createQuizResult({aswerList, userId: user.id, prisma: prismaClient, documentId, questionOption})
       quizResultId = quizResult.id as string;
