@@ -186,7 +186,7 @@ const FileUploadPage = () => {
   return (
     <div className="container">
       <UploadModal onCancel={handleModalCancel} isOpen={isOpen}/>
-      <Button onClick={() => setOpen(true)} style={{ marginBottom: 12 }}>アップロード</Button>
+      <Button type='primary' onClick={() => setOpen(true)} style={{ marginBottom: 12 }}>アップロード</Button>
       <Table 
         rowKey="id" 
         dataSource={documentList} 

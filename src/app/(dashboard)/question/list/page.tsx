@@ -141,7 +141,7 @@ const QuestionList = () => {
   return (
     <div className="container">
       <QuesFormModal onCancel={handleModalCancel} isOpen={isOpen} onSuccess={getQuestionList}/>
-      <Button onClick={() => setOpen(true)} style={{ marginBottom: 12 }}>新規追加</Button>
+      <Button type='primary' onClick={() => setOpen(true)} style={{ marginBottom: 12 }}>新規追加</Button>
       <Table 
         rowKey="id" 
         dataSource={questionList} 

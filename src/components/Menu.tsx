@@ -3,14 +3,14 @@
 import { useEffect, useMemo, useState } from "react"
 import { useUser } from "@clerk/nextjs"
 import { Menu } from "antd";
-import { AppstoreOutlined } from "@ant-design/icons";
+import { AppstoreOutlined, ContainerOutlined, FieldTimeOutlined, FileSearchOutlined, FileTextOutlined, HistoryOutlined, HomeOutlined, ReadOutlined, ScheduleOutlined } from "@ant-design/icons";
 import { usePathname, useRouter } from "next/navigation";
 import { routeAccessMap } from "@/lib/settings";
 
 const menuItems = () => [
   {
     key: "0",
-    icon: <AppstoreOutlined />,
+    icon: <HomeOutlined />,
     label: "Home",
     href: '/home'
   },
@@ -23,26 +23,31 @@ const menuItems = () => [
         key: "10",
         href: "/document/list",
         label: "ドキュメント一覧",
+        icon: <FileTextOutlined />, 
       },
       {
         key: "11",
         href: "/document/view",
         label: "ドキュメント閲覧",
+        icon: <ReadOutlined />,
       },
       {
         key: "12",
         href: "/history/list",
         label: "テスト履歴",
+        icon: <HistoryOutlined />,
       },
       {
         key: "13",
         href: "/question/list",
-        label: "問題集",
+        label: "問題一覧",
+        icon: <FieldTimeOutlined />
       },
       {
         key: "14",
         href: "/testResult/list",
         label: "テスト結果一覧",
+        icon: <ScheduleOutlined />,
       },
     ],
   },
