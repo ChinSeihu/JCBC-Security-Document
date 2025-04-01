@@ -1,3 +1,9 @@
+import { ButtonProps } from "antd"
+
+export const SCORE_LINE = 0.8
+
+export const isPass = (point: number = 0) => point >= SCORE_LINE
+
 export enum FILE_TYPE {
 	PDF = "1"
 }
@@ -15,3 +21,9 @@ export const QUESTION_TYPE = {
  export const FILE_TYPE_TEXT = {
 	[FILE_TYPE.PDF]: 'PDF'
  } 
+
+ export const operateBtnProperty: ButtonProps = {
+   className: 'text-xs',
+   color: "primary",
+   variant: "filled"
+ }

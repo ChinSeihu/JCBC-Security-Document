@@ -3,7 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import "antd/dist/reset.css";
-import { App } from "antd";
+import { App, ConfigProvider } from "antd";
+import jaJP from 'antd/locale/ja_JP';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,7 +23,9 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={inter.className}>
-          <App style={{height: '100%'}}>{children}</App>
+          <ConfigProvider locale={jaJP}>
+            <App style={{height: '100%'}}>{children}</App>
+          </ConfigProvider >
         </body>
       </html>
     </ClerkProvider>

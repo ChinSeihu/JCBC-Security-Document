@@ -84,7 +84,7 @@ const QuesFormModal = (props: any) => {
 
 	return (
 		<Modal
-			title="問題新規" 
+			title="問題新規作成" 
 			cancelText="キャンセル" 
       okText="保存"
 			open={isOpen} 
@@ -98,6 +98,7 @@ const QuesFormModal = (props: any) => {
 			<Form
 				form={form}
 				layout="vertical"
+        onValuesChange={console.log}
 			>
 			<Form.Item 
         required 
@@ -176,9 +177,7 @@ const QuesFormModal = (props: any) => {
                     initialValue={false}
                     valuePropName="checked"
                   >
-                    <Tooltip title="正解に設定する">
-                      <Checkbox />
-                    </Tooltip>
+                    <Checkbox title="正解に設定する"/>
                   </Form.Item>
                   {fields.length > 1 ? (
                     <MinusCircleOutlined

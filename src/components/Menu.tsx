@@ -31,8 +31,18 @@ const menuItems = () => [
       },
       {
         key: "12",
+        href: "/history/list",
+        label: "テスト履歴",
+      },
+      {
+        key: "13",
         href: "/question/list",
         label: "問題集",
+      },
+      {
+        key: "14",
+        href: "/testResult/list",
+        label: "テスト結果一覧",
       },
     ],
   },

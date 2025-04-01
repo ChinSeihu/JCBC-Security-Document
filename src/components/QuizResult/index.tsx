@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
-import { get } from '@/lib';
+import { get, postJson } from '@/lib';
 import { App, Button , List, Result,  Row,  Space,  Spin, Tag, Typography } from 'antd';
 import Style from './style.module.css'
 import { IQuizResultResponse } from '@/app/api/quiz/result/server';
-import { CloseCircleFilled, CloseCircleOutlined } from '@ant-design/icons';
+import { CheckCircleFilled, CloseCircleFilled, CloseCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 
 const QuizResult = (props: any) => {
-  const { documentId } = props
+  const { documentId, onReTest } = props
   const [loading, setLoading] = useState(false);
   const { message } = App.useApp();
   const [quizResult, setQuizResult] = useState<IQuizResultResponse>()
@@ -39,17 +39,15 @@ const QuizResult = (props: any) => {
     quizResult?.quizAnswers?.filter(it => it?.selectedInfos?.some?.((op: any) => !op.isCorrect))
   , [quizResult])
 
-  console.log(quizResult, 'quizResult>>>>>>')
-
 	return (
     <Spin spinning={loading}>
-      {isPass && <RenderResult isPass={isPass} quizResult={quizResult} wrongQues={wrongQues as any[]}/>}
+      <RenderResult onReTest={onReTest} documentId={documentId} isPass={isPass} quizResult={quizResult} wrongQues={wrongQues as any[]}/>
       <List
         itemLayout="horizontal"
         bordered
         size="small"
         dataSource={wrongQues}
-        // locale={}
+        locale={{ emptyText: "すべての質問に正解して、おめでとうございます。"}}
         renderItem={(item, index: number) => 
           <List.Item key={index} className={Style["list-item"]}>
             <Row><Typography.Text style={{textAlign: 'left'}}>{item.questionText}</Typography.Text></Row>
@@ -70,31 +68,60 @@ const QuizResult = (props: any) => {
 
 const RenderResult = (props: {
   isPass: boolean;
+  onReTest: () => void;
   quizResult?: IQuizResultResponse;
+  documentId: string;
   wrongQues: any[]
 }) => {
-  const { isPass, quizResult, wrongQues } = props
+  const { isPass, onReTest, quizResult, wrongQues, documentId } = props
+  const { message } = App.useApp();
+  const [loading, setLoading] = useState(false);
+
+  const handleRetest = async () => {
+    try {
+      setLoading(true);
+      const response = await postJson('/api/quiz/reTest', {
+        documentId
+      })
+      message.success(response?.message || "回答に成功しました")
+      onReTest?.()
+    } catch (e: any) {
+      message.error(e?.message)
+    }
+    setLoading(false);
+  }
+
   return (
-    <Result
-      status={isPass ? "success" : "error"}
-      className={Style["result-container"]}
-      title={<Typography.Title level={5} style={{ textAlign: 'left'}}><CloseCircleFilled style={{ color: "red"}} /> テストの結果が出ていました！</Typography.Title>}
-      subTitle={
-        <div style={{textAlign: 'left'}}>
-          今回のテストの正解率: <Tag bordered={false} color='success'>{quizResult?.score.toFixed(2)}%</Tag>
-          ({(quizResult?.totalQuestions || 0) - (wrongQues?.length || 0)}/{quizResult?.totalQuestions})<br/>
-          提出時間: <Tag bordered={false} color='default'>{dayjs(quizResult?.completedAt).format('YYYY-MM-DD HH:mm:ss')}</Tag> 
-        </div>
-      }
-      icon={null}
-      extra={(
-        <span>
-        {!isPass && <Button type="primary" size="small" style={{fontSize: 12}}>再テスト</Button>}
-        {/* <Button onClick={getQuizResult}>リフレッシュ</Button> */}
-        </span>
-        )}
-    >
-    </Result>
+    <Spin spinning={loading}>
+      <Result
+        status={isPass ? "success" : "error"}
+        className={Style["result-container"]}
+        title={
+        <Typography.Title level={5} style={{ textAlign: 'left'}}>
+          {isPass ? <CheckCircleFilled style={{ color: "#52c41a"}}/> : <CloseCircleFilled style={{ color: "red"}} /> } テストの結果が出ていました！
+        </Typography.Title>}
+        subTitle={
+          <div style={{textAlign: 'left'}}>
+            今回のテストの正解率: <Tag bordered={false} color='success'>{((quizResult?.score || 0) * 100).toFixed(2)}%</Tag>
+            ({(quizResult?.totalQuestions || 0) - (wrongQues?.length || 0)}/{quizResult?.totalQuestions})<br/>
+            提出時間: <Tag bordered={false} color='default'>{dayjs(quizResult?.completedAt).format('YYYY-MM-DD HH:mm:ss')}</Tag> 
+          </div>
+        }
+        icon={null}
+        extra={(
+          <span>
+          {!isPass && 
+            <Button 
+              type="primary" 
+              size="small" 
+              style={{fontSize: 12}} 
+              onClick={handleRetest}
+            >再テスト</Button>}
+          </span>
+          )}
+      >
+      </Result>
+    </Spin>
   )
 }
 

@@ -119,9 +119,12 @@ export const getQuizAnswer = async (resultId: string = ``) => {
                   order: true,
                   content: true,
                   isCorrect: true
+                },
+                where: {
+                  delFlag: false
                 }
               }
-            }
+            },
           }
         }
       })

@@ -86,7 +86,7 @@ const PDFViewer = () => {
       {numPages && (
         <div className={Style["pagination"]}>
           <Pagination onChange={handlePageChange} total={numPages} pageSize={1}/>
-          <Button onClick={handleToTest} type="primary" size="small" className="ml-4px mr-4px">試験</Button>
+          <Button onClick={handleToTest} type="primary" size="small" className="ml-4px mr-4px text-xs">試験</Button>
         </div>
       )}
     </div>

@@ -30,6 +30,7 @@ const QuestionDrawer = (props: IProps) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [sendLoading, setSendLoading] = useState(false)
+  const [isCompleted, setCompleted] = useState(testStatus.isCompleted);
   const { message } = App.useApp();
 
   console.log(testStatus, 'testStatus')
@@ -43,7 +44,8 @@ const QuestionDrawer = (props: IProps) => {
       setLoading(true);
       const response = await get('/api/quiz/listOfDocument', { documentId });
       console.log(response, 'getQuestionList')
-      setQuestionList(response?.data || []);
+      const queslist = response?.data?.sort(() => Math.random() - 0.5)
+      setQuestionList(queslist || []);
     } catch (error: any) {
       console.log(error, "error>>>>")
       message.error(error.message);
@@ -65,6 +67,7 @@ const QuestionDrawer = (props: IProps) => {
         documentId
       })
       message.success(response?.message || "回答に成功しました")
+      setCompleted(true);
     } catch (e: any) {
       message.error(e?.message)
     }
@@ -80,6 +83,11 @@ const QuestionDrawer = (props: IProps) => {
     })
   }
 
+  const handleReTest = () => {
+    setCompleted(false);
+    getQuestionList()
+  }
+
 	return (
   <Drawer
     title={<span style={{ float: 'left'}}>テスト</span>}
@@ -90,7 +98,7 @@ const QuestionDrawer = (props: IProps) => {
     getContainer={() => document.getElementsByClassName("document-view-draw-container")[0]}
     open={isOpen}
     extra={
-      !testStatus?.isCompleted && <Space>
+      !isCompleted && <Space>
         <Button onClick={onClose}>キャンセル</Button>
         <Button 
           loading={sendLoading} 
@@ -102,7 +110,10 @@ const QuestionDrawer = (props: IProps) => {
     }
   >
     <Spin spinning={loading}>
-    {testStatus?.isCompleted ? <QuizResult documentId={documentId} /> : <RenderTestForm disabled={sendLoading} questionList={questionList} form={form}/>}
+    {isCompleted 
+      ? <QuizResult documentId={documentId} onReTest={handleReTest}/> 
+      : <RenderTestForm disabled={sendLoading} questionList={questionList} form={form}/>
+    }
     </Spin>
   </Drawer>
 	);
@@ -148,8 +159,14 @@ const RenderTestForm = ({
 }
 
 
-const RenderMultiple = (props: any) => {
+interface ISelectOptionProp {
+  quesOptions: any[];
+  onChange?: () => void;
+  disabled: boolean;
+}
+const RenderMultiple = (props: ISelectOptionProp) => {
   const { quesOptions, onChange, disabled } = props
+  // quesOptions.sort(() => Math.random() - 0.5)
 
   return (
     <Checkbox.Group style={style} onChange={onChange} disabled={disabled}>
@@ -171,8 +188,9 @@ const RenderMultiple = (props: any) => {
   )
 }
 
-const RenderSingle = (props: any) => {
+const RenderSingle = (props: ISelectOptionProp) => {
   const { quesOptions, onChange, disabled } = props
+  // quesOptions.sort(() => Math.random() - 0.5)
 
   return (
     <Radio.Group optionType="button" style={style} onChange={onChange} disabled={disabled}>

@@ -1,7 +1,5 @@
-import { Prisma, PrismaClient } from "@prisma/client"
-import { DefaultArgs } from "@prisma/client/runtime/library"
-
-type ClientPrisma = Omit<PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>, "$disconnect" | "$connect" | "$on" | "$transaction" | "$use" | "$extends">
+import { ClientPrisma } from "@/constants/type";
+import { Prisma } from "@prisma/client"
 
 interface ListQuesOptionsParams {
     aswerList: any[],
@@ -52,11 +50,9 @@ export async function createQuizResult(params: ListQuesOptionsParams & QuizResul
     const { aswerList, userId, prisma, documentId, questionOption } = params
 
     const mistakeList = aswerList.filter((it: any) => {
-      // TODO 
-        return questionOption.filter(item => item.questionId === it.questionId).every(option => option.isCorrect)
+        const currentOption = questionOption.filter(item => item.questionId === it.questionId)
+        return it.answer.some((answer: number) => currentOption.find(op => (op.order == answer) && !op.isCorrect))
       })
-
-      console.log(mistakeList.length, aswerList.length, 'createQuizResult>>>')
 
       // 回答結果
       const quizResult = await prisma.quizResult.create({

@@ -61,5 +61,7 @@ export async function POST(request: Request) {
       { data: { message: 'システムエラー'} },
       { status: HttpStatusCode.InternalServerError }
     )
+  } finally {
+    prisma.$disconnect();
   }
 }

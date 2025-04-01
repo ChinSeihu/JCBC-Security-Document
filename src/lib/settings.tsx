@@ -9,5 +9,7 @@ export const routeAccessMap: RouteAccessMap = {
   "/document/list": ["admin"],
   "/document/view": ["admin", "employee"],
   "/question/list": ["admin"],
+  "/testResult/list": ["admin"],
+  "/history/list": ["admin", "employee"],
   "/home": ["admin", "employee"],
 };

@@ -83,6 +83,7 @@ model QuesOption {
   content       String   @db.Text
   isCorrect     Boolean  @default(false)
   order         Int
+  delFlag       Boolean      @default(false)
 
   question   Question @relation(fields: [questionId], references: [id])
 }

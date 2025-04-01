@@ -3,30 +3,31 @@ import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { get, postJson } from '@/lib';
 import { App, Badge, Button, Popconfirm, Table } from 'antd';
-import { IPagination } from '@/constants/type'
-import { FILE_TYPE_TEXT, FILE_TYPE } from '@/constants';
+import { TPagination } from '@/constants/type'
+import { FILE_TYPE_TEXT, FILE_TYPE, operateBtnProperty } from '@/constants';
 import UploadModal from '@/components/UploadModal';
 
 import './style.css';
 
-const initPagination: IPagination  = {
+const initPagination: TPagination  = {
   page: 1,
   pageSize: 10,
   total: 0,
-  totalPages: 0
+  totalPages: 0,
+  showSizeChanger: true,
 }
 
 const FileUploadPage = () => {
   const [tableLoading, seTableLoading] = useState(false);
   const [documentList, setDocumentList] = useState([]);
-  const [pagination, setPagination] = useState<IPagination>(initPagination);
+  const [pagination, setPagination] = useState<TPagination>(initPagination);
   const [isOpen, setOpen] = useState(false);
   const { message } = App.useApp();
   
-  const getFileInfoList = async () => {
+  const getFileInfoList = async (page: number = 1, pageSize: number = pagination.pageSize) => {
     try {
       seTableLoading(true);
-      const response = await get('/api/document/list');
+      const response = await get('/api/document/list', { page, pageSize });
       console.log(response, 'getFileInfoList')
       setDocumentList(response?.data || []);
       setPagination({...pagination, ...(response?.pagination || {})});
@@ -52,6 +53,25 @@ const FileUploadPage = () => {
 
       if (success) {
         getFileInfoList();
+        return message.success(msg)
+      }
+      message.warning(msg)
+    } catch (e: any) {
+      message.error(e?.message)
+    }
+  }
+
+  const handleFileDelete = async (record: any) => {
+    try {
+      const { success, message: msg} = await postJson('/api/document/delete', {
+        id: record.id,
+        isPublic: record.isPublic
+      })
+      
+      console.log(success, msg, 'handleFileDelete')
+
+      if (success) {
+        getFileInfoList(initPagination.page, pagination.pageSize);
         return message.success(msg)
       }
       message.warning(msg)
@@ -131,7 +151,7 @@ const FileUploadPage = () => {
             okText="はい"
             cancelText="キャンセル"
           >
-            {!r.isPublic && <Button type='link' style={{marginRight: 6 }} size='small'>公開</Button>}
+            {!r.isPublic && <Button {...operateBtnProperty} style={{marginRight: 6 }} size='small'>公開</Button>}
           </Popconfirm>
           <Popconfirm
             title="ファイルの公開を取り下げ"
@@ -141,7 +161,17 @@ const FileUploadPage = () => {
             okText="はい"
             cancelText="キャンセル"
           >
-            {r.isPublic && <Button type='link' size='small'>取り下げ</Button>}
+            {r.isPublic && <Button {...operateBtnProperty} size='small'>取り下げ</Button>}
+          </Popconfirm>
+          <Popconfirm
+            title="ファイルの削除"
+            description="このファイルを削除しますか?"
+            onConfirm={() => {handleFileDelete(r)}}
+            onCancel={() => {}}
+            okText="はい"
+            cancelText="キャンセル"
+          >
+            {!r.isPublic && <Button {...operateBtnProperty} size='small'>削除</Button>}
           </Popconfirm>
         </div>
       )
@@ -161,7 +191,7 @@ const FileUploadPage = () => {
         rowKey="id" 
         dataSource={documentList} 
         columns={columns}
-        pagination={pagination}
+        pagination={{ ...pagination, onChange: (page, pageSize) => getFileInfoList(page, pageSize)}}
         loading={tableLoading}
         bordered
         size='small'
