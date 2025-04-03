@@ -7,6 +7,11 @@ interface ListDocumentsParams {
   page?: number
   pageSize?: number
 
+  startDate?: string
+  endDate?: string
+  isPublic?: 'false' | 'true'
+  fileName?: string
+
   // 排序参数
   orderBy?: 'createdAt' | 'updatedAt' | 'fileName' | 'fileSize'
   orderDirection?: 'asc' | 'desc'
@@ -41,7 +46,18 @@ export async function listDocuments(params: ListDocumentsParams): Promise<Pagina
     // 构建查询条件
     const where: any = {
       AND: [
-        { fileType }, // 按文件类型过滤
+        { 
+          fileType,
+          createdDate: {
+            lte: params?.endDate ? new Date(params.endDate).toISOString() : undefined,
+            gte: params?.startDate ? new Date(params.startDate).toISOString() : undefined, 
+          },
+          isPublic: params?.isPublic && params?.isPublic === 'true',
+          fileName: {
+            contains: params.fileName, 
+            mode: 'insensitive',
+          },
+        },
         { 
           OR: search ? [
             { fileName: { contains: search, mode: 'insensitive' } },
@@ -78,7 +94,7 @@ export async function listDocuments(params: ListDocumentsParams): Promise<Pagina
         },
         where,
         skip: (page - 1) * pageSize,
-        take: pageSize,
+        take: Number(pageSize),
         orderBy: { [orderBy]: orderDirection },
       })
     ])
@@ -87,8 +103,8 @@ export async function listDocuments(params: ListDocumentsParams): Promise<Pagina
       data: documents,
       pagination: {
         total,
-        page,
-        pageSize,
+        page: Number(page),
+        pageSize: Number(pageSize),
         totalPages: Math.ceil(total / pageSize)
       }
     }

@@ -1,13 +1,16 @@
 "use client"
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import { get, postJson } from '@/lib';
-import { App, Badge, Button, Popconfirm, Table } from 'antd';
+import { App, Badge, Button, Popconfirm, Typography } from 'antd';
 import { TPagination } from '@/constants/type'
 import { FILE_TYPE_TEXT, FILE_TYPE, operateBtnProperty } from '@/constants';
 import UploadModal from '@/components/UploadModal';
+import type { ActionType, ProColumns } from '@ant-design/pro-components';
+import { LightFilter, ProFormSelect, ProTable } from '@ant-design/pro-components';
 
 import './style.css';
+import { UploadOutlined } from '@ant-design/icons';
 
 const initPagination: TPagination  = {
   page: 1,
@@ -17,30 +20,31 @@ const initPagination: TPagination  = {
   showSizeChanger: true,
 }
 
+const publicEnum = {
+  0: { text: '未公開', status: 'Default' },
+  1: { text: '公開中', status: 'Success' },
+}
+
 const FileUploadPage = () => {
-  const [tableLoading, seTableLoading] = useState(false);
-  const [documentList, setDocumentList] = useState([]);
   const [pagination, setPagination] = useState<TPagination>(initPagination);
   const [isOpen, setOpen] = useState(false);
+  const [params, setParams] = useState<any>({});
   const { message } = App.useApp();
+  const actionRef = useRef<ActionType>();
   
-  const getFileInfoList = async (page: number = 1, pageSize: number = pagination.pageSize) => {
+  const getFileInfoList = async (params = {}) => {
     try {
-      seTableLoading(true);
-      const response = await get('/api/document/list', { page, pageSize });
-      console.log(response, 'getFileInfoList')
-      setDocumentList(response?.data || []);
-      setPagination({...pagination, ...(response?.pagination || {})});
+      const response = await get('/api/document/list', {
+        page: initPagination.page,
+        pageSize: pagination.pageSize,
+        ...params,
+      });
+      return response;
     } catch (error: any) {
       console.log(error, "error>>>>")
       message.error(error.message);
     }
-    seTableLoading(false)
   }
-
-  useEffect(() => {
-    getFileInfoList();
-  }, [])
   
   const handleOperation = async (record: any, status: boolean) => {
     try {
@@ -52,7 +56,7 @@ const FileUploadPage = () => {
       console.log(success, msg, 'handleOperation')
 
       if (success) {
-        getFileInfoList();
+        actionRef.current?.reload()
         return message.success(msg)
       }
       message.warning(msg)
@@ -71,7 +75,7 @@ const FileUploadPage = () => {
       console.log(success, msg, 'handleFileDelete')
 
       if (success) {
-        getFileInfoList(initPagination.page, pagination.pageSize);
+        actionRef.current?.reload();
         return message.success(msg)
       }
       message.warning(msg)
@@ -80,68 +84,73 @@ const FileUploadPage = () => {
     }
   }
 
-  const columns = [
+  const columns:ProColumns[] = [
     {
       title: 'ID',
-      dataIndex: '',
-      key: 'id',
+      dataIndex: 'index',
       width: 40,
+      hideInSearch: true,
       render: (_:any, __:any, index: number) => (pagination.page - 1) * pagination.pageSize + index + 1
     },
     {
       title: 'ファイル名',
       dataIndex: 'fileName',
-      key: 'fileName',
       className: 'fileName-cell',
       ellipsis: true,
-      render: (name: string, record: any) => <a href={record.pathName} target='_blank'>{name}</a>
+      render: (name, record: any) => <a href={record.pathName} target='_blank'>{name}</a>
     },
     {
       title: 'ファイルId',
       dataIndex: 'id',
-      key: 'fileId',
+      key: 'id',
       ellipsis: true,
+      hideInSearch: true,
     },
     {
       title: '書類タイプ',
       width: '12%',
       dataIndex: 'fileType',
-      key: 'fileType',
-      render: (v: FILE_TYPE) => FILE_TYPE_TEXT[v]
+      hideInSearch: true,
+      valueEnum: {
+        [FILE_TYPE_TEXT[FILE_TYPE.PDF]]: { text: 'PDF' }
+      },
+      render: (_: any, { fileType }: any) => FILE_TYPE_TEXT[fileType as FILE_TYPE]
     },
     {
       title: 'サイズ',
       dataIndex: 'filesize',
-      key: 'filesize',
+      hideInSearch: true,
       width: 80,
-      render: (v: number) => v ? Math.ceil(v / 1024) + 'KB' : '-'
+      render: (v: any) => v ? Math.ceil(v / 1024) + 'KB' : '-'
     },
     {
       title: '作成日時',
       dataIndex: 'createdDate',
-      key: 'createdDate',
+      valueType: 'dateRange',
       width:150,
-      render: (v: string) => dayjs(v).format('YYYY-MM-DD HH:mm:ss')
+      // hideInSearch: true,
+      render: (_, record) =>  dayjs(record.createdDate).format('YYYY-MM-DD HH:mm:ss')
     },
     {
       title: '作成者',
       dataIndex: 'userName',
-      key: 'userName',
-      render: (_: string, r: any) => `${r.user.firstName} ${r.user.lastName}`
+      hideInSearch: true,
+      render: (_, r: any) => `${r.user.firstName} ${r.user.lastName}`
     },
     {
       title: '公開状態',
       dataIndex: 'isPublic',
-      key: 'isPublic',
-      render: (v: boolean) => <Badge status={v ? 'success' : 'default'} text={v ? '公開中' : '未公開'}/>
+      hideInSearch: true,
+      valueEnum: publicEnum,
+      render: (_, record: any ) => <Badge status={record.isPublic ? 'success' : 'default'} text={record.isPublic ? '公開中' : '未公開'}/>
     },
     {
       title: '操作',
       dataIndex: 'operate',
-      // fixed: 'right',
-      key: 'operate',
-      width: 160,
-      render: (_: string, r: any) => (
+      fixed: 'right',
+      hideInSearch: true,
+      width: 140,
+      render: (_, r: any) => (
         <div>
           <Popconfirm
             title="ファイル公開"
@@ -179,22 +188,54 @@ const FileUploadPage = () => {
   ];
 
   const handleModalCancel = (isUploaded: boolean) => {
-    if (isUploaded) getFileInfoList();
+    if (isUploaded) actionRef.current?.reload();
     setOpen(false);
   }
 
   return (
     <div className="container">
       <UploadModal onCancel={handleModalCancel} isOpen={isOpen}/>
-      <Button type='primary' onClick={() => setOpen(true)} style={{ marginBottom: 12 }}>アップロード</Button>
-      <Table 
+      <ProTable
         rowKey="id" 
-        dataSource={documentList} 
+        actionRef={actionRef}
+        params={params}
+        cardBordered
+        request={async (params, sorter, filter) => {
+          console.log(params, sorter, filter);
+          const [startDate, endDate] = params?.createdDate || []
+          const { pagination: resPagination, data } = await getFileInfoList({
+            startDate: startDate,
+            endDate: endDate,
+            ...params,
+            page: params.current
+          })
+          setPagination({...pagination, ...(resPagination || {})})
+          return Promise.resolve({
+            data: data,
+            success: true,
+            total: resPagination?.total
+          });
+        }}
         columns={columns}
-        pagination={{ ...pagination, onChange: (page, pageSize) => getFileInfoList(page, pageSize)}}
-        loading={tableLoading}
+        pagination={{ ...pagination }}
         bordered
-        size='small'
+        defaultSize='small'
+        toolbar={{
+          actions: ([
+            <Button type="primary" onClick={() => setOpen(true)} icon={<UploadOutlined />}>
+              アップロード
+            </Button>,
+            <LightFilter>
+              <ProFormSelect
+                label='公開状態'
+                name='isPublic'
+                onChange={(v: boolean) => setParams({ isPublic: v })}
+                options={[{value: true, label: '公開中'}, { value: false, label: '未公開' }]} 
+              />
+            </LightFilter>
+          ]),
+        }}
+        headerTitle={<Typography.Title level={5}>ドキュメント一覧</Typography.Title>}
       />
     </div>
   );

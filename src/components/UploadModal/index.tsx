@@ -85,10 +85,9 @@ const UploadModal = (props: any) => {
 				<p className="ant-upload-drag-icon">
 					<InboxOutlined />
 				</p>
-				<p className="ant-upload-text">Click or drag file to this area to upload</p>
+				<p className="ant-upload-text">アップロードするには、ファイルをクリックまたはこの領域にドラッグします</p>
 				<p className="ant-upload-hint">
-					Support for a single or bulk upload. Strictly prohibited from uploading company data or other
-					banned files.
+				単一だけアップロードをサポートします。会社のデータやその他の禁止ファイルのアップロードはご遠慮ください。
 				</p>
 			</Dragger>
 			<Button

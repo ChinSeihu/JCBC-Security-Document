@@ -58,9 +58,9 @@ const PDFViewer = () => {
       <div className={Style["pdf-container"]}>
         <Spin spinning={loading}>
           {isTesting && <FloatButton type="primary" onClick={() => setOpen(true)}/>}
-          {fileInfo?.pathName ? 
+          {fileInfo?.pathUrl ? 
             <Document
-              file={fileInfo?.pathName}
+              file={fileInfo?.pathUrl}
               onLoadSuccess={onDocumentLoadSuccess}
               loading={<div>Loading PDF...</div>}
               error={<div>Failed to load PDF!</div>}
@@ -85,7 +85,7 @@ const PDFViewer = () => {
       <div className="document-view-draw-container"/>
       {numPages && (
         <div className={Style["pagination"]}>
-          <Pagination onChange={handlePageChange} total={numPages} pageSize={1}/>
+          <Pagination onChange={handlePageChange} total={numPages} showSizeChanger={false} pageSize={1}/>
           <Button onClick={handleToTest} type="primary" size="small" className="ml-4px mr-4px text-xs">試験</Button>
         </div>
       )}

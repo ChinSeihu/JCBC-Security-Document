@@ -1,6 +1,6 @@
 import { ButtonProps } from "antd"
 
-export const SCORE_LINE = 0.8
+export const SCORE_LINE = 1
 
 export const isPass = (point: number = 0) => point >= SCORE_LINE
 

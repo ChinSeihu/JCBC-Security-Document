@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { useUser } from "@clerk/nextjs"
 import { Menu } from "antd";
-import { AppstoreOutlined, ContainerOutlined, FieldTimeOutlined, FileSearchOutlined, FileTextOutlined, HistoryOutlined, HomeOutlined, ReadOutlined, ScheduleOutlined } from "@ant-design/icons";
+import { AppstoreOutlined, FileTextOutlined, HistoryOutlined, HomeOutlined, ProfileOutlined, ReadOutlined, ScheduleOutlined } from "@ant-design/icons";
 import { usePathname, useRouter } from "next/navigation";
 import { routeAccessMap } from "@/lib/settings";
 
@@ -41,7 +41,7 @@ const menuItems = () => [
         key: "13",
         href: "/question/list",
         label: "問題一覧",
-        icon: <FieldTimeOutlined />
+        icon: <ProfileOutlined />,
       },
       {
         key: "14",
@@ -113,6 +113,7 @@ const SideMenu = () => {
         mode="inline" 
         defaultSelectedKeys={selectedKey}
         items={viewMenu}
+        inlineIndent={16}
         defaultOpenKeys={openKey}
       />
     </div>

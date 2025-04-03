@@ -33,7 +33,9 @@ const QuestionDrawer = (props: IProps) => {
   const [isCompleted, setCompleted] = useState(testStatus.isCompleted);
   const { message } = App.useApp();
 
-  console.log(testStatus, 'testStatus')
+  useEffect(() => {
+    setCompleted(testStatus.isCompleted)
+  }, [testStatus.isCompleted])
 
 	useEffect(() => {
     if (documentId) getQuestionList()

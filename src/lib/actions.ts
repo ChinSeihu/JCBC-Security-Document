@@ -1,0 +1,8 @@
+export const getSearchParams = (searchParams: URLSearchParams) => {
+    const result: Record<string, any> = {};
+    searchParams?.entries()?.forEach(it => {
+        const [key, value] = it;
+        result[key] = value;
+    })
+    return result;
+}

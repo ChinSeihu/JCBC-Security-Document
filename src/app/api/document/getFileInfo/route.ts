@@ -36,10 +36,11 @@ export async function GET() {
     }
 
     const testStatus = await getUserTestStatus(fileInfo);
+    const pathUrl = `${process.cwd()}/public` + fileInfo.pathName
 
     // 返回 PDF 数据流
     return NextResponse.json({
-      data: {...fileInfo, success: true, testStatus },
+      data: {...fileInfo, pathUrl,success: true, testStatus },
       status: HttpStatusCode.Ok
     });
 
