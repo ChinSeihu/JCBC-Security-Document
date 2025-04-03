@@ -1,12 +1,13 @@
 "use client"
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import { get, postJson } from '@/lib';
-import { App, Button, Popconfirm, Table, Tag, Typography, PaginationProps, Badge } from 'antd';
+import { App, Button, Popconfirm, Tag, Typography, Badge } from 'antd';
 import { TPagination } from '@/constants/type'
-import {  isPass, operateBtnProperty, QUESTION_TYPE } from '@/constants';
+import {  isPass, operateBtnProperty, PUBLIC_STATUS_ENUM, publicEnum, resultOption } from '@/constants';
+import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
 
-import Style from './style.module.css';
+import './style.module.css';
 
 const initPagination: TPagination = {
   page: 1,
@@ -26,23 +27,23 @@ const TestResult = ({ point }: {point: number}) => {
 }
 
 const TestHistoryList = () => {
-  const [tableLoading, seTableLoading] = useState(false);
-  const [resultList, setResultList] = useState([]);
   const [pagination, setPagination] = useState<TPagination>(initPagination);
 	const { message } = App.useApp();
+  const actionRef = useRef<ActionType>();
 
-  const getTestHistoryList = async (page: number = 1, pageSize: number = pagination.pageSize) => {
+  const getTestHistoryList = async (params = {}) => {
     try {
-      seTableLoading(true);
-      const response = await get('/api/test/history', { page, pageSize });
+      const response = await get('/api/test/history', {
+        page: initPagination.page,
+        pageSize: pagination.pageSize,
+        ...params,
+      });
       console.log(response, 'history')
-      setResultList(response?.data || []);
-      setPagination({...pagination, ...(response?.pagination || {})});
+      return response;
     } catch (error: any) {
       console.log(error, "error>>>>")
       message.error(error.message);
     }
-    seTableLoading(false)
   }
 
   useEffect(() => {
@@ -67,54 +68,58 @@ const TestHistoryList = () => {
     }
   }
 
-  const columns = [
+  const columns: ProColumns[] = [
     {
       title: 'ID',
-      dataIndex: '',
-      key: 'id',
+      dataIndex: 'id',
       width: 40,
+      hideInSearch: true,
       render: (_:any, __:any, index: number) => (pagination.page - 1) * pagination.pageSize + index + 1
     },
     {
       title: '関連ドキュメント',
       dataIndex: 'document',
-      key: 'document',
-      // className: 'fileName-cell',
+      valueType: 'text',
       ellipsis: true,
-      render: (document: any) => document.fileName
+      formItemProps: { label: 'ドキュメント' },
+      render: (_,record) => record?.document?.fileName || '-'
     },
     {
       title: '公開状態',
       dataIndex: 'isPublic',
-      key: 'isPublic',
+      valueEnum: publicEnum,
       render: (_:any, r: any) => <Badge status={r.document.isPublic ? 'success' : 'default'} text={r.document.isPublic ? '公開中' : '未公開'}/>
     },
     {
       title: '正解/総計',
       dataIndex: 'correctAnswers',
-      key: 'correctAnswers',
-      render: (v: number, record: any) => <Tag>{v}/{record.totalQuestions}</Tag>
+      hideInSearch: true,
+      render: (v, record: any) => <Tag>{v}/{record.totalQuestions}</Tag>
     },
     {
       title: 'テスト結果',
       dataIndex: 'score',
-      key: 'score',
-      render: (v: number) => <TestResult point={v}/>
+      valueType: 'select',
+      fieldProps: { options: resultOption },
+      render: (_, record) => <TestResult point={record.score}/>
     },
     {
       title: '実施日時',
       dataIndex: 'completedAt',
-      key: 'completedAt',
+      valueType: 'dateRange',
+      search: {
+        transform: (dates) => ({startDate: dates[0], endDate: dates[1] })
+      },
       width: 150,
-      render: (v: string) => dayjs(v).format('YYYY-MM-DD HH:mm:ss')
+      render: (_, record) => dayjs(record.completedAt).format('YYYY-MM-DD HH:mm:ss')
     },
     {
       title: '操作',
       dataIndex: 'operate',
       // fixed: 'right',
-      key: 'operate',
-      width: 160,
-      render: (_: string, r: any) => (
+      valueType: 'option',
+      width: 100,
+      render: (_, r: any) => (
         <div>
           <Popconfirm
             title="再テスト実施"
@@ -133,15 +138,32 @@ const TestHistoryList = () => {
 
   return (
     <div className="container">
-      <Table 
-        // title={() => <Typography.Title level={5}>テスト結果一覧</Typography.Title>}
-        rowKey="id" 
-        dataSource={resultList} 
+      <ProTable
+        rowKey="idx" 
+        actionRef={actionRef}
+        cardBordered
+        request={async (params, sorter, filter) => {
+          console.log(params, sorter, filter);
+          const { pagination: resPagination, data } = await getTestHistoryList({
+            ...params,
+            page: params.current
+          }) || {}
+          setPagination({...pagination, ...(resPagination || {})})
+          return ({
+            data: data || [],
+            success: true,
+            total: resPagination?.total || 0
+          });
+        }}
         columns={columns}
-        pagination={{ ...pagination, onChange: (page, pageSize) => getTestHistoryList(page, pageSize)}}
-        loading={tableLoading}
+        search={{
+          labelWidth: 95,
+          span: 8,
+        }}
+        pagination={{ ...pagination }}
         bordered
-        size='small'
+        defaultSize='small'
+        headerTitle={<Typography.Title level={5}>テスト履歴一覧</Typography.Title>}
       />
     </div>
   );

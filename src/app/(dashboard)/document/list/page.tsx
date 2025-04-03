@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { get, postJson } from '@/lib';
 import { App, Badge, Button, Popconfirm, Typography } from 'antd';
 import { TPagination } from '@/constants/type'
-import { FILE_TYPE_TEXT, FILE_TYPE, operateBtnProperty } from '@/constants';
+import { FILE_TYPE_TEXT, FILE_TYPE, operateBtnProperty, publicEnum } from '@/constants';
 import UploadModal from '@/components/UploadModal';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { LightFilter, ProFormSelect, ProTable } from '@ant-design/pro-components';
@@ -20,15 +20,9 @@ const initPagination: TPagination  = {
   showSizeChanger: true,
 }
 
-const publicEnum = {
-  0: { text: '未公開', status: 'Default' },
-  1: { text: '公開中', status: 'Success' },
-}
-
 const FileUploadPage = () => {
   const [pagination, setPagination] = useState<TPagination>(initPagination);
   const [isOpen, setOpen] = useState(false);
-  const [params, setParams] = useState<any>({});
   const { message } = App.useApp();
   const actionRef = useRef<ActionType>();
   
@@ -107,6 +101,13 @@ const FileUploadPage = () => {
       hideInSearch: true,
     },
     {
+      title: '公開状態',
+      dataIndex: 'isPublic',
+      // hideInSearch: true,
+      valueEnum: publicEnum,
+      render: (_, record: any ) => <Badge status={record.isPublic ? 'success' : 'default'} text={record.isPublic ? '公開中' : '未公開'}/>
+    },
+    {
       title: '書類タイプ',
       width: '12%',
       dataIndex: 'fileType',
@@ -128,7 +129,9 @@ const FileUploadPage = () => {
       dataIndex: 'createdDate',
       valueType: 'dateRange',
       width:150,
-      // hideInSearch: true,
+      search: {
+        transform: (dates) => ({startDate: dates[0], endDate: dates[1] })
+      },
       render: (_, record) =>  dayjs(record.createdDate).format('YYYY-MM-DD HH:mm:ss')
     },
     {
@@ -136,13 +139,6 @@ const FileUploadPage = () => {
       dataIndex: 'userName',
       hideInSearch: true,
       render: (_, r: any) => `${r.user.firstName} ${r.user.lastName}`
-    },
-    {
-      title: '公開状態',
-      dataIndex: 'isPublic',
-      hideInSearch: true,
-      valueEnum: publicEnum,
-      render: (_, record: any ) => <Badge status={record.isPublic ? 'success' : 'default'} text={record.isPublic ? '公開中' : '未公開'}/>
     },
     {
       title: '操作',
@@ -199,14 +195,10 @@ const FileUploadPage = () => {
       <ProTable
         rowKey="id" 
         actionRef={actionRef}
-        params={params}
         cardBordered
         request={async (params, sorter, filter) => {
           console.log(params, sorter, filter);
-          const [startDate, endDate] = params?.createdDate || []
           const { pagination: resPagination, data } = await getFileInfoList({
-            startDate: startDate,
-            endDate: endDate,
             ...params,
             page: params.current
           }) || {}
@@ -219,6 +211,7 @@ const FileUploadPage = () => {
         }}
         columns={columns}
         pagination={{ ...pagination }}
+        search={{ span: 8 }}
         bordered
         defaultSize='small'
         toolbar={{
@@ -226,14 +219,14 @@ const FileUploadPage = () => {
             <Button type="primary" onClick={() => setOpen(true)} icon={<UploadOutlined />}>
               アップロード
             </Button>,
-            <LightFilter>
-              <ProFormSelect
-                label='公開状態'
-                name='isPublic'
-                onChange={(v: boolean) => setParams({ isPublic: v })}
-                options={[{value: true, label: '公開中'}, { value: false, label: '未公開' }]} 
-              />
-            </LightFilter>
+            // <LightFilter>
+            //   <ProFormSelect
+            //     label='公開状態'
+            //     name='isPublic'
+            //     onChange={(v: boolean) => setParams({ isPublic: v })}
+            //     options={[{value: true, label: '公開中'}, { value: false, label: '未公開' }]} 
+            //   />
+            // </LightFilter>
           ]),
         }}
         headerTitle={<Typography.Title level={5}>ドキュメント一覧</Typography.Title>}

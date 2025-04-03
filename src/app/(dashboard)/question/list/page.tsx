@@ -1,13 +1,15 @@
 "use client"
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import { get, postJson } from '@/lib';
-import { App, Button, Popconfirm, Table, Tooltip } from 'antd';
+import { App, Button, Popconfirm, Table, Tooltip, Typography } from 'antd';
 import { TPagination } from '@/constants/type'
-import {  operateBtnProperty, QUESTION_TYPE } from '@/constants';
+import {  operateBtnProperty, QUESTION_TYPE_EUNM } from '@/constants';
 import QuesFormModal from '@/components/QuesFormModal';
+import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
 
 import Style from './style.module.css';
+import { PlusOutlined } from '@ant-design/icons';
 
 const initPagination: TPagination  = {
   page: 1,
@@ -18,29 +20,25 @@ const initPagination: TPagination  = {
 }
 
 const QuestionList = () => {
-  const [tableLoading, seTableLoading] = useState(false);
-  const [questionList, setQuestionList] = useState([]);
   const [pagination, setPagination] = useState<TPagination>(initPagination);
   const [isOpen, setOpen] = useState(false);
+  const actionRef = useRef<ActionType>();
 	const { message } = App.useApp();
 
-  const getQuestionList = async (page: number = 1, pageSize: number = pagination.pageSize) => {
+  const getQuestionList = async (params = {}) => {
     try {
-      seTableLoading(true);
-      const response = await get('/api/quiz/list', { page, pageSize });
+      const response = await get('/api/quiz/list', {
+        page: initPagination.page,
+        pageSize: pagination.pageSize,
+        ...params,
+      });
       console.log(response, 'getQuestionList')
-      setQuestionList(response?.data || []);
-      setPagination({...pagination, ...(response?.pagination || {})});
+      return response;
     } catch (error: any) {
       console.log(error, "error>>>>")
       message.error(error.message);
     }
-    seTableLoading(false)
   }
-
-  useEffect(() => {
-    getQuestionList();
-  }, [])
 
   const handleQuizDelete = async (record: any) => {
     try {
@@ -51,7 +49,7 @@ const QuestionList = () => {
       console.log(success, msg, 'handleQuizDelete')
 
       if (success) {
-        getQuestionList(initPagination.page, pagination.pageSize);
+        actionRef.current?.reload();
         return message.success(msg)
       }
       message.warning(msg)
@@ -60,60 +58,63 @@ const QuestionList = () => {
     }
   }
 
-  const columns = [
+  const columns: ProColumns[] = [
     {
       title: 'ID',
-      dataIndex: '',
-      key: 'id',
+      dataIndex: 'idx',
+      hideInSearch: true,
       width: 40,
       render: (_:any, __:any, index: number) => (pagination.page - 1) * pagination.pageSize + index + 1
     },
     {
       title: '関連ドキュメント',
       dataIndex: 'document',
-      key: 'document',
+      valueType: 'text',
       ellipsis: true,
-      render: (document: any, record: any) => document.fileName
-    },
+      className: Style['fileName-cell'],
+      formItemProps: {
+        label: 'ドキュメント',
+      },
+      render: (_, record) => <a target="_blank" href={record?.document?.pathName}>{record.document.fileName}</a>    },
     {
       title: 'ドキュメントID',
       dataIndex: 'documentId',
-      key: 'documentId',
+      hideInSearch: true,
       ellipsis: true
     },
     {
       title: '問題タイプ',
       width: '10%',
       dataIndex: 'questionType',
-      key: 'questionType',
-      render: (v: "SINGLE_CHOICE" | "MULTIPLE_CHOICE") => QUESTION_TYPE[v]
+      valueEnum: QUESTION_TYPE_EUNM,
     },
     {
       title: '問題内容',
       dataIndex: 'content',
-      key: 'content',
       ellipsis: true,
     },
     {
       title: '作成日時',
       dataIndex: 'createdDate',
-      key: 'createdDate',
+      valueType: 'dateRange',
+      search: {
+        transform: (dates) => ({startDate: dates[0], endDate: dates[1] })
+      },
       width: 150,
-      render: (v: string) => dayjs(v).format('YYYY-MM-DD HH:mm:ss')
+      render: (_, record) => dayjs(record?.createdDate).format('YYYY-MM-DD HH:mm:ss')
     },
     {
       title: '作成者',
       dataIndex: 'userName',
-      key: 'userName',
-      render: (_: string, r: any) => `${r.user.firstName} ${r.user.lastName}`
+      render: (_, r: any) => `${r.user.firstName} ${r.user.lastName}`
     },
     {
       title: '操作',
       dataIndex: 'operate',
-      // fixed: 'right',
-      key: 'operate',
-      width: 160,
-      render: (_: string, r: any) => (
+      fixed: 'right',
+      valueType: 'option',
+      width: 120,
+      render: (_, r: any) => (
         <div>
           <Popconfirm
             title="問題の削除"
@@ -140,16 +141,40 @@ const QuestionList = () => {
 
   return (
     <div className="container">
-      <QuesFormModal onCancel={handleModalCancel} isOpen={isOpen} onSuccess={getQuestionList}/>
-      <Button type='primary' onClick={() => setOpen(true)} style={{ marginBottom: 12 }}>新規追加</Button>
-      <Table 
-        rowKey="id" 
-        dataSource={questionList} 
+      <QuesFormModal onCancel={handleModalCancel} isOpen={isOpen} onSuccess={() => actionRef.current?.reload()}/>
+      <ProTable
+        rowKey="idx" 
+        actionRef={actionRef}
+        cardBordered
+        request={async (params, sorter, filter) => {
+          console.log(params, sorter, filter);
+          const { pagination: resPagination, data } = await getQuestionList({
+            ...params,
+            page: params.current
+          }) || {}
+          setPagination({...pagination, ...(resPagination || {})})
+          return ({
+            data: data || [],
+            success: true,
+            total: resPagination?.total || 0
+          });
+        }}
         columns={columns}
-        pagination={{ ...pagination, onChange: (page, pageSize) => getQuestionList(page, pageSize)}}
-        loading={tableLoading}
+        search={{
+          labelWidth: 95,
+          span: 8,
+        }}
+        toolbar={{
+          actions: ([
+            <Button type="primary" onClick={() => setOpen(true)} icon={<PlusOutlined />}>
+              新規追加
+            </Button>
+          ]),
+        }}
+        pagination={{ ...pagination }}
         bordered
-        size='small'
+        defaultSize='small'
+        headerTitle={<Typography.Title level={5}>問題一覧</Typography.Title>}
       />
     </div>
   );

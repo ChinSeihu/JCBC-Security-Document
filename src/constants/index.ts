@@ -9,13 +9,8 @@ export enum FILE_TYPE {
 }
 
 export enum QUESTION_TYPE_EUNM {
-	SINGLE_CHOICE = "SINGLE_CHOICE",
-	MULTIPLE_CHOICE = "MULTIPLE_CHOICE"
-}
-
-export const QUESTION_TYPE = {
-	[QUESTION_TYPE_EUNM.SINGLE_CHOICE]: "単一選択",
-	[QUESTION_TYPE_EUNM.MULTIPLE_CHOICE]: "多肢選択"
+	SINGLE_CHOICE = "単一選択",
+	MULTIPLE_CHOICE = "多肢選択"
 }
 
  export const FILE_TYPE_TEXT = {
@@ -27,3 +22,18 @@ export const QUESTION_TYPE = {
    color: "primary",
    variant: "filled"
  }
+
+ export const publicEnum = {
+   closed: { text: '未公開', status: 'Default' },
+   open: { text: '公開中', status: 'Success' },
+ }
+
+ export enum PUBLIC_STATUS_ENUM {
+	CLOSED = 'closed',
+	OPEN = 'open'
+ }
+
+ export const resultOption = [
+	{value: 1, label: '合格'}, 
+	{value: 0, label: '不合格'}
+]

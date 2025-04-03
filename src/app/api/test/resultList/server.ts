@@ -1,3 +1,4 @@
+import { PUBLIC_STATUS_ENUM } from "@/constants"
 import prisma from "@/lib/prisma"
 import dayjs from "dayjs"
 
@@ -8,7 +9,7 @@ interface ListQuestionParams {
   pageSize?: number
   startDate?: string
   endDate?: string
-  isPublic?: 'false' | 'true'
+  isPublic?: PUBLIC_STATUS_ENUM
   document?: string
   score?: string
   userName?: string
@@ -51,7 +52,7 @@ export async function resultList(params: ListQuestionParams): Promise<PaginatedQ
             gte: startDate ? dayjs(startDate).toISOString() : undefined, 
           },
           document: {
-            isPublic: isPublic && isPublic === 'true',
+            isPublic: isPublic && isPublic === PUBLIC_STATUS_ENUM.OPEN,
             fileName: { contains: document, mode: 'insensitive' }
           },
           score: score ? {

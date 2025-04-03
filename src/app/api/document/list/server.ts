@@ -1,5 +1,7 @@
+import { PUBLIC_STATUS_ENUM } from "@/constants"
 import prisma from "@/lib/prisma"
 import { Prisma } from "@prisma/client"
+import dayjs from "dayjs"
 
 // 类型定义
 interface ListDocumentsParams {
@@ -9,7 +11,7 @@ interface ListDocumentsParams {
 
   startDate?: string
   endDate?: string
-  isPublic?: 'false' | 'true'
+  isPublic?: PUBLIC_STATUS_ENUM
   fileName?: string
 
   // 排序参数
@@ -39,6 +41,9 @@ export async function listDocuments(params: ListDocumentsParams): Promise<Pagina
       orderBy = 'lastModifiedDate',
       orderDirection = 'desc',
       fileType,
+      endDate,
+      startDate,
+      isPublic
     } = params
 
     // 构建查询条件
@@ -47,10 +52,10 @@ export async function listDocuments(params: ListDocumentsParams): Promise<Pagina
         { 
           fileType,
           createdDate: {
-            lte: params?.endDate ? new Date(params.endDate).toISOString() : undefined,
-            gte: params?.startDate ? new Date(params.startDate).toISOString() : undefined, 
+            lte: endDate ? dayjs(endDate).add(1, 'd').toISOString() : undefined,
+            gte: startDate ? dayjs(startDate).toISOString() : undefined, 
           },
-          isPublic: params?.isPublic && params?.isPublic === 'true',
+          isPublic: isPublic && isPublic === PUBLIC_STATUS_ENUM.OPEN,
           fileName: {
             contains: params.fileName, 
             mode: 'insensitive',

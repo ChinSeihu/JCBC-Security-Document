@@ -1,13 +1,14 @@
 import { HttpStatusCode } from 'axios';
 import { NextRequest, NextResponse } from 'next/server';
 import { listQuestion } from './server';
+import { getSearchParams } from '@/lib/actions';
 
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const page = Number(searchParams.get('page') || 1);
-    const pageSize = Number(searchParams.get('pageSize') || 10);
-    const response = await listQuestion({ page, pageSize })
+    const params = getSearchParams(searchParams);
+    
+    const response = await listQuestion(params)
 
     return NextResponse.json({
       status: HttpStatusCode.Ok,

@@ -1,11 +1,17 @@
 import prisma from "@/lib/prisma"
+import dayjs from "dayjs"
 
 // 类型定义
 interface ListQuestionParams {
   // 分页参数
   page?: number
   pageSize?: number
-
+  endDate?: string
+  startDate?: string
+  questionType?: string
+  document?: string
+  content?: string
+  userName?: string
   // 排序参数
   orderBy?: 'createdAt' | 'updatedAt' | 'fileName' | 'fileSize'
   orderDirection?: 'asc' | 'desc'
@@ -29,11 +35,48 @@ export async function listQuestion(params: ListQuestionParams): Promise<Paginate
       pageSize = 10,
       orderBy = 'lastModifiedDate',
       orderDirection = 'desc',
+      endDate,
+      startDate,
+      questionType,
+      document = '',
+      content = '',
+      userName = ''
     } = params
+
+    const where: any = {
+          AND: [
+            { 
+              questionType,
+              content: {
+                contains: content, 
+                mode: 'insensitive',
+              },
+              createdDate: {
+                lte: endDate ? dayjs(endDate).add(1, 'd').toISOString() : undefined,
+                gte: startDate ? dayjs(startDate).toISOString() : undefined, 
+              },
+              document: {
+                fileName: {
+                  contains: document, 
+                  mode: 'insensitive',
+                },
+              },
+            },
+            {
+              user: {
+                OR: [
+                  { firstName: { contains: userName, mode: 'insensitive' } },
+                  { lastName: { contains: userName, mode: 'insensitive' } },
+                ],
+              }
+            },
+            { delFlag: false } // 默认过滤已删除
+          ].filter(Boolean)
+        }
 
     // 并行查询
     const [total, documents] = await Promise.all([
-      prisma.question.count({ where: { delFlag: false } }),
+      prisma.question.count({ where }),
       prisma.question.findMany({
         select: {
           id: true,
@@ -53,9 +96,9 @@ export async function listQuestion(params: ListQuestionParams): Promise<Paginate
             }
           }
         },
-        where: { delFlag: false },
+        where,
         skip: (page - 1) * pageSize,
-        take: pageSize,
+        take: Number(pageSize),
         orderBy: { [orderBy]: orderDirection },
       })
     ])
@@ -64,8 +107,8 @@ export async function listQuestion(params: ListQuestionParams): Promise<Paginate
       data: documents,
       pagination: {
         total,
-        page,
-        pageSize,
+        page: Number(page),
+        pageSize: Number(pageSize),
         totalPages: Math.ceil(total / pageSize)
       }
     }

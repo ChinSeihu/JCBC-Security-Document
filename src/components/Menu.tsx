@@ -22,7 +22,7 @@ const menuItems = () => [
       {
         key: "10",
         href: "/document/list",
-        label: "ドキュメント一覧",
+        label: "ドキュメント",
         icon: <FileTextOutlined />, 
       },
       {
@@ -40,13 +40,13 @@ const menuItems = () => [
       {
         key: "13",
         href: "/question/list",
-        label: "問題一覧",
+        label: "問題集",
         icon: <ProfileOutlined />,
       },
       {
         key: "14",
         href: "/testResult/list",
-        label: "テスト結果一覧",
+        label: "テスト結果",
         icon: <ScheduleOutlined />,
       },
     ],

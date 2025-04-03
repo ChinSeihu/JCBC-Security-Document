@@ -2,18 +2,14 @@
 import { useEffect, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import { get, postJson } from '@/lib';
-import { App, Button, Popconfirm, Table, Tag, Typography, PaginationProps, Badge } from 'antd';
+import { App, Button, Popconfirm, Tag, Typography, Badge } from 'antd';
 import { TPagination } from '@/constants/type'
-import {  isPass, operateBtnProperty, QUESTION_TYPE } from '@/constants';
-import { ActionType, LightFilter, ProColumns, ProFormSelect, ProTable } from '@ant-design/pro-components';
+import {  isPass, operateBtnProperty, PUBLIC_STATUS_ENUM, publicEnum, resultOption } from '@/constants';
+import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
 
 import Style from './style.module.css';
 import { ExportOutlined } from '@ant-design/icons';
 
-const publicEnum = {
-  0: { text: '未公開', status: 'Default' },
-  1: { text: '公開中', status: 'Success' },
-}
 const initPagination: TPagination = {
   page: 1,
   pageSize: 10,
@@ -81,10 +77,9 @@ const TestResultList = () => {
       title: '関連ドキュメント',
       dataIndex: 'document',
       valueType: 'text',
-      className: 'fileName-cell',
+      className: Style['fileName-cell'],
       formItemProps: {
         label: 'ドキュメント',
-        // labelCol:{ span: 8 }
       },
       ellipsis: true,
       render: (_, record) => <a target="_blank" href={record?.document?.pathName}>{record.document.fileName}</a>
@@ -105,9 +100,7 @@ const TestResultList = () => {
       title: 'テスト結果',
       dataIndex: 'score',
       valueType: 'select',
-      fieldProps: {
-        options: [{value: 1, label: '合格'}, {value: 0, label: '不合格'}]
-      },
+      fieldProps: { options: resultOption },
       render: (_, record) => <TestResult point={record?.score}/>
     },
     {
@@ -119,6 +112,9 @@ const TestResultList = () => {
       title: '実施日時',
       dataIndex: 'completedAt',
       valueType: 'dateRange',
+      search: {
+        transform: (dates) => ({startDate: dates[0], endDate: dates[1] })
+      },
       width: 150,
       render: (_, record) => dayjs(record.completedAt).format('YYYY-MM-DD HH:mm:ss')
     },
@@ -154,13 +150,9 @@ const TestResultList = () => {
         cardBordered
         request={async (params, sorter, filter) => {
           console.log(params, sorter, filter);
-          const [startDate, endDate] = params?.completedAt || []
           const { pagination: resPagination, data } = await getTestResultList({
-            startDate: startDate,
-            endDate: endDate,
             ...params,
             userName: params.user,
-            isPublic: params.isPublic && params.isPublic === '1',
             page: params.current
           }) || {}
           setPagination({...pagination, ...(resPagination || {})})
@@ -172,7 +164,8 @@ const TestResultList = () => {
         }}
         columns={columns}
         search={{
-          labelWidth: 'auto',
+          labelWidth: 95,
+          span: 8,
         }}
         toolbar={{
           actions: ([
