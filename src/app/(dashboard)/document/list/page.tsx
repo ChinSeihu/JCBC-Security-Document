@@ -84,7 +84,7 @@ const FileUploadPage = () => {
     }
   }
 
-  const columns:ProColumns[] = [
+  const columns: ProColumns[] = [
     {
       title: 'ID',
       dataIndex: 'index',
@@ -148,6 +148,7 @@ const FileUploadPage = () => {
       title: '操作',
       dataIndex: 'operate',
       fixed: 'right',
+      valueType: 'option',
       hideInSearch: true,
       width: 140,
       render: (_, r: any) => (
@@ -208,12 +209,12 @@ const FileUploadPage = () => {
             endDate: endDate,
             ...params,
             page: params.current
-          })
+          }) || {}
           setPagination({...pagination, ...(resPagination || {})})
-          return Promise.resolve({
-            data: data,
+          return ({
+            data: data || [],
             success: true,
-            total: resPagination?.total
+            total: resPagination?.total || 0
           });
         }}
         columns={columns}

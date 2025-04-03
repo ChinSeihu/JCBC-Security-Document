@@ -1,7 +1,3 @@
-.fileName-cell {
+.fileName-cell a span {
 	color: #69b1ff;
-}
-
-.container {
-	height: 100%;
 }

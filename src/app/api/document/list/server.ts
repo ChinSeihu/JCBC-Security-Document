@@ -18,7 +18,6 @@ interface ListDocumentsParams {
 
   // 过滤参数
   fileType?: string
-  search?: string
 }
 
 interface PaginatedDocuments {
@@ -40,7 +39,6 @@ export async function listDocuments(params: ListDocumentsParams): Promise<Pagina
       orderBy = 'lastModifiedDate',
       orderDirection = 'desc',
       fileType,
-      search,
     } = params
 
     // 构建查询条件
@@ -57,12 +55,6 @@ export async function listDocuments(params: ListDocumentsParams): Promise<Pagina
             contains: params.fileName, 
             mode: 'insensitive',
           },
-        },
-        { 
-          OR: search ? [
-            { fileName: { contains: search, mode: 'insensitive' } },
-            { description: { contains: search, mode: 'insensitive' } }
-          ] : undefined
         },
         { delFlag: false } // 默认过滤已删除
       ].filter(Boolean)

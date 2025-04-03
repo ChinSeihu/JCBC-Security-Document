@@ -1,13 +1,19 @@
 "use client"
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import { get, postJson } from '@/lib';
 import { App, Button, Popconfirm, Table, Tag, Typography, PaginationProps, Badge } from 'antd';
 import { TPagination } from '@/constants/type'
 import {  isPass, operateBtnProperty, QUESTION_TYPE } from '@/constants';
+import { ActionType, LightFilter, ProColumns, ProFormSelect, ProTable } from '@ant-design/pro-components';
 
 import Style from './style.module.css';
+import { ExportOutlined } from '@ant-design/icons';
 
+const publicEnum = {
+  0: { text: '未公開', status: 'Default' },
+  1: { text: '公開中', status: 'Success' },
+}
 const initPagination: TPagination = {
   page: 1,
   pageSize: 10,
@@ -26,28 +32,24 @@ const TestResult = ({ point }: {point: number}) => {
 }
 
 const TestResultList = () => {
-  const [tableLoading, seTableLoading] = useState(false);
-  const [resultList, setResultList] = useState([]);
   const [pagination, setPagination] = useState<TPagination>(initPagination);
 	const { message } = App.useApp();
-
-  const getTestResultList = async (page: number = 1, pageSize: number = pagination.pageSize) => {
+  const actionRef = useRef<ActionType>();
+  
+  const getTestResultList = async (params = {}) => {
     try {
-      seTableLoading(true);
-      const response = await get('/api/test/resultList', { page, pageSize });
+      const response = await get('/api/test/resultList', {
+        page: initPagination.page,
+        pageSize: pagination.pageSize,
+        ...params,
+      });
       console.log(response, 'resultList')
-      setResultList(response?.data || []);
-      setPagination({...pagination, ...(response?.pagination || {})});
+      return response
     } catch (error: any) {
       console.log(error, "error>>>>")
       message.error(error.message);
     }
-    seTableLoading(false)
   }
-
-  useEffect(() => {
-    getTestResultList();
-  }, [])
   
   const handleOperation = async (record: any) => {
     try {
@@ -58,7 +60,7 @@ const TestResultList = () => {
       })
       
       if (success) {
-        getTestResultList();
+        actionRef.current?.reload();
         return message.success(msg)
       }
       message.warning(msg)
@@ -67,60 +69,67 @@ const TestResultList = () => {
     }
   }
 
-  const columns = [
+  const columns: ProColumns[] = [
     {
       title: 'ID',
-      dataIndex: '',
-      key: 'id',
+      dataIndex: 'idx',
       width: 40,
-      render: (_:any, __:any, index: number) => (pagination.page - 1) * pagination.pageSize + index + 1
+      hideInSearch: true,
+      render: (_, __, index: number) => (pagination.page - 1) * pagination.pageSize + index + 1
     },
     {
       title: '関連ドキュメント',
       dataIndex: 'document',
-      key: 'document',
+      valueType: 'text',
       className: 'fileName-cell',
+      formItemProps: {
+        label: 'ドキュメント',
+        // labelCol:{ span: 8 }
+      },
       ellipsis: true,
-      render: (document: any, record: any) => <a target="_blank" href={record?.document?.pathName}>{document.fileName}</a>
+      render: (_, record) => <a target="_blank" href={record?.document?.pathName}>{record.document.fileName}</a>
     },
     {
       title: '公開状態',
       dataIndex: 'isPublic',
-      key: 'isPublic',
-      render: (_:any, r: any) => <Badge status={r.document.isPublic ? 'success' : 'default'} text={r.document.isPublic ? '公開中' : '未公開'}/>
+      valueEnum: publicEnum,
+      render: (_, r) => <Badge status={r.document.isPublic ? 'success' : 'default'} text={r.document.isPublic ? '公開中' : '未公開'}/>
     },
     {
       title: '正解/総計',
       dataIndex: 'correctAnswers',
-      key: 'correctAnswers',
-      render: (v: number, record: any) => <Tag>{v}/{record.totalQuestions}</Tag>
+      hideInSearch: true,
+      render: (v, record) => <Tag>{v}/{record.totalQuestions}</Tag>
     },
     {
       title: 'テスト結果',
       dataIndex: 'score',
-      key: 'score',
-      render: (v: number) => <TestResult point={v}/>
+      valueType: 'select',
+      fieldProps: {
+        options: [{value: 1, label: '合格'}, {value: 0, label: '不合格'}]
+      },
+      render: (_, record) => <TestResult point={record?.score}/>
     },
     {
       title: '受験者',
       dataIndex: 'user',
-      key: 'user',
-      render: (user: any) => `${user.firstName} ${user.lastName}`
+      renderText: (user) => `${user.firstName} ${user.lastName}`
     },
     {
       title: '実施日時',
       dataIndex: 'completedAt',
-      key: 'completedAt',
+      valueType: 'dateRange',
       width: 150,
-      render: (v: string) => dayjs(v).format('YYYY-MM-DD HH:mm:ss')
+      render: (_, record) => dayjs(record.completedAt).format('YYYY-MM-DD HH:mm:ss')
     },
     {
       title: '操作',
       dataIndex: 'operate',
-      // fixed: 'right',
-      key: 'operate',
-      width: 160,
-      render: (_: string, r: any) => (
+      fixed: 'right',
+      valueType: 'option',
+      width: 100,
+      hideInSearch: true,
+      render: (_, r: any) => (
         <div>
           <Popconfirm
             title="再テスト指定"
@@ -139,15 +148,43 @@ const TestResultList = () => {
 
   return (
     <div className="container">
-      <Table 
-        // title={() => <Typography.Title level={5}>テスト結果一覧</Typography.Title>}
-        rowKey="id" 
-        dataSource={resultList} 
+      <ProTable
+        rowKey="idx" 
+        actionRef={actionRef}
+        cardBordered
+        request={async (params, sorter, filter) => {
+          console.log(params, sorter, filter);
+          const [startDate, endDate] = params?.completedAt || []
+          const { pagination: resPagination, data } = await getTestResultList({
+            startDate: startDate,
+            endDate: endDate,
+            ...params,
+            userName: params.user,
+            isPublic: params.isPublic && params.isPublic === '1',
+            page: params.current
+          }) || {}
+          setPagination({...pagination, ...(resPagination || {})})
+          return ({
+            data: data || [],
+            success: true,
+            total: resPagination?.total || 0
+          });
+        }}
         columns={columns}
-        pagination={{ ...pagination, onChange: (page, pageSize) => getTestResultList(page, pageSize)}}
-        loading={tableLoading}
+        search={{
+          labelWidth: 'auto',
+        }}
+        toolbar={{
+          actions: ([
+            <Button type="primary" icon={<ExportOutlined />}>
+              エクスポート
+            </Button>
+          ]),
+        }}
+        pagination={{ ...pagination }}
         bordered
-        size='small'
+        defaultSize='small'
+        headerTitle={<Typography.Title level={5}>テスト結果一覧</Typography.Title>}
       />
     </div>
   );

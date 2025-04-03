@@ -1,11 +1,17 @@
 import prisma from "@/lib/prisma"
+import dayjs from "dayjs"
 
 // 类型定义
 interface ListQuestionParams {
   // 分页参数
   page?: number
   pageSize?: number
-
+  startDate?: string
+  endDate?: string
+  isPublic?: 'false' | 'true'
+  document?: string
+  score?: string
+  userName?: string
   // 排序参数
   orderBy?: 'createdAt' | 'updatedAt' | 'fileName' | 'fileSize'
   orderDirection?: 'asc' | 'desc'
@@ -29,11 +35,44 @@ export async function resultList(params: ListQuestionParams): Promise<PaginatedQ
       pageSize = 10,
       orderBy = 'completedAt',
       orderDirection = 'desc',
+      startDate,
+      endDate,
+      isPublic,
+      document = '',
+      score,
+      userName = ''
     } = params
+
+    const where: any = {
+      AND: [
+        { 
+          completedAt: {
+            lte: endDate ? dayjs(endDate).add(1, 'd').toISOString() : undefined,
+            gte: startDate ? dayjs(startDate).toISOString() : undefined, 
+          },
+          document: {
+            isPublic: isPublic && isPublic === 'true',
+            fileName: { contains: document, mode: 'insensitive' }
+          },
+          score: score ? {
+            gte: Number(score),
+            lt: score === '0' ? 1 : undefined
+          } : undefined
+        },
+        {
+          user: {
+            OR: [
+              { firstName: { contains: userName, mode: 'insensitive' } },
+              { lastName: { contains: userName, mode: 'insensitive' } },
+            ],
+          }
+        }
+      ].filter(Boolean)
+    }
 
     // 并行查询
     const [total, documents] = await Promise.all([
-      prisma.quizResult.count(),
+      prisma.quizResult.count({ where }),
       prisma.quizResult.findMany({
         select: {
           id: true,
@@ -58,8 +97,9 @@ export async function resultList(params: ListQuestionParams): Promise<PaginatedQ
             }
           }
         },
+        where,
         skip: (page - 1) * pageSize,
-        take: pageSize,
+        take: Number(pageSize),
         orderBy: { [orderBy]: orderDirection },
       })
     ])
@@ -68,8 +108,8 @@ export async function resultList(params: ListQuestionParams): Promise<PaginatedQ
       data: documents,
       pagination: {
         total,
-        page,
-        pageSize,
+        page: Number(page),
+        pageSize: Number(pageSize),
         totalPages: Math.ceil(total / pageSize)
       }
     }
