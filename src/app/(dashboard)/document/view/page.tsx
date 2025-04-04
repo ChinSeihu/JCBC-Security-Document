@@ -44,17 +44,18 @@ const PDFViewer = () => {
     try {
       setLoading(true)
       const fileResponse = await get('/api/document/fileInfo')
-      setFileInfo(fileResponse.data)
-      return fileResponse
-    }catch (e: any) {
+      setFileInfo(fileResponse)
+      return fileResponse || {}
+    } catch (e: any) {
       message.error(e?.message)
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   useEffect(() => {
     getFileInfo().then((res) => {
-      if (res.data) getFileStream()
+      if (res.success) getFileStream()
     })
   }, [])
 
