@@ -20,14 +20,14 @@ export default function RootLayout({
 }>) {
   console.log('RootLayout>>>>>')
   return (
-    <ClerkProvider>
+    <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
       <html lang="en">
         <body className={inter.className}>
           <ConfigProvider locale={jaJP}>
-            <App style={{height: '100%'}}>{children}</App>
+            <App style={{height: '100%' }}>{children}</App>
           </ConfigProvider >
         </body>
       </html>
     </ClerkProvider>
-  );  
+  );
 }

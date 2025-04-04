@@ -216,17 +216,9 @@ const FileUploadPage = () => {
         defaultSize='small'
         toolbar={{
           actions: ([
-            <Button type="primary" onClick={() => setOpen(true)} icon={<UploadOutlined />}>
+            <Button key='upload' type="primary" onClick={() => setOpen(true)} icon={<UploadOutlined />}>
               アップロード
             </Button>,
-            // <LightFilter>
-            //   <ProFormSelect
-            //     label='公開状態'
-            //     name='isPublic'
-            //     onChange={(v: boolean) => setParams({ isPublic: v })}
-            //     options={[{value: true, label: '公開中'}, { value: false, label: '未公開' }]} 
-            //   />
-            // </LightFilter>
           ]),
         }}
         headerTitle={<Typography.Title level={5}>ドキュメント一覧</Typography.Title>}

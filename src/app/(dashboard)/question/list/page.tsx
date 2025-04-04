@@ -166,7 +166,7 @@ const QuestionList = () => {
         }}
         toolbar={{
           actions: ([
-            <Button type="primary" onClick={() => setOpen(true)} icon={<PlusOutlined />}>
+            <Button key='add' type="primary" onClick={() => setOpen(true)} icon={<PlusOutlined />}>
               新規追加
             </Button>
           ]),

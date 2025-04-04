@@ -4,9 +4,9 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import Style from './style.module.css'
-import { get } from '@/lib';
 import { App, Button, Empty, FloatButton, Pagination, Spin } from 'antd';
 import QuestionDrawer from '@/components/QuestionDrawer';
+import { get } from '@/lib';
 
 // 配置 PDF worker
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.min.mjs`;
@@ -17,9 +17,11 @@ const PDFViewer = () => {
   const [fileInfo, setFileInfo] = useState<any>({});
   const [loading, setLoading] = useState(false);
   const [isOpen, setOpen] = useState(false);
+  const [fileurl, setFileurl] = useState<any>();
+
   const [isTesting, setIsTesting] = useState(false);
   const { message } = App.useApp();
-  
+
   // PDF 加载成功回调
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
@@ -28,8 +30,22 @@ const PDFViewer = () => {
   const getFileStream = async () => {
     try {
       setLoading(true)
-      const fileResponse = await get('/api/document/getFileInfo')
-      setFileInfo(fileResponse);
+      const fileResponse = await fetch('/api/document/fileStream')
+      if (fileResponse.ok) {
+        const blob = await fileResponse.blob();
+        setFileurl(URL.createObjectURL(blob))
+      }
+    }catch (e: any) {
+      message.error(e?.message)
+    }
+    setLoading(false)
+  }
+  const getFileInfo = async () => {
+    try {
+      setLoading(true)
+      const fileResponse = await get('/api/document/fileInfo')
+      setFileInfo(fileResponse.data)
+      return fileResponse
     }catch (e: any) {
       message.error(e?.message)
     }
@@ -37,7 +53,9 @@ const PDFViewer = () => {
   }
 
   useEffect(() => {
-    getFileStream();
+    getFileInfo().then((res) => {
+      if (res.data) getFileStream()
+    })
   }, [])
 
   const handlePageChange = (page: number) => {
@@ -58,9 +76,9 @@ const PDFViewer = () => {
       <div className={Style["pdf-container"]}>
         <Spin spinning={loading}>
           {isTesting && <FloatButton type="primary" onClick={() => setOpen(true)}/>}
-          {fileInfo?.pathUrl ? 
+          {fileurl ? 
             <Document
-              file={fileInfo?.pathUrl}
+              file={fileurl}
               onLoadSuccess={onDocumentLoadSuccess}
               loading={<div>Loading PDF...</div>}
               error={<div>Failed to load PDF!</div>}

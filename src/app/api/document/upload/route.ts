@@ -22,13 +22,13 @@ export async function POST(request: Request) {
 
     await documentCreate({
       filename: file.name,
-      pathName: `/upload/${filename}`,
+      pathName: `${process.env.NEXT_PUBLIC_UPLOAD_DIR}${filename}`,
       fileSize: file.size
     })
     
     // 保存到 public/upload
     await writeFile(
-      `${process.cwd()}/public/upload/${filename}`,
+      `${process.cwd()}/public/${process.env.NEXT_PUBLIC_UPLOAD_DIR}/${filename}`,
       new Uint8Array(buffer)
     );
 
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
       data: {
         filename,
         success: true,
-        url: `/upload/${filename}`,
+        url: `${process.env.NEXT_PUBLIC_UPLOAD_DIR}/${filename}`,
       },
     });
 

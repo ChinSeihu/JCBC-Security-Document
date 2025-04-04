@@ -4,18 +4,10 @@ import fs from 'fs';
 import path from 'path';
 import { getPublicFileInfo, getUserTestStatus } from './server';
 import { HttpStatusCode } from 'axios';
+import { readFile } from 'fs/promises';
 
 export async function GET() {
   try {
-    // const { searchParams } = new URL(request.url);
-    // const filename = searchParams.get('filename');
-
-    // if (!filename) {
-    //   return NextResponse.json(
-    //     { error: 'Missing filename parameter' },
-    //     { status: 400 }
-    //   );
-    // }
     const fileInfo = await getPublicFileInfo();
     // 构建文件路径
     const filePath = path.join(
@@ -35,15 +27,15 @@ export async function GET() {
       );
     }
 
-    const testStatus = await getUserTestStatus(fileInfo);
-    const pathUrl = fileInfo.pathName
+    const fileBuffer = await readFile(filePath);
 
-    // 返回 PDF 数据流
-    return NextResponse.json({
-      data: {...fileInfo, pathUrl,success: true, testStatus },
-      status: HttpStatusCode.Ok
+    console.log(fileInfo, 'fileInfo>>>>>>>>>')
+    return new NextResponse(fileBuffer, {
+      headers: {
+        "Content-Type": "application/pdf", // 根据实际文件类型调整
+        "Content-Disposition": `inline; filename="${fileInfo.fileName}"`,
+      },
     });
-
   } catch (error) {
     return NextResponse.json(
       { error: 'Internal Server Error' },

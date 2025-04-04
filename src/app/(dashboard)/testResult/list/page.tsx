@@ -169,7 +169,7 @@ const TestResultList = () => {
         }}
         toolbar={{
           actions: ([
-            <Button type="primary" icon={<ExportOutlined />}>
+            <Button key='export' type="primary" icon={<ExportOutlined />}>
               エクスポート
             </Button>
           ]),

@@ -6,6 +6,10 @@ html, body, .ant-app {
   height: 100%;
 }
 
+/* html {
+  zoom: 100%;
+} */
+
 .react-calendar {
   width: 100% !important;
   border: none !important;

@@ -28,7 +28,7 @@ function request(config: any = {}) {
   return axios(config)
     .then(response => {
       const { status, data, message: msg } = response.data || {}
-      console.log(response.data, 'response')
+      // console.log(response.data, 'response')
       // 接受一个可定制响应的方式
       if (config._customResponse) return response
 
