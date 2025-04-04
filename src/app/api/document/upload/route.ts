@@ -22,7 +22,7 @@ export async function POST(request: Request) {
 
     await documentCreate({
       filename: file.name,
-      pathName: `${process.env.NEXT_PUBLIC_UPLOAD_DIR}${filename}`,
+      pathName: `${process.env.NEXT_PUBLIC_UPLOAD_DIR}/${filename}`,
       fileSize: file.size
     })
     
