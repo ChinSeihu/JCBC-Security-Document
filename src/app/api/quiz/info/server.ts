@@ -25,7 +25,7 @@ export const getQuestionInfo = async (questionId: string) => {
         return result;
     } catch (error) {
         console.error('問題詳細の取得に失败:', error)
-    throw new Error('問題詳細の取得に失败しました')
+        throw new Error('問題詳細の取得に失败しました')
     } finally {
         await prisma.$disconnect()
     }

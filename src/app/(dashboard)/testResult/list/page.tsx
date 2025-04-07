@@ -170,7 +170,7 @@ const TestResultList = () => {
         toolbar={{
           actions: ([
             <Button key='export' type="primary" icon={<ExportOutlined />}>
-              エクスポート
+              エクスポート(実装中)
             </Button>
           ]),
         }}

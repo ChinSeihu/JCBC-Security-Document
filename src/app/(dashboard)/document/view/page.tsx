@@ -97,7 +97,7 @@ const PDFViewer = () => {
       <QuestionDrawer 
         onCancel={handleModalCancel} 
         isOpen={isOpen} 
-        documentId={fileInfo.id} 
+        documentId={fileInfo?.id} 
         testStatus={fileInfo?.testStatus || {}}
         setOpen={setOpen}
       />

@@ -48,7 +48,7 @@
     "typescript": "^5"
   },
   "resolutions": {
-    "@clerk/shared": "^3.2.1"
+    "@clerk/shared": "3.2.1"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"

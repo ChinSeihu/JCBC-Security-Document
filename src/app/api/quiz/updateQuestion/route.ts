@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma'
 import { HttpStatusCode } from 'axios'
 import { currentUser } from '@clerk/nextjs/server'
 import { checkDocumentExits, updateQuesOptions, updateQuestionItem } from './server'
+import { ClientPrisma } from '@/constants/type'
 
 export async function POST(request: Request) {
   try {
@@ -17,7 +18,7 @@ export async function POST(request: Request) {
       )
     }
 
-    prisma.$transaction(async (runPrisma) => {
+    prisma.$transaction(async (runPrisma: ClientPrisma) => {
       const user = await currentUser();
       if (!user?.id) throw new Error('userId is not defined...')
       // 4. 检查关联 document 是否存在
