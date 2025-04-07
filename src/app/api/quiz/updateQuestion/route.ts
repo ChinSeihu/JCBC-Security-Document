@@ -3,14 +3,14 @@ import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { HttpStatusCode } from 'axios'
 import { currentUser } from '@clerk/nextjs/server'
-import { checkDocumentExits, createQuesOptions, createQuestionItem } from './server'
+import { checkDocumentExits, updateQuesOptions, updateQuestionItem } from './server'
 
 export async function POST(request: Request) {
   try {
-    const { content, questionType, documentId, quesOptions } = await request.json()
-    console.log(content, questionType, documentId, quesOptions)
+    const { content, questionType, documentId, quesOptions, questionId } = await request.json()
+    console.log(content, questionType, documentId, quesOptions, questionId)
     // 3. 数据校验
-    if (!content || !questionType || !quesOptions?.length) {
+    if (!content || !questionType || !quesOptions?.length || !questionId) {
       return NextResponse.json(
         { data: { message: 'パラメーター不備' }},
         { status: HttpStatusCode.BadRequest }
@@ -27,22 +27,22 @@ export async function POST(request: Request) {
         return NextResponse.json({ data:{ message: 'ドキュメントが存在しない' }}, { status: HttpStatusCode.NotFound })
       }
 
-      // 5. 创建问题
-      const question = await createQuestionItem({
+      await updateQuestionItem({
           documentId,
           content,
           questionType,
           runPrisma,
-          userId: user.id
+          userId: user.id,
+          questionId
       })
 
-      await createQuesOptions({runPrisma, questionId: question.id, quesOptions })
+      await updateQuesOptions({runPrisma, questionId, quesOptions })
 
     })
     return NextResponse.json({
       data: {
         success: true,
-        message: '追加に成功しました',
+        message: '更新に成功しました',
       },
       status: HttpStatusCode.Ok
   })

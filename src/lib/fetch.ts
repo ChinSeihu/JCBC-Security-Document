@@ -39,12 +39,12 @@ function request(config: any = {}) {
       }
     })
     .catch(err => {
-      throw new Error(err.message || 'request error')
-      // if (messageMap[err.message]) {
-      //   message.error(messageMap[err.message])
-      // } else {
-      //   message.error(err.message)
-      // }
+      console.log(new Error(err.message || 'request error'))
+      if (messageMap[err.message]) {
+        message.error(messageMap[err.message])
+      } else {
+        message.error(err.message)
+      }
     })
 }
 

@@ -24,6 +24,8 @@ const QuestionList = () => {
   const [isOpen, setOpen] = useState(false);
   const actionRef = useRef<ActionType>();
 	const { message } = App.useApp();
+  const [isEdit, setEdit] = useState(false)
+  const [record, setRecord] = useState<any>()
 
   const getQuestionList = async (params = {}) => {
     try {
@@ -126,9 +128,7 @@ const QuestionList = () => {
           >
             {!r.isPublic && <Button {...operateBtnProperty} size='small' style={{ marginRight: 6 }}>削除</Button>}
           </Popconfirm>
-          <Tooltip title='実装中...'>
-            <Button {...operateBtnProperty} size='small'>編集</Button>
-          </Tooltip>
+          <Button {...operateBtnProperty} size='small' onClick={() => handleModalOpen(true, r)}>編集</Button>
         </div>
       )
     },
@@ -137,11 +137,25 @@ const QuestionList = () => {
   const handleModalCancel = (msg?: string) => {
     if (msg?.length) message.success(msg)
     setOpen(false);
+    setEdit(false);
+    setRecord(null)
+  }
+
+  const handleModalOpen = (isEdit: boolean, record?: any) => {
+    setOpen(true);
+    setEdit(isEdit);
+    setRecord(record || {});
   }
 
   return (
     <div className="container">
-      <QuesFormModal onCancel={handleModalCancel} isOpen={isOpen} onSuccess={() => actionRef.current?.reload()}/>
+      <QuesFormModal 
+        onCancel={handleModalCancel} 
+        isOpen={isOpen} 
+        onSuccess={() => actionRef.current?.reload()}
+        isEdit={isEdit}
+        questionId={record?.id}
+      />
       <ProTable
         rowKey="idx" 
         actionRef={actionRef}
@@ -166,7 +180,7 @@ const QuestionList = () => {
         }}
         toolbar={{
           actions: ([
-            <Button key='add' type="primary" onClick={() => setOpen(true)} icon={<PlusOutlined />}>
+            <Button key='add' type="primary" onClick={() => handleModalOpen(false)} icon={<PlusOutlined />}>
               新規追加
             </Button>
           ]),

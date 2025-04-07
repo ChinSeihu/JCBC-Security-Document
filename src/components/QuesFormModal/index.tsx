@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { get, post, postJson } from '@/lib';
-import { Button, Modal, Form, Radio, Input, Select, Row, Checkbox, Tag, App, Typography, Tooltip } from 'antd';
+import { Button, Modal, Form, Radio, Input, Select, Row, Checkbox, Tag, App, Typography, Tooltip, Spin } from 'antd';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import Style from './style.module.css'
 
@@ -12,12 +12,38 @@ const requiredRule = (msg: string) => [
 ];
 
 const QuesFormModal = (props: any) => {
+  const { isEdit, questionId } = props;
 	const [isOpen, setOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [slectLoading, setSelectLoading] = useState(false);
 	const [form] = Form.useForm();
 	const [documentList, setDocumentList] = useState([]);
   const { message, modal } = App.useApp();
+  const [detail, setDetail] = useState<any>()
+  const [spinning, setSpining] = useState(false)
+
+  const getQuestionDetail = async (questionId: string) => {
+    try {
+      setSpining(true);
+      const response = await get('/api/quiz/info', { questionId });
+      console.log(response, 'getQuestionDetail>>>>>')
+      setDetail(response)
+      form.setFieldsValue(response)
+    } catch(e: any) {
+      console.log(e)
+      message.error(e?.message)
+    }
+    setSpining(false);
+  }
+
+  useEffect(() => {
+		setOpen(props.isOpen);
+    if (props.isOpen) getFileInfoList()
+	}, [props.isOpen])
+
+  useEffect(() => {
+    isEdit && getQuestionDetail(questionId)
+  }, [questionId, isEdit])
 
 	const getFileInfoList = async () => {
 		try {
@@ -63,6 +89,23 @@ const QuesFormModal = (props: any) => {
     setLoading(false);
 	}
 
+	const handleUpdateQues = async (valuse: any) => {
+    try {
+      setLoading(true);
+      const response = await postJson('/api/quiz/updateQuestion', {
+        ...valuse,
+        questionId
+      }) 
+      console.log(response, 'updateQuestion>>>>>')
+      onCancel(response?.message || '更新に成功しました');
+      props?.onSuccess?.();
+    } catch(e: any) {
+      console.log(e)
+      message.error(e?.message)
+    }
+    setLoading(false);
+	}
+
   const handleSubmit = async () => {
     await form.validateFields().then((values) => {  
       console.log(values, 'handleSubmit')
@@ -71,20 +114,15 @@ const QuesFormModal = (props: any) => {
       if (!hasCorrect) {
         return message.warning('少なくとも1つの正解項目をチェックインしてください');
       }
-      handleCreateQues(values)
+      isEdit ? handleUpdateQues(values) : handleCreateQues(values)
     }).catch((error) => {
       console.log(error, 'handleSubmit error')
     });
   }
 
-  useEffect(() => {
-		setOpen(props.isOpen);
-    if (props.isOpen) getFileInfoList()
-	}, [props.isOpen])
-
 	return (
 		<Modal
-			title="問題新規作成" 
+			title={`問題${isEdit ? '情報更新' : '新規作成'}`} 
 			cancelText="キャンセル" 
       okText="保存"
 			open={isOpen} 
@@ -95,6 +133,7 @@ const QuesFormModal = (props: any) => {
       okButtonProps={{ loading }}
 			destroyOnClose
 		>
+      <Spin spinning={spinning}>
 			<Form
 				form={form}
 				layout="vertical"
@@ -104,7 +143,8 @@ const QuesFormModal = (props: any) => {
         required 
         label="関連ドキュメント" 
         name="documentId"
-        rules={requiredRule('関連ドキュメント')}  
+        rules={requiredRule('関連ドキュメント')}
+        initialValue={detail?.documentId}
       >
 				<Select loading={slectLoading}>
 				{documentList.map(({id, fileName}: any) => (
@@ -158,6 +198,14 @@ const QuesFormModal = (props: any) => {
                   </Form.Item>
                   <Form.Item
                     {...restField}
+                    required={false}
+                    style={{ height: 32 }}
+                    name={[name, "id"]}
+                  >
+                    <Input hidden/>
+                  </Form.Item>
+                  <Form.Item
+                    {...restField}
                     style={{ width: 500}}
                     name={[name, "content"]}
                     validateTrigger={['onChange', 'onBlur']}
@@ -204,6 +252,7 @@ const QuesFormModal = (props: any) => {
         </Form.List>
 			</Form.Item>
 			</Form>
+      </Spin>
 		</Modal>
 	);
 };
