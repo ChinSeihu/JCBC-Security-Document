@@ -31,6 +31,8 @@ const TestResultList = () => {
   const [pagination, setPagination] = useState<TPagination>(initPagination);
 	const { message } = App.useApp();
   const actionRef = useRef<ActionType>();
+  const [params, setParams] = useState({})
+  const [exportLoading, setExportLoading] = useState(false)
   
   const getTestResultList = async (params = {}) => {
     try {
@@ -142,6 +144,26 @@ const TestResultList = () => {
     },
   ];
 
+  const handleExportCsv = async () => {
+    try {
+      setExportLoading(true)
+      const response = await fetch('/api/test/export', params);
+      if (response.ok) {
+        console.log(response, 'handleExportCsv')
+        const csvData  = await response.text();
+        const blob = new Blob([csvData], { type: 'text/csv' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'data.csv';
+        link.click();
+      }
+    } catch (error: any) {
+      console.log(error, "error>>>>")
+      message.error(error.message);
+    }
+    setExportLoading(false)
+  }
+
   return (
     <div className="container">
       <ProTable
@@ -156,6 +178,7 @@ const TestResultList = () => {
             page: params.current
           }) || {}
           setPagination({...pagination, ...(resPagination || {})})
+          setParams(params)
           return ({
             data: data || [],
             success: true,
@@ -169,8 +192,8 @@ const TestResultList = () => {
         }}
         toolbar={{
           actions: ([
-            <Button key='export' type="primary" icon={<ExportOutlined />}>
-              エクスポート(実装中)
+            <Button loading={exportLoading} key='export' type="primary" onClick={handleExportCsv} icon={<ExportOutlined />}>
+              エクスポート
             </Button>
           ]),
         }}

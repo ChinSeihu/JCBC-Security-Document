@@ -23,6 +23,7 @@
     "antd": "^5.24.4",
     "axios": "^1.8.4",
     "dayjs": "^1.11.13",
+    "json2csv": "^6.0.0-alpha.2",
     "next": "^15.2.3",
     "next-cloudinary": "^6.16.0",
     "prisma": "^6.5.0",
@@ -37,6 +38,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@types/json2csv": "^5.0.7",
     "@types/node": "^20",
     "@types/react": "~18",
     "@types/react-dom": "~18",

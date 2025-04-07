@@ -18,22 +18,10 @@ interface ListQuestionParams {
   orderDirection?: 'asc' | 'desc'
 }
 
-interface PaginatedTestResult {
-  data: any,
-  pagination: {
-    total: number
-    page: number
-    pageSize: number
-    totalPages: number
-  }
-}
-
 // 核心查询函数
-export async function resultList(params: ListQuestionParams): Promise<PaginatedTestResult> {
+export async function resultList(params: ListQuestionParams): Promise<any[]> {
   try {
     const {
-      page = 1,
-      pageSize = 10,
       orderBy = 'completedAt',
       orderDirection = 'desc',
       startDate,
@@ -72,48 +60,35 @@ export async function resultList(params: ListQuestionParams): Promise<PaginatedT
     }
 
     // 并行查询
-    const [total, documents] = await Promise.all([
-      prisma.quizResult.count({ where }),
-      prisma.quizResult.findMany({
-        select: {
-          id: true,
-          score: true,
-          totalQuestions: true,
-          completedAt: true,
-          correctAnswers: true,
-          user: {
-            select: {
-              lastName: true,
-              firstName: true,
-              userId: true
-            }
-          },
-          documentId: true,
-          document: {
-            select: {
-              pathName: true,
-              fileName: true,
-              isPublic: true,
-              id: true,
-            }
+    const documents = await prisma.quizResult.findMany({
+      select: {
+        id: true,
+        score: true,
+        totalQuestions: true,
+        completedAt: true,
+        correctAnswers: true,
+        user: {
+          select: {
+            lastName: true,
+            firstName: true,
+            userId: true
           }
         },
-        where,
-        skip: (page - 1) * pageSize,
-        take: Number(pageSize),
-        orderBy: { [orderBy]: orderDirection },
-      })
-    ])
+        documentId: true,
+        document: {
+          select: {
+            pathName: true,
+            fileName: true,
+            isPublic: true,
+            id: true,
+          }
+        }
+      },
+      where,
+      orderBy: { [orderBy]: orderDirection },
+    })
 
-    return {
-      data: documents,
-      pagination: {
-        total,
-        page: Number(page),
-        pageSize: Number(pageSize),
-        totalPages: Math.ceil(total / pageSize)
-      }
-    }
+    return documents;
   } catch (error) {
     console.error('查询テスト結果テーブル失败:', error)
     throw new Error('Failed to fetch test results')
