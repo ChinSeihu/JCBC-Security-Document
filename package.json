@@ -25,6 +25,7 @@
     "dayjs": "^1.11.13",
     "json2csv": "^6.0.0-alpha.2",
     "next": "^15.2.3",
+    "next-auth": "^4.24.11",
     "next-cloudinary": "^6.16.0",
     "prisma": "^6.5.0",
     "re-chart": "^1.0.0",

@@ -1,6 +1,5 @@
 import { PUBLIC_STATUS_ENUM } from "@/constants"
 import prisma from "@/lib/prisma"
-import { Prisma } from "@prisma/client"
 import dayjs from "dayjs"
 
 // 类型定义

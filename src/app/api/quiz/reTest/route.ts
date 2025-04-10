@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server'
 // import { validateAdmin } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { HttpStatusCode } from 'axios'
-import { currentUser } from '@clerk/nextjs/server'
 import { updateTestStatus } from './server'
+import { validateUser } from '@/lib'
 
 export async function POST(request: Request) {
   try {
@@ -18,8 +18,7 @@ export async function POST(request: Request) {
     }
 
     await prisma.$transaction(async (prismaClient) => {
-      const user = await currentUser();
-      if (!user?.id) throw new Error('userId is not defined...')
+      const user = await validateUser();
 
       // テスト状態を更新する
       await updateTestStatus({userId: userId || user.id, prisma: prismaClient, documentId})

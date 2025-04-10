@@ -1,5 +1,5 @@
+import { validateUser } from "@/lib";
 import prisma from "@/lib/prisma"
-import { currentUser } from "@clerk/nextjs/server";
 
 interface FilePathResponse {
 	id: string;
@@ -35,7 +35,7 @@ export async function getPublicFileInfo(): Promise<FilePathResponse | null> {
 // ドキュメントに紐づけテスト状態を取得
 export async function getUserTestStatus(fileInfo: FilePathResponse){
 	try {
-		const user = await currentUser();
+		const user = await validateUser();
 		const result = await prisma.testStatus.findUnique({
 			select: {
 				id: true,

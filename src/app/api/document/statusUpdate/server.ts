@@ -1,5 +1,5 @@
+import { validateUser } from "@/lib";
 import prisma from "@/lib/prisma"
-import { currentUser } from "@clerk/nextjs/server"
 
 // 类型定义
 interface IUpdateParams {
@@ -11,8 +11,7 @@ interface IUpdateParams {
 // ドキュメント公開状態更新
 export async function documentStatusUpdate(params: IUpdateParams): Promise<void> {
   try {
-    const user = await currentUser();
-    if (!user?.id) throw new Error('userId is not defined...')
+    const user = await validateUser();
       
     await prisma.document.update({
       data: {

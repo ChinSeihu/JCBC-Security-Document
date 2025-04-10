@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server'
 // import { validateAdmin } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { HttpStatusCode } from 'axios'
-import { currentUser } from '@clerk/nextjs/server'
 import { getQuestionOptions, createQuizResult, createQuizAnswer, createTestStatus } from './server'
+import { validateUser } from '@/lib'
 
 export async function POST(request: Request) {
   try {
@@ -18,8 +18,7 @@ export async function POST(request: Request) {
     }
     let quizResultId = null
     await prisma.$transaction(async (prismaClient) => {
-      const user = await currentUser();
-      if (!user?.id) throw new Error('userId is not defined...')
+      const user = await validateUser();
 
       const questionOption = await getQuestionOptions({ aswerList, prisma: prismaClient });
       console.log(questionOption, 'questionOption>')

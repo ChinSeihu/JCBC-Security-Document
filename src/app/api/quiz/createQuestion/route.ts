@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server'
 // import { validateAdmin } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { HttpStatusCode } from 'axios'
-import { currentUser } from '@clerk/nextjs/server'
 import { checkDocumentExits, createQuesOptions, createQuestionItem } from './server'
 import { ClientPrisma } from '@/constants/type'
+import { validateUser } from '@/lib'
 
 export async function POST(request: Request) {
   try {
@@ -19,8 +19,7 @@ export async function POST(request: Request) {
     }
 
     prisma.$transaction(async (runPrisma: ClientPrisma) => {
-      const user = await currentUser();
-      if (!user?.id) throw new Error('userId is not defined...')
+      const user = await validateUser();
       // 4. 检查关联 document 是否存在
       const quizExists = await checkDocumentExits(runPrisma, documentId)
 
@@ -34,7 +33,7 @@ export async function POST(request: Request) {
           content,
           questionType,
           runPrisma,
-          userId: user.id
+          userId: user.id as string
       })
 
       await createQuesOptions({runPrisma, questionId: question.id, quesOptions })

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { HttpStatusCode } from 'axios'
-import { currentUser } from '@clerk/nextjs/server'
 import { getResponse } from './server'
+import { validateUser } from '@/lib';
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,8 +15,7 @@ export async function GET(request: NextRequest) {
       )
     }
     
-    const user = await currentUser();
-    if (!user?.id) throw new Error('userId is not defined...')
+    const user = await validateUser();
 
     const quizResultInfo = await getResponse({ userId: user.id, documentId })
 

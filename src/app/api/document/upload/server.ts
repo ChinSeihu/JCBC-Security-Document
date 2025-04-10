@@ -1,6 +1,6 @@
 import { FILE_TYPE } from "@/constants";
+import { validateUser } from "@/lib";
 import prisma from "@/lib/prisma";
-import { currentUser } from "@clerk/nextjs/server";
 
 interface DocumentParams {
 	filename: string;
@@ -12,8 +12,7 @@ interface DocumentParams {
 export const documentCreate = async (params: DocumentParams) => {
   
   try {
-    const user = await currentUser();
-    if (!user?.id) throw new Error('userId is not defined...')
+    const user = await validateUser();
 
     const newDocument = await prisma.document.create({
       data: {
@@ -23,9 +22,9 @@ export const documentCreate = async (params: DocumentParams) => {
         filesize: params.fileSize, // 2MB
         pathName: params.pathName,
         description: params.description,
-        lastModifiedAt: user.id,
+        lastModifiedAt: user.id as string,
         lastModifiedDate: new Date(),
-        createdAt: user.id,
+        createdAt: user.id as string,
         createdDate: new Date()
       }
     })

@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react"
-import { useUser } from "@clerk/nextjs"
 import { Menu } from "antd";
 import { AppstoreOutlined, FileTextOutlined, HistoryOutlined, HomeOutlined, ProfileOutlined, ReadOutlined, ScheduleOutlined } from "@ant-design/icons";
 import { usePathname, useRouter } from "next/navigation";
 import { routeAccessMap } from "@/lib/settings";
+import { useSessionInfo } from "@/lib";
 
 const menuItems = () => [
   {
@@ -54,25 +54,25 @@ const menuItems = () => [
 ];
 
 const SideMenu = () => {
-  const { user } = useUser();
+  const session = useSessionInfo();
   const router = useRouter();
-  const role = user?.publicMetadata.role as string;
+  const roles = session?.roles;
   const currentUrl = usePathname()
   const [viewMenu, setMenu] = useState(menuItems());
-  console.log(role, 'role>>>>>>>')
+  console.log(roles, 'role>>>>>>>')
 
   useEffect(() => {
-    const menu = getMenu(role);
+    const menu = getMenu(roles);
     setMenu(menu);
-  }, [role])
+  }, [roles])
 
-  const getMenu = (role: string) => {
+  const getMenu = (roles: string[]) => {
     return menuItems().filter(it => {
       const permissionList = routeAccessMap[it.href as string]
-      if (permissionList && !permissionList?.includes(role)) return false
+      if (permissionList && !permissionList?.some(it => roles.includes(it) )) return false
       if (it?.children?.length) {
         it.children = it?.children?.filter(child => {
-          return routeAccessMap[child.href]?.includes(role)
+          return routeAccessMap[child.href]?.some(it => roles.includes(it))
         })
         return it?.children?.length
       }

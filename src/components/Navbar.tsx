@@ -1,9 +1,10 @@
-import { UserButton, useUser } from "@clerk/nextjs";
+import { useSession, getCsrfToken, signOut } from "next-auth/react";
 import Image from "next/image";
 
-const Navbar = () => {
-  const { user } = useUser()
+const Navbar = async () => {
+  const { data: session } = useSession({ required: true });
 
+  
   return (
     <div className="flex items-center justify-between p-4">
       {/* ICONS AND USER */}
@@ -18,12 +19,14 @@ const Navbar = () => {
           </div>
         </div>
         <div className="flex flex-col">
-          <span className="text-xs leading-3 font-medium">{user?.firstName} {user?.lastName}</span>
+          <span className="text-xs leading-3 font-medium">{session?.user?.name}</span>
           <span className="text-[10px] text-gray-500 text-right leading-none" >
-            {user?.publicMetadata?.role as string}
+            {session?.user?.email}
           </span>
         </div>
-        <UserButton />
+        <></>
+        {/* <UserButton /> */}
+        {/* {signOut()} */}
       </div>
     </div>
   );
