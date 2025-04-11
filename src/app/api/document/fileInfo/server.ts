@@ -33,9 +33,8 @@ export async function getPublicFileInfo(): Promise<FilePathResponse | null> {
 }
 
 // ドキュメントに紐づけテスト状態を取得
-export async function getUserTestStatus(fileInfo: FilePathResponse){
+export async function getUserTestStatus(fileInfo: FilePathResponse, userId: string){
 	try {
-		const user = await validateUser();
 		const result = await prisma.testStatus.findUnique({
 			select: {
 				id: true,
@@ -43,7 +42,7 @@ export async function getUserTestStatus(fileInfo: FilePathResponse){
 			},
 			where: {
 				user_document_tenant : {
-					userId: user?.id as string,
+					userId: userId,
 					documentId: fileInfo.id
 				}
 			}

@@ -1,10 +1,13 @@
 import { HttpStatusCode } from 'axios';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { checkPublicStatus, documentStatusUpdate } from './server';
+import { validateUser } from '@/lib';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const params = await request.json()
+    const user = await validateUser(request);
+    
     const { id, isPublic } = params;
 
     if (!id) {
@@ -26,7 +29,7 @@ export async function POST(request: Request) {
       });
     }
 
-    await documentStatusUpdate({id, isPublic})
+    await documentStatusUpdate({ id, isPublic, userId: user.id })
 
     return NextResponse.json({
       status: HttpStatusCode.Ok,

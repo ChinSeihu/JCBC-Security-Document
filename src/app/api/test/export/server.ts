@@ -1,4 +1,5 @@
 import { PUBLIC_STATUS_ENUM } from "@/constants"
+import { getUserList } from "@/lib"
 import prisma from "@/lib/prisma"
 import dayjs from "dayjs"
 
@@ -47,14 +48,6 @@ export async function resultList(params: ListQuestionParams): Promise<any[]> {
             gte: Number(score),
             lt: score === '0' ? 1 : undefined
           } : undefined
-        },
-        {
-          user: {
-            OR: [
-              { firstName: { contains: userName, mode: 'insensitive' } },
-              { lastName: { contains: userName, mode: 'insensitive' } },
-            ],
-          }
         }
       ].filter(Boolean)
     }
@@ -67,13 +60,6 @@ export async function resultList(params: ListQuestionParams): Promise<any[]> {
         totalQuestions: true,
         completedAt: true,
         correctAnswers: true,
-        user: {
-          select: {
-            lastName: true,
-            firstName: true,
-            userId: true
-          }
-        },
         documentId: true,
         document: {
           select: {
@@ -88,7 +74,20 @@ export async function resultList(params: ListQuestionParams): Promise<any[]> {
       orderBy: { [orderBy]: orderDirection },
     })
 
-    return documents;
+    const userList = await getUserList()
+
+    const data = documents.map((item: any) => {
+      const CurrentUser = userList.find((it: any) => it.id === item.createdAt)
+
+      return {
+        ...item,
+        username: CurrentUser?.username,
+        firstName: CurrentUser?.firstName,
+        lastName: CurrentUser?.lastName
+      }}
+    ).filter((item) => `${item.firstName} ${item.lastName}`.includes(userName))
+
+    return data;
   } catch (error) {
     console.error('查询テスト結果テーブル失败:', error)
     throw new Error('Failed to fetch test results')

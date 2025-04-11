@@ -31,30 +31,3 @@ export async function getPublicFileInfo(): Promise<FilePathResponse | null> {
 		await prisma.$disconnect()
 	}
 }
-
-// ドキュメントに紐づけテスト状態を取得
-export async function getUserTestStatus(fileInfo: FilePathResponse){
-	try {
-		const user = await validateUser();
-		const result = await prisma.testStatus.findUnique({
-			select: {
-				id: true,
-				isCompleted: true,
-			},
-			where: {
-				user_document_tenant : {
-					userId: user?.id as string,
-					documentId: fileInfo.id
-				}
-			}
-		})
-
-		console.log("テストステータスの取得に成功:", result?.id)
-		return result
-	} catch (error) {
-		console.error('テストステータスの取得に失敗:', error)
-		throw new Error('テストステータスの取得に失敗')
-	} finally {
-		await prisma.$disconnect()
-	}
-}

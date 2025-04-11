@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
       )
     }
     
-    const user = await validateUser();
+    const user = await validateUser(request);
 
     const quizResultInfo = await getResponse({ userId: user.id, documentId })
 

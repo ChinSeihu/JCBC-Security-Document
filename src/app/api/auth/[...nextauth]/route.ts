@@ -2,16 +2,11 @@ import NextAuth, { NextAuthOptions } from "next-auth";
 import { Provider } from "next-auth/providers/index";
 import KeycloakProvider from "next-auth/providers/keycloak";
 
-export const KEYCLOAK_CLIENT_ID = "security-document";
-export const KEYCLOAK_CLIENT_SECRET = process.env.NEXT_PUBLIC_KEYCLOAK_SECRET_KEY as string;
-export const KEYCLOAK_URL = "http://sso-staging.jcbc.co.jp/auth";
-export const KEYCLOAK_REALM = "JCBC-SI-TESTING";
-
-const KEYCLOAK_ISSUER = `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}`;
+const KEYCLOAK_ISSUER = `${process.env.KEYCLOAK_URL}/realms/${process.env.KEYCLOAK_REALM}`;
 
 const keycloakConfig = {
-  clientId: KEYCLOAK_CLIENT_ID,
-  clientSecret: KEYCLOAK_CLIENT_SECRET,
+  clientId: process.env.KEYCLOAK_CLIENT_ID!,
+  clientSecret: process.env.NEXT_PUBLIC_KEYCLOAK_SECRET_KEY!,
   issuer: KEYCLOAK_ISSUER,
 } as const;
 

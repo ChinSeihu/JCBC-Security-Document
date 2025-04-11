@@ -7,19 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String  @id @default(uuid())
-  userId    String  @unique
-  firstName String  @db.VarChar(255)
-  lastName  String  @db.VarChar(255)
-  delFlag   Boolean @default(false)
-
-  question    Question[]
-  document    Document[]
-  testStatus  TestStatus[]
-  quizResults QuizResult[]
-}
-
 model Document {
   id               String    @id @default(uuid())
   fileName         String    @db.VarChar(255)
@@ -34,7 +21,6 @@ model Document {
   lastModifiedAt   String?
   lastModifiedDate DateTime? @default(now())
 
-  user              User         @relation(fields: [createdAt], references: [userId])
   testStatus        TestStatus[]
   quesOptionuestion Question[]
   quizResult        QuizResult[]
@@ -48,7 +34,6 @@ model TestStatus {
   isCompleted  Boolean      @default(false)
   quizResultIds String[]
 
-  user       User         @relation(fields: [userId], references: [userId])
   document   Document     @relation(fields: [documentId], references: [id])
   quizResult QuizResult[]
 
@@ -66,7 +51,6 @@ model Question {
   lastModifiedAt   String?
   lastModifiedDate DateTime?    @default(now())
 
-  user        User         @relation(fields: [createdAt], references: [userId])
   document    Document     @relation(fields: [documentId], references: [id])
   quesOptions QuesOption[]
   quizAnswers QuizAnswer[]
@@ -99,7 +83,6 @@ model QuizResult {
   testStatusId   String?
 
   document             Document     @relation(fields: [documentId], references: [id])
-  user                 User         @relation(fields: [userId], references: [userId])
   quizAnswers          QuizAnswer[]
   testStatus           TestStatus?  @relation(fields: [testStatusId], references: [id])
 }

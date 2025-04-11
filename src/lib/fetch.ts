@@ -1,5 +1,7 @@
 import { message } from 'antd'
 import axios, { HttpStatusCode } from 'axios'
+import { Profile, Session } from 'next-auth'
+import { getSession } from 'next-auth/react'
 
 const messageMap: any = {
   'request error': '请求失败，请稍后重试',
@@ -16,11 +18,21 @@ axios.interceptors.request.use(function(config) {
   return config
 })
 
-function request(config: any = {}) {
+interface SessionExtra {
+    accessToken: string;
+    roles: string[];
+    user: Profile 
+}
+export type TSessionInfo = Session & SessionExtra
+async function request(config: any = {}) {
+  const session = await getSession() as TSessionInfo
   config = Object.assign(
     {
       withCredentials: true,
       timeout: 30 * 1000,
+      headers: {
+        Authorization: `Bearer ${session?.accessToken}`,
+      },
     },
     config,
   )

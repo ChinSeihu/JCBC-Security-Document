@@ -136,9 +136,9 @@ const FileUploadPage = () => {
     },
     {
       title: '作成者',
-      dataIndex: 'userName',
+      dataIndex: 'username',
       hideInSearch: true,
-      render: (_, r: any) => `${r.user.firstName} ${r.user.lastName}`
+      render: (_, r: any) => [r?.firstName, r?.lastName].join(' ').trim() || '-'
     },
     {
       title: '操作',

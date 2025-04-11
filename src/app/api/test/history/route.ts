@@ -8,9 +8,9 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const params = getSearchParams(searchParams) || {};
 
-    const user = await validateUser();                
+    const user = await validateUser(request);                
     
-    const response = await historyList({ ...params, userId: user.id })
+    const response = await historyList({ ...params, user })
 
     return NextResponse.json({
       status: HttpStatusCode.Ok,

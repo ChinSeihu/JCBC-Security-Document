@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { get, postJson } from '@/lib';
 import { App, Button, Popconfirm, Tag, Typography, Badge } from 'antd';
 import { TPagination } from '@/constants/type'
-import {  isPass, operateBtnProperty, PUBLIC_STATUS_ENUM, publicEnum, resultOption } from '@/constants';
+import {  isPass, operateBtnProperty, publicEnum, resultOption } from '@/constants';
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
 
 import Style from './style.module.css';
@@ -108,7 +108,7 @@ const TestResultList = () => {
     {
       title: '受験者',
       dataIndex: 'user',
-      renderText: (user) => `${user.firstName} ${user.lastName}`
+      render: (_, r) => [r?.firstName, r?.lastName].join(' ').trim() || '-'
     },
     {
       title: '実施日時',

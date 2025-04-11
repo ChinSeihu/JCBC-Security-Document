@@ -1,11 +1,11 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 // import { validateAdmin } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { HttpStatusCode } from 'axios'
 import { updateTestStatus } from './server'
 import { validateUser } from '@/lib'
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const { documentId, userId } = await request.json()
     console.log(documentId, userId)
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     }
 
     await prisma.$transaction(async (prismaClient) => {
-      const user = await validateUser();
+      const user = await validateUser(request);
 
       // テスト状態を更新する
       await updateTestStatus({userId: userId || user.id, prisma: prismaClient, documentId})

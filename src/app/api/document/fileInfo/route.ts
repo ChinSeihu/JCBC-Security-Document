@@ -1,12 +1,14 @@
 // app/api/read-pdf/route.js (App Router)
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getPublicFileInfo, getUserTestStatus } from './server';
 import { HttpStatusCode } from 'axios';
+import { validateUser } from '@/lib';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const fileInfo = await getPublicFileInfo();
-
+		const user = await validateUser(request);
+    
     if (!fileInfo) {
       return NextResponse.json(
         { 
@@ -17,7 +19,7 @@ export async function GET() {
       );
     }
 
-    const testStatus = await getUserTestStatus(fileInfo);
+    const testStatus = await getUserTestStatus(fileInfo, user.id);
 
     return NextResponse.json({
       data: {...fileInfo, success: true, testStatus },

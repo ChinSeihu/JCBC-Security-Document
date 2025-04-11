@@ -1,14 +1,16 @@
 import { HttpStatusCode } from 'axios';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { writeFile } from 'node:fs/promises';
 import { v4 as uuidv4 } from 'uuid';
 import { documentCreate } from './server';
+import { validateUser } from '@/lib';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
-
+    const user = await validateUser(request);
+    
     if (!file) {
       return NextResponse.json(
         { error: 'No files received' }, 
@@ -17,13 +19,14 @@ export async function POST(request: Request) {
     }
 
     // 生成唯一文件名
-    const filename = `${uuidv4()}-${file.name}`;
+    const filename = `${uuidv4()}-${Date.now()}.pdf`;
     const buffer = Buffer.from(await file.arrayBuffer());
 
     await documentCreate({
       filename: file.name,
       pathName: `${process.env.NEXT_PUBLIC_UPLOAD_DIR}/${filename}`,
-      fileSize: file.size
+      fileSize: file.size,
+      userId: user.id
     })
     
     // 保存到 public/upload

@@ -108,7 +108,7 @@ const QuestionList = () => {
     {
       title: '作成者',
       dataIndex: 'userName',
-      render: (_, r: any) => `${r.user.firstName} ${r.user.lastName}`
+      render: (_, r: any) => [r?.firstName, r?.lastName].join(' ').trim() || '-'
     },
     {
       title: '操作',

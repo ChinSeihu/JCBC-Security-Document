@@ -66,7 +66,7 @@ const SideMenu = () => {
     setMenu(menu);
   }, [roles])
 
-  const getMenu = (roles: string[]) => {
+  const getMenu = (roles: string[] = []) => {
     return menuItems().filter(it => {
       const permissionList = routeAccessMap[it.href as string]
       if (permissionList && !permissionList?.some(it => roles.includes(it) )) return false
@@ -98,10 +98,21 @@ const SideMenu = () => {
     return { openKey, selectedKey }
   }, [viewMenu, currentUrl])
 
-  const handleMenuClick = (handler: any ) => {
-    const { item } = handler;
-    console.log(item.props.href, 'handleMemuClick')
-    router.push(item.props.href);
+  const getMenuHref = (keyPath: string []) => {
+    let menulist = viewMenu.slice()
+    let item: any
+    while (keyPath.length) {
+      const key = keyPath.pop()
+      item = menulist.find(it => it.key === key);
+      if (keyPath.length) menulist = item?.children
+    }
+    return item?.href
+  }
+
+  const handleMenuClick = ({ keyPath }: any ) => {
+    const href = getMenuHref(keyPath)
+    console.log(href, 'handleMemuClick')
+    router.push(href);
   }
 
   const { openKey, selectedKey } = defaultOpenCheckedKey

@@ -1,4 +1,5 @@
 import { PUBLIC_STATUS_ENUM } from "@/constants"
+import { getUserList } from "@/lib"
 import prisma from "@/lib/prisma"
 import dayjs from "dayjs"
 
@@ -60,19 +61,11 @@ export async function resultList(params: ListQuestionParams): Promise<PaginatedT
             lt: score === '0' ? 1 : undefined
           } : undefined
         },
-        {
-          user: {
-            OR: [
-              { firstName: { contains: userName, mode: 'insensitive' } },
-              { lastName: { contains: userName, mode: 'insensitive' } },
-            ],
-          }
-        }
       ].filter(Boolean)
     }
 
     // 并行查询
-    const [total, documents] = await Promise.all([
+    const [total, quizResults] = await Promise.all([
       prisma.quizResult.count({ where }),
       prisma.quizResult.findMany({
         select: {
@@ -81,13 +74,7 @@ export async function resultList(params: ListQuestionParams): Promise<PaginatedT
           totalQuestions: true,
           completedAt: true,
           correctAnswers: true,
-          user: {
-            select: {
-              lastName: true,
-              firstName: true,
-              userId: true
-            }
-          },
+          userId: true,
           documentId: true,
           document: {
             select: {
@@ -105,8 +92,22 @@ export async function resultList(params: ListQuestionParams): Promise<PaginatedT
       })
     ])
 
+    const userList = await getUserList()
+
+    const data = quizResults.map((item) => {
+      const CurrentUser = userList.find((it: any) => it.id === item.userId)
+
+      return {
+        ...item,
+        username: CurrentUser?.username,
+        firstName: CurrentUser?.firstName,
+        lastName: CurrentUser?.lastName
+      }}
+    ).filter((item) => `${item.firstName} ${item.lastName}`.includes(userName))
+    
+
     return {
-      data: documents,
+      data,
       pagination: {
         total,
         page: Number(page),

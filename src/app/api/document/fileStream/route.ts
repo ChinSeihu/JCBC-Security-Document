@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import { getPublicFileInfo, getUserTestStatus } from './server';
+import { getPublicFileInfo } from './server';
 import { HttpStatusCode } from 'axios';
 import { readFile } from 'fs/promises';
 
@@ -37,8 +37,9 @@ export async function GET() {
       },
     });
   } catch (error) {
+    console.log(error)
     return NextResponse.json(
-      { error: 'Internal Server Error' },
+      { error: 'システムエラー' },
       { status: HttpStatusCode.InternalServerError }
     );
   }

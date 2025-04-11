@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-// import { validateAdmin } from '@/lib/auth'
 import { HttpStatusCode } from 'axios'
 import { getQuestionInfo } from './server'
 import { getSearchParams } from '@/lib/actions';

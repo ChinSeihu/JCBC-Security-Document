@@ -1,4 +1,5 @@
 import { PUBLIC_STATUS_ENUM } from "@/constants"
+import { getUserList } from "@/lib"
 import prisma from "@/lib/prisma"
 import dayjs from "dayjs"
 
@@ -12,7 +13,6 @@ interface ListDocumentsParams {
   endDate?: string
   isPublic?: PUBLIC_STATUS_ENUM
   fileName?: string
-
   // 排序参数
   orderBy?: 'createdAt' | 'updatedAt' | 'fileName' | 'fileSize'
   orderDirection?: 'asc' | 'desc'
@@ -42,7 +42,7 @@ export async function listDocuments(params: ListDocumentsParams): Promise<Pagina
       fileType,
       endDate,
       startDate,
-      isPublic
+      isPublic,
     } = params
 
     // 构建查询条件
@@ -81,12 +81,6 @@ export async function listDocuments(params: ListDocumentsParams): Promise<Pagina
           isPublic: true,
           lastModifiedAt: true,
           lastModifiedDate: true,
-          user: {
-            select: {
-              lastName: true,
-              firstName: true
-            }
-          }
         },
         where,
         skip: (page - 1) * pageSize,
@@ -95,8 +89,21 @@ export async function listDocuments(params: ListDocumentsParams): Promise<Pagina
       })
     ])
 
+    const userList = await getUserList()
+
+    const data = documents.map((item: any) => {
+      const CurrentUser = userList.find((it: any) => it.id === item.createdAt)
+
+      return {
+        ...item,
+        username: CurrentUser?.username,
+        firstName: CurrentUser?.firstName,
+        lastName: CurrentUser?.lastName
+      }}
+    )
+
     return {
-      data: documents,
+      data,
       pagination: {
         total,
         page: Number(page),

@@ -6,17 +6,16 @@ interface IUpdateParams {
   // 分页参数
   id: string
   isPublic: boolean,
+  userId: string
 }
 
 // ドキュメント公開状態更新
 export async function documentStatusUpdate(params: IUpdateParams): Promise<void> {
-  try {
-    const user = await validateUser();
-      
+  try {      
     await prisma.document.update({
       data: {
         isPublic: params.isPublic,
-        lastModifiedAt: user.id,
+        lastModifiedAt: params.userId,
         lastModifiedDate: new Date(),
       },
       where: {

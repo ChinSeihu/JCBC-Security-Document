@@ -1,7 +1,7 @@
-import { useSession, getCsrfToken, signOut } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
 
-const Navbar = async () => {
+const Navbar = () => {
   const { data: session } = useSession({ required: true });
 
   

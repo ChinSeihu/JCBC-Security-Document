@@ -1,11 +1,11 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 // import { validateAdmin } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { HttpStatusCode } from 'axios'
 import { getQuestionOptions, createQuizResult, createQuizAnswer, createTestStatus } from './server'
 import { validateUser } from '@/lib'
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const { aswerList, documentId } = await request.json()
     console.log(aswerList, documentId)
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     }
     let quizResultId = null
     await prisma.$transaction(async (prismaClient) => {
-      const user = await validateUser();
+      const user = await validateUser(request);
 
       const questionOption = await getQuestionOptions({ aswerList, prisma: prismaClient });
       console.log(questionOption, 'questionOption>')

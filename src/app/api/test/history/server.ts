@@ -1,4 +1,5 @@
 import { PUBLIC_STATUS_ENUM } from "@/constants"
+import { getUserList } from "@/lib"
 import prisma from "@/lib/prisma"
 import dayjs from "dayjs"
 
@@ -15,7 +16,7 @@ interface ListQuestionParams {
   // 排序参数
   orderBy?: 'createdAt' | 'updatedAt' | 'fileName' | 'fileSize'
   orderDirection?: 'asc' | 'desc'
-  userId: string
+  user: any
 }
 
 interface PaginatedQuestion {
@@ -36,7 +37,7 @@ export async function historyList(params: ListQuestionParams): Promise<Paginated
       pageSize = 10,
       orderBy = 'completedAt',
       orderDirection = 'desc',
-      userId,
+      user,
       isPublic,
       startDate,
       endDate,
@@ -47,7 +48,7 @@ export async function historyList(params: ListQuestionParams): Promise<Paginated
     const where: any = {
       AND: [
         { 
-          userId,
+          userId: user.id,
           completedAt: {
             lte: endDate ? dayjs(endDate).add(1, 'd').toISOString() : undefined,
             gte: startDate ? dayjs(startDate).toISOString() : undefined, 
@@ -65,7 +66,7 @@ export async function historyList(params: ListQuestionParams): Promise<Paginated
     }
 
     // 并行查询
-    const [total, documents] = await Promise.all([
+    const [total, quizResults] = await Promise.all([
       prisma.quizResult.count({ where }),
       prisma.quizResult.findMany({
         select: {
@@ -74,12 +75,7 @@ export async function historyList(params: ListQuestionParams): Promise<Paginated
           totalQuestions: true,
           completedAt: true,
           correctAnswers: true,
-          user: {
-            select: {
-              lastName: true,
-              firstName: true
-            }
-          },
+          userId: true,
           documentId: true,
           document: {
             select: {
@@ -95,9 +91,17 @@ export async function historyList(params: ListQuestionParams): Promise<Paginated
         orderBy: { [orderBy]: orderDirection },
       })
     ])
+    
+    const data = quizResults.map((item) => ({
+        ...item,
+        username: user?.username,
+        firstName: user?.firstName,
+        lastName: user?.lastName
+      })
+    )
 
     return {
-      data: documents,
+      data,
       pagination: {
         total,
         page: Number(page),

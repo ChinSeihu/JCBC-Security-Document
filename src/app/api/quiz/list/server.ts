@@ -1,3 +1,4 @@
+import { getUserList } from "@/lib"
 import prisma from "@/lib/prisma"
 import dayjs from "dayjs"
 
@@ -62,14 +63,6 @@ export async function listQuestion(params: ListQuestionParams): Promise<Paginate
                 },
               },
             },
-            {
-              user: {
-                OR: [
-                  { firstName: { contains: userName, mode: 'insensitive' } },
-                  { lastName: { contains: userName, mode: 'insensitive' } },
-                ],
-              }
-            },
             { delFlag: false } // 默认过滤已删除
           ].filter(Boolean)
         }
@@ -83,12 +76,7 @@ export async function listQuestion(params: ListQuestionParams): Promise<Paginate
           questionType: true,
           content: true,
           createdDate: true,
-          user: {
-            select: {
-              lastName: true,
-              firstName: true
-            }
-          },
+          createdAt: true,
           documentId: true,
           document: {
             select: {
@@ -103,8 +91,21 @@ export async function listQuestion(params: ListQuestionParams): Promise<Paginate
       })
     ])
 
+    const userList = await getUserList()
+
+    const data = documents.map((item) => {
+      const CurrentUser = userList.find((it: any) => it.id === item.createdAt)
+
+      return {
+        ...item,
+        username: CurrentUser?.username,
+        firstName: CurrentUser?.firstName,
+        lastName: CurrentUser?.lastName
+      }}
+    ).filter((item) => `${item.firstName} ${item.lastName}`.includes(userName))
+
     return {
-      data: documents,
+      data,
       pagination: {
         total,
         page: Number(page),

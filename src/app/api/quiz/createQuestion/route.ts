@@ -1,12 +1,11 @@
-import { NextResponse } from 'next/server'
-// import { validateAdmin } from '@/lib/auth'
+import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { HttpStatusCode } from 'axios'
 import { checkDocumentExits, createQuesOptions, createQuestionItem } from './server'
 import { ClientPrisma } from '@/constants/type'
 import { validateUser } from '@/lib'
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const { content, questionType, documentId, quesOptions } = await request.json()
     console.log(content, questionType, documentId, quesOptions)
@@ -19,7 +18,7 @@ export async function POST(request: Request) {
     }
 
     prisma.$transaction(async (runPrisma: ClientPrisma) => {
-      const user = await validateUser();
+      const user = await validateUser(request);
       // 4. 检查关联 document 是否存在
       const quizExists = await checkDocumentExits(runPrisma, documentId)
 

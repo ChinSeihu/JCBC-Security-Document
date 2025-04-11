@@ -7,7 +7,6 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const params = getSearchParams(searchParams);
-
     const response = await listDocuments(params)
 
     return NextResponse.json({

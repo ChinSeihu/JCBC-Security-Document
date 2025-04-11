@@ -6,14 +6,13 @@ interface DocumentParams {
 	filename: string;
 	pathName: string
 	fileSize: number;
-	description?: string
+	description?: string;
+  userId: string
 }
 
 export const documentCreate = async (params: DocumentParams) => {
   
   try {
-    const user = await validateUser();
-
     const newDocument = await prisma.document.create({
       data: {
         // 必填字段
@@ -22,9 +21,9 @@ export const documentCreate = async (params: DocumentParams) => {
         filesize: params.fileSize, // 2MB
         pathName: params.pathName,
         description: params.description,
-        lastModifiedAt: user.id as string,
+        lastModifiedAt: params.userId,
         lastModifiedDate: new Date(),
-        createdAt: user.id as string,
+        createdAt: params.userId,
         createdDate: new Date()
       }
     })
