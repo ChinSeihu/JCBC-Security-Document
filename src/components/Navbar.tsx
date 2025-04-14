@@ -3,9 +3,12 @@ import Image from "next/image";
 import { LogoutOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Avatar, Dropdown, Space } from 'antd';
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
   const { data: session } = useSession({ required: true });
+  const router = useRouter()
   const items: MenuProps['items'] = [
     {
       key: '1',
@@ -16,6 +19,10 @@ const Navbar = () => {
       ),
     }
   ]
+
+  useEffect(() => {
+    if (!session) router.push('/auth')
+  }, [router, session])
   
   return (
     <div className="flex items-center justify-between p-4">
