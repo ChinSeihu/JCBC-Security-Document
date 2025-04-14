@@ -52,14 +52,14 @@ const TestHistoryList = () => {
   
   const handleOperation = async (record: any) => {
     try {
-      const { success, message: msg} = await postJson('/api/document/statusUpdate', {
-        id: record.id,
+      if (!record?.userId) throw new Error('ユーザーIDが見つかりませんでした！')
+      const { success, message: msg} = await postJson('/api/quiz/reTest', {
+        userId: record?.userId,
+        documentId: record.document.id
       })
       
-      console.log(success, msg, 'handleOperation')
-
       if (success) {
-        getTestHistoryList();
+        actionRef.current?.reload();
         return message.success(msg)
       }
       message.warning(msg)

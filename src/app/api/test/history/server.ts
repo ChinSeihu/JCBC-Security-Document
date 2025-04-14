@@ -79,6 +79,7 @@ export async function historyList(params: ListQuestionParams): Promise<Paginated
           documentId: true,
           document: {
             select: {
+              id: true,
               pathName: true,
               fileName: true,
               isPublic: true,

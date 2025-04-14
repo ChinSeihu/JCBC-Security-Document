@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
         '公開状態': item.document.isPublic ? '公開中': '未公開',
         '正解/総計': `${item.correctAnswers}/${item.totalQuestions}`,
         'テスト結果': item.score === 1 ? ' 合格':'不合格',
-        '受験者': item.user.firstName + ' ' + item.user.lastName,
+        '受験者': item.username,
         '実施日時': dayjs(item.completedAt).format('YYYY-MM-DD HH:mm:ss'),
       }
     })

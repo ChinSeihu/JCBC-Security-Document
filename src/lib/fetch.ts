@@ -50,14 +50,14 @@ async function request(config: any = {}) {
         throw new Error(msg || 'request error')
       }
     })
-    .catch(err => {
-      console.log(new Error(err.message || 'request error'))
-      if (messageMap[err.message]) {
-        message.error(messageMap[err.message])
-      } else {
-        message.error(err.message)
-      }
-    })
+    // .catch(err => {
+    //   console.log(new Error(err.message || 'request error'))
+    //   // if (messageMap[err.message]) {
+    //   //   message.error(messageMap[err.message])
+    //   // } else {
+    //   //   message.error(err.message)
+    //   // }
+    // })
 }
 
 // https://github.com/axios/axios/blob/master/lib/core/Axios.js

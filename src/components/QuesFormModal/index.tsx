@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { get, post, postJson } from '@/lib';
+import { get, postJson } from '@/lib';
 import { Button, Modal, Form, Radio, Input, Select, Row, Checkbox, Tag, App, Typography, Tooltip, Spin } from 'antd';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import Style from './style.module.css'
@@ -109,11 +109,15 @@ const QuesFormModal = (props: any) => {
   const handleSubmit = async () => {
     await form.validateFields().then((values) => {  
       console.log(values, 'handleSubmit')
-      const hasCorrect = values?.quesOptions?.some((it: any) => it.isCorrect);
+      const hasCorrect = values?.quesOptions?.filter((it: any) => it.isCorrect);
               
-      if (!hasCorrect) {
+      if (!hasCorrect.length) {
         return message.warning('少なくとも1つの正解項目をチェックインしてください');
       }
+      if (values.questionType === 'SINGLE_CHOICE' && hasCorrect.length > 1) {
+        return message.warning('単一選択の場合、正解を一つのみチェックしてください');
+      }
+
       isEdit ? handleUpdateQues(values) : handleCreateQues(values)
     }).catch((error) => {
       console.log(error, 'handleSubmit error')

@@ -51,9 +51,9 @@ const TestResultList = () => {
   
   const handleOperation = async (record: any) => {
     try {
-      if (!record?.user?.userId) throw new Error('ユーザーIDが見つかりませんでした！')
+      if (!record?.userId) throw new Error('ユーザーIDが見つかりませんでした！')
       const { success, message: msg} = await postJson('/api/quiz/reTest', {
-        userId: record?.user?.userId,
+        userId: record?.userId,
         documentId: record.document.id
       })
       
