@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma'
 import { HttpStatusCode } from 'axios'
 import { updateTestStatus } from './server'
 import { validateUser } from '@/lib'
+import { ClientPrisma } from '@/constants/type'
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,7 +18,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    await prisma.$transaction(async (prismaClient) => {
+    await prisma.$transaction(async (prismaClient: ClientPrisma ) => {
       const user = await validateUser(request);
 
       // テスト状態を更新する

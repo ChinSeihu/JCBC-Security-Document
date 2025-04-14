@@ -85,7 +85,7 @@ export async function resultList(params: ListQuestionParams): Promise<any[]> {
         firstName: CurrentUser?.firstName,
         lastName: CurrentUser?.lastName
       }}
-    ).filter((item) => `${item.firstName} ${item.lastName}`.includes(userName))
+    ).filter((item: any) => `${item.firstName} ${item.lastName}`.includes(userName))
 
     return data;
   } catch (error) {

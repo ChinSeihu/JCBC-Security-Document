@@ -87,9 +87,9 @@ export async function getResponse(params: IUserDocParams): Promise<IQuizResultRe
 
   if (!result) return null;
 
-  const quizAnswers = quizAnswer.map((item) => {
+  const quizAnswers = quizAnswer.map((item: any) => {
     const questionText = item.question.content
-    const selectedInfos = item.question.quesOptions.filter(it => item.selectedOptions.includes(it.order as any))  
+    const selectedInfos = item.question.quesOptions.filter((it: any) => item.selectedOptions.includes(it.order as any))  
     return {
       questionText,
       selectedInfos

@@ -93,7 +93,7 @@ export async function listQuestion(params: ListQuestionParams): Promise<Paginate
 
     const userList = await getUserList()
 
-    const data = documents.map((item) => {
+    const data = documents.map((item: any) => {
       const CurrentUser = userList.find((it: any) => it.id === item.createdAt)
 
       return {
@@ -102,7 +102,7 @@ export async function listQuestion(params: ListQuestionParams): Promise<Paginate
         firstName: CurrentUser?.firstName,
         lastName: CurrentUser?.lastName
       }}
-    ).filter((item) => `${item.firstName} ${item.lastName}`.includes(userName))
+    ).filter((item: any) => `${item.firstName} ${item.lastName}`.includes(userName))
 
     return {
       data,

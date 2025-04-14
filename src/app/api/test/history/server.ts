@@ -93,7 +93,7 @@ export async function historyList(params: ListQuestionParams): Promise<Paginated
       })
     ])
     
-    const data = quizResults.map((item) => ({
+    const data = quizResults.map((item: any) => ({
         ...item,
         username: user?.username,
         firstName: user?.firstName,

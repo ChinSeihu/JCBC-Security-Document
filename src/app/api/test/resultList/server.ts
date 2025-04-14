@@ -94,7 +94,7 @@ export async function resultList(params: ListQuestionParams): Promise<PaginatedT
 
     const userList = await getUserList()
 
-    const data = quizResults.map((item) => {
+    const data = quizResults.map((item: any) => {
       const CurrentUser = userList.find((it: any) => it.id === item.userId)
 
       return {
@@ -103,7 +103,7 @@ export async function resultList(params: ListQuestionParams): Promise<PaginatedT
         firstName: CurrentUser?.firstName,
         lastName: CurrentUser?.lastName
       }}
-    ).filter((item) => `${item.firstName} ${item.lastName}`.includes(userName))
+    ).filter((item: any) => `${item.firstName} ${item.lastName}`.includes(userName))
     
 
     return {
