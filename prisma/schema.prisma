@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Document {
+  id               String    @id @default(uuid())
+  fileName         String    @db.VarChar(255)
+  pathName         String    @unique
+  fileType         String    @db.VarChar(255)
+  filesize         Int
+  description      String?   @db.Text
+  isPublic         Boolean   @default(false)
+  delFlag          Boolean   @default(false)
+  createdAt        String
+  createdDate      DateTime  @default(now())
+  lastModifiedAt   String?
+  lastModifiedDate DateTime? @default(now())
+
+  testStatus        TestStatus[]
+  quesOptionuestion Question[]
+  quizResult        QuizResult[]
+}
+
+// テスト状态
+model TestStatus {
+  id           String       @id @default(uuid())
+  userId       String
+  documentId   String
+  isCompleted  Boolean      @default(false)
+  quizResultIds String[]
+
+  document   Document     @relation(fields: [documentId], references: [id])
+  quizResult QuizResult[]
+
+  @@unique([userId, documentId], name: "user_document_tenant")
+}
+
+model Question {
+  id               String       @id @default(uuid())
+  questionType     QuestionType
+  content          String       @db.Text
+  documentId       String
+  delFlag          Boolean      @default(false)
+  createdAt        String
+  createdDate      DateTime     @default(now())
+  lastModifiedAt   String?
+  lastModifiedDate DateTime?    @default(now())
+
+  document    Document     @relation(fields: [documentId], references: [id])
+  quesOptions QuesOption[]
+  quizAnswers QuizAnswer[]
+}
+
+enum QuestionType {
+  SINGLE_CHOICE
+  MULTIPLE_CHOICE
+}
+
+model QuesOption {
+  id            String   @id @default(uuid())
+  questionId    String
+  content       String   @db.Text
+  isCorrect     Boolean  @default(false)
+  order         Int
+  delFlag       Boolean      @default(false)
+
+  question   Question @relation(fields: [questionId], references: [id])
+}
+
+model QuizResult {
+  id             String   @id @default(uuid())
+  userId         String
+  documentId     String
+  score          Float // 正确率（正确题数/总题数）
+  totalQuestions Int
+  correctAnswers Int
+  completedAt    DateTime @default(now())
+  testStatusId   String?
+
+  document             Document     @relation(fields: [documentId], references: [id])
+  quizAnswers          QuizAnswer[]
+  testStatus           TestStatus?  @relation(fields: [testStatusId], references: [id])
+}
+
+model QuizAnswer {
+  id              String     @id @default(uuid())
+  resultId        String
+  questionId      String
+  selectedOptions Int[]
+  question        Question   @relation(fields: [questionId], references: [id])
+  result          QuizResult @relation(fields: [resultId], references: [id])
+}

@@ -1,0 +1,54 @@
+{
+  "name": "security-document",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "prisma:generate": "npx prisma generate",
+    "prisma:migrate": "npx prisma migrate dev --name init",
+    "prisma:seed": "npx prisma db seed",
+    "prisma:push": "npx prisma db push"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.6.1",
+    "@ant-design/pro-components": "^2.8.7",
+    "@prisma/client": "^6.5.0",
+    "@react-pdf/renderer": "^4.3.0",
+    "@types/uuid": "^10.0.0",
+    "antd": "^5.24.4",
+    "axios": "^1.8.4",
+    "dayjs": "^1.11.13",
+    "json2csv": "^6.0.0-alpha.2",
+    "next": "^15.2.3",
+    "next-auth": "^4.24.11",
+    "next-cloudinary": "^6.16.0",
+    "prisma": "^6.5.0",
+    "re-chart": "^1.0.0",
+    "react": "~18",
+    "react-dom": "~18",
+    "react-pdf": "^9.2.1",
+    "recharts": "^2.15.0",
+    "security-document": "file:",
+    "ts-node": "^10.9.2",
+    "uuid": "^11.1.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/json2csv": "^5.0.7",
+    "@types/node": "^20",
+    "@types/react": "~18",
+    "@types/react-dom": "~18",
+    "babel-plugin-import": "^1.13.8",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.5",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+  }
+}
