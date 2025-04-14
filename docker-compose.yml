@@ -16,7 +16,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     mem_limit: 412m
-    mem_reservation: 256m
     cpus: 0.2
     restart: always
 
@@ -24,7 +23,6 @@ services:
     build: . 
     container_name: jcbc-sd
     mem_limit: 412m
-    mem_reservation: 256m
     cpus: 0.6
     restart: always
     ports:
