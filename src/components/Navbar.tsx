@@ -1,9 +1,21 @@
 import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
+import { LogoutOutlined } from '@ant-design/icons';
+import type { MenuProps } from 'antd';
+import { Avatar, Dropdown, Space } from 'antd';
 
 const Navbar = () => {
   const { data: session } = useSession({ required: true });
-
+  const items: MenuProps['items'] = [
+    {
+      key: '1',
+      label: (
+        <a onClick={() => signOut()}>
+          <LogoutOutlined style={{ marginRight: 12 }}/>Logout
+        </a>
+      ),
+    }
+  ]
   
   return (
     <div className="flex items-center justify-between p-4">
@@ -26,6 +38,9 @@ const Navbar = () => {
         </div>
         <></>
         {/* <UserButton /> */}
+        <Dropdown menu={{ items }}>
+          <Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" />
+        </Dropdown>
         {/* {signOut()} */}
       </div>
     </div>
