@@ -6,7 +6,7 @@ const KEYCLOAK_ISSUER = `${process.env.KEYCLOAK_URL}/realms/${process.env.KEYCLO
 
 const keycloakConfig = {
   clientId: process.env.KEYCLOAK_CLIENT_ID!,
-  clientSecret: process.env.NEXT_PUBLIC_KEYCLOAK_SECRET_KEY!,
+  clientSecret: process.env.KEYCLOAK_SECRET_KEY!,
   issuer: KEYCLOAK_ISSUER,
 } as const;
 
@@ -14,7 +14,7 @@ const providers: Provider[] = [
   // Configure Keycloak as the authentication provider
   KeycloakProvider(keycloakConfig),
 ];
-
+console.log(keycloakConfig, 'keycloakConfig')
 const authOptions: NextAuthOptions = { providers };
 
 const handler = NextAuth({

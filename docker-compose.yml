@@ -26,7 +26,7 @@ services:
     cpus: 0.6
     restart: always
     ports:
-      - "3000:3000"
+      - "80:3000"
     environment:
       - DATABASE_URL=postgresql://postgres:password@postgres:5432/security
     depends_on:
@@ -37,7 +37,6 @@ services:
         npx prisma generate &&
         npx prisma migrate deploy &&
         npx prisma db seed &&
-        npm run build &&
         npm start
       "
 

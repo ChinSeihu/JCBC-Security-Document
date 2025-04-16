@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { get, postJson } from '@/lib';
 import { App, Button, Checkbox, Drawer, Form, FormInstance, List, Radio, Row, Space, Spin, Typography } from 'antd';
 import Style from './style.module.css'
-import { QUESTION_TYPE_EUNM } from '@/constants';
+import { QUESTION_CODE_EUNM } from '@/constants';
 import QuizResult from '../QuizResult';
 
 const style: React.CSSProperties = {
@@ -145,7 +145,7 @@ const RenderTestForm = ({
                 </Form.Item>
                 <Form.Item name={[index, "answer"]} rules={[{ required: true, message: "この質問をご回答ください" }]}>
                   {
-                    questionType === QUESTION_TYPE_EUNM.MULTIPLE_CHOICE 
+                    questionType === QUESTION_CODE_EUNM.MULTIPLE_CHOICE 
                     ? <RenderMultiple disabled={disabled} quesOptions={quesOptions} />
                     : <RenderSingle disabled={disabled} quesOptions={quesOptions} />
                   }

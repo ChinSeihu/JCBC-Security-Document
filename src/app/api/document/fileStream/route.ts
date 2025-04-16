@@ -33,7 +33,7 @@ export async function GET() {
     return new NextResponse(fileBuffer, {
       headers: {
         "Content-Type": "application/pdf", // 根据实际文件类型调整
-        "Content-Disposition": `inline; filename="${fileInfo.fileName}"`,
+        "Content-Disposition": `inline; filename*=UTF-8''${encodeURIComponent(fileInfo.fileName)}`,
       },
     });
   } catch (error) {

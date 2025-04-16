@@ -44,7 +44,7 @@ export async function getKeycloakAdminToken() {
       `${process.env.KEYCLOAK_URL}/realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/token`,
       new URLSearchParams({
         client_id: process.env.KEYCLOAK_CLIENT_ID!,
-        client_secret: process.env.NEXT_PUBLIC_KEYCLOAK_SECRET_KEY!,
+        client_secret: process.env.KEYCLOAK_SECRET_KEY!,
         grant_type: 'client_credentials',
       })
     );

@@ -69,10 +69,10 @@ const SideMenu = () => {
   const getMenu = (roles: string[] = []) => {
     return menuItems().filter(it => {
       const permissionList = routeAccessMap[it.href as string]
-      if (permissionList && !permissionList?.some(it => roles.includes(it) )) return false
+      if (permissionList && !permissionList?.some(it => roles.some(role => role.includes(it)))) return false
       if (it?.children?.length) {
         it.children = it?.children?.filter(child => {
-          return routeAccessMap[child.href]?.some(it => roles.includes(it))
+          return routeAccessMap[child.href]?.some(it => roles.some(role => role.includes(it)))
         })
         return it?.children?.length
       }
