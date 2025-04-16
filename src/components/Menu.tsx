@@ -62,7 +62,7 @@ const SideMenu = () => {
   console.log(roles, 'role>>>>>>>')
 
   useEffect(() => {
-    const menu = getMenu(roles);
+    const menu = getMenu([...(roles || []), 'employee']); //デフォルトで社員権限に設定
     setMenu(menu);
   }, [roles])
 

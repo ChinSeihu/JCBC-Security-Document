@@ -25,7 +25,10 @@ const handler = NextAuth({
       if (account?.access_token) {
         token.accessToken = account.access_token;
         // 提取角色（根据 Keycloak 配置的声明名称）
-        const tokenInfo = JSON.parse(atob(account.access_token.split('.')[1]))
+        const base64Url = account.access_token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = Buffer.from(base64, 'base64').toString('utf-8');
+        const tokenInfo = JSON.parse(jsonPayload);
         token.roles = tokenInfo?.realm_access?.roles || [];
         token.user = profile
       }
