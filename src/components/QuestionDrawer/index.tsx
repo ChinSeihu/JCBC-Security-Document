@@ -168,16 +168,16 @@ interface ISelectOptionProp {
 }
 const RenderMultiple = (props: ISelectOptionProp) => {
   const { quesOptions, onChange, disabled } = props
-  // quesOptions.sort(() => Math.random() - 0.5)
-
+  const queslist = quesOptions.sort(() => Math.random() - 0.5)
+  
   return (
     <Checkbox.Group style={style} onChange={onChange} disabled={disabled}>
       {
-        quesOptions.map((it: any, idx: number) => (
+        queslist.map((it: any, idx: number) => (
         <Form.Item noStyle key={idx}>
           <Row gutter={8} style={{flexWrap: 'nowrap'}}>
             <Checkbox style={{ borderRadius: '50%'}} className={Style["radio-option"]} value={it.order}>
-              {String.fromCharCode(65 + it.order)}
+              {String.fromCharCode(65 + idx)}
             </Checkbox>
             <Form.Item noStyle>
               <Typography.Text style={{textAlign: 'left', marginLeft: 8}}>{it.content}</Typography.Text>
@@ -192,16 +192,16 @@ const RenderMultiple = (props: ISelectOptionProp) => {
 
 const RenderSingle = (props: ISelectOptionProp) => {
   const { quesOptions, onChange, disabled } = props
-  // quesOptions.sort(() => Math.random() - 0.5)
+  const queslist = quesOptions.sort(() => Math.random() - 0.5)
 
   return (
     <Radio.Group optionType="button" style={style} onChange={onChange} disabled={disabled}>
       {
-        quesOptions.map((it: any, idx: number) => (
+        queslist.map((it: any, idx: number) => (
         <Form.Item noStyle key={idx}>
           <Row gutter={8} style={{flexWrap: 'nowrap'}}>
             <Radio.Button style={{ borderRadius: '50%'}} className={Style["radio-option"]} value={it.order}>
-              {String.fromCharCode(65 + it.order)}
+              {String.fromCharCode(65 + idx)}
             </Radio.Button>
             <Form.Item noStyle>
               <Typography.Text style={{textAlign: 'left', marginLeft: 8}}>{it.content}</Typography.Text>

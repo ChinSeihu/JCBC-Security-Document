@@ -24,26 +24,25 @@ export async function POST(request: Request) {
 
     const filePath = path.join(
       process.cwd(), 
-      'public/',
       fileInfo?.pathName || ''
     );
 
     if (!fileInfo || !fs.existsSync(filePath)) {
-      return NextResponse.json(
-        { 
-          data: null, 
-          message: '該当のファイルがみつかりませんでした',
-          status: HttpStatusCode.NotFound 
-        }
-      );
+      // return NextResponse.json(
+      //   { 
+      //     data: null, 
+      //     message: '該当のファイルがみつかりませんでした',
+      //     status: HttpStatusCode.NotFound 
+      //   }
+      // );
+      console.log('該当のファイルがみつかりませんでした')
+    } else {
+      await fs.unlink(filePath, async (err) => {
+        if (err) console.log('ファイルの削除に失敗しました！');
+      });
     }
 
-    await fs.unlink(filePath, async (err) => {
-      console.log(err, 'err>>>>')
-      if (err) throw 'ファイルの削除に失敗しました！';
-
-      await handleDocumentDelete(id)
-    });
+    await handleDocumentDelete(id)
 
     // 返回 PDF 数据流
     return NextResponse.json({

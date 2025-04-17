@@ -12,7 +12,6 @@ export async function GET() {
     // 构建文件路径
     const filePath = path.join(
       process.cwd(), 
-      'public/',
       fileInfo?.pathName || ''
     );
 

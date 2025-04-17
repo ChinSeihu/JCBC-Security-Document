@@ -19,25 +19,29 @@ export async function POST(request: NextRequest) {
     }
 
     prisma.$transaction(async (runPrisma: ClientPrisma) => {
-      const user = await validateUser(request);
-      // 4. 检查关联 document 是否存在
-      const quizExists = await checkDocumentExits(runPrisma, documentId)
+      try {
+        const user = await validateUser(request);
+        // 4. 检查关联 document 是否存在
+        const quizExists = await checkDocumentExits(runPrisma, documentId)
 
-      if (!quizExists) {
-        return NextResponse.json({ data:{ message: 'ドキュメントが存在しない' }}, { status: HttpStatusCode.NotFound })
+        if (!quizExists) {
+          return NextResponse.json({ data:{ message: 'ドキュメントが存在しない' }}, { status: HttpStatusCode.NotFound })
+        }
+
+        await updateQuestionItem({
+            documentId,
+            content,
+            questionType,
+            runPrisma,
+            userId: user.id,
+            questionId
+        })
+
+        await updateQuesOptions({runPrisma, questionId, quesOptions })
+          
+      } catch(e) {
+        throw e
       }
-
-      await updateQuestionItem({
-          documentId,
-          content,
-          questionType,
-          runPrisma,
-          userId: user.id,
-          questionId
-      })
-
-      await updateQuesOptions({runPrisma, questionId, quesOptions })
-
     })
     return NextResponse.json({
       data: {

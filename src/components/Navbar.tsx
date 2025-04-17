@@ -2,10 +2,11 @@ import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
 import { LogoutOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { Avatar, Dropdown, Space } from 'antd';
+import { Avatar, Dropdown } from 'antd';
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-
+const ColorList = ['#f56a00', '#7265e6', '#ffbf00', '#00a2ae'];
+const color = ColorList[Math.ceil(Math.random() * 10) % 4]
 const Navbar = () => {
   const { data: session } = useSession({ required: true });
   const router = useRouter()
@@ -25,9 +26,9 @@ const Navbar = () => {
   }, [router, session])
   
   return (
-    <div className="flex items-center justify-between p-4">
+    <div className="flex items-center justify-between p-3">
       {/* ICONS AND USER */}
-      <div className="flex items-center gap-6 justify-end w-full">
+      <div className="flex items-center gap-4 justify-end w-full">
         <div className="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer">
           <Image src="/message.png" alt="" width={20} height={20} />
         </div>
@@ -37,7 +38,7 @@ const Navbar = () => {
             1
           </div>
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col items-end">
           <span className="text-xs leading-3 font-medium">{session?.user?.name}</span>
           <span className="text-[10px] text-gray-500 text-right leading-none" >
             {session?.user?.email}
@@ -46,7 +47,7 @@ const Navbar = () => {
         <></>
         {/* <UserButton /> */}
         <Dropdown menu={{ items }}>
-          <Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" />
+          <Avatar style={{ cursor: 'pointer',backgroundColor: color, verticalAlign: 'middle' }}>{session?.user?.name?.slice(0,2)}</Avatar>
         </Dropdown>
         {/* {signOut()} */}
       </div>

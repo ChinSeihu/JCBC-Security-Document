@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     
     // 保存到 public/upload
     await writeFile(
-      `${process.cwd()}/public/${process.env.NEXT_PUBLIC_UPLOAD_DIR}/${filename}`,
+      `${process.cwd()}/${process.env.NEXT_PUBLIC_UPLOAD_DIR}/${filename}`,
       new Uint8Array(buffer)
     );
 

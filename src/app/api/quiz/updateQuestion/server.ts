@@ -53,13 +53,19 @@ export const updateQuesOptions = async ({ runPrisma, questionId, quesOptions }: 
 }) => {
   try {
     const updateList = quesOptions.map(item => {
-       return runPrisma.quesOption.update({
-        data: item,
-        where: {
-          id: item.id,
-          questionId
-        }
-      })
+      if (item?.id) {
+        return runPrisma.quesOption.update({
+          data: item,
+          where: {
+            id: item?.id,
+            questionId
+          }
+        })
+      } else {
+        return runPrisma.quesOption.create({
+         data: { ...item, questionId }
+       })
+      }
     })
     
     prisma.$transaction(updateList)

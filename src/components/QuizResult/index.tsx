@@ -53,7 +53,7 @@ const QuizResult = (props: any) => {
             <Row><Typography.Text style={{textAlign: 'left'}}>{item.questionText}</Typography.Text></Row>
             {getWrongOptions(item.selectedInfos).map((it, idx) => (
               <Space className={Style["answer-option"]} key={idx}>
-                <Typography.Text type="danger">{String.fromCharCode(65 + it.order)}</Typography.Text>
+                <Typography.Text type="danger">あなたの回答：</Typography.Text>
                 <Typography.Text type="danger">{it.content}</Typography.Text>
               </Space>
             ))}
