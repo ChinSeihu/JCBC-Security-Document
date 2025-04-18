@@ -31,30 +31,28 @@ const QuestionDrawer = (props: IProps) => {
   const [loading, setLoading] = useState(false);
   const [sendLoading, setSendLoading] = useState(false)
   const [isCompleted, setCompleted] = useState(false);
-  const [fileInfo, setFileInfo] = useState<any>({});
   const [refresh, setRefresh] = useState(false);
   const { message } = App.useApp();
 
   useEffect(() => {
     setOpen(props.isOpen)
-    props.isOpen && getFileInfo(props.documentId)
-    if (props.documentId) getQuestionList(props.documentId)
+    if (props.isOpen && props.documentId) {
+      setLoading(true)
+      getFileInfo(props.documentId).then(() => {
+        getQuestionList(props.documentId)
+      })
+    }
   }, [props])
 
   const getFileInfo = async (documentId: string) => {
     try {
       setLoading(true)
       const fileResponse = await get('/api/document/fileInfo', { documentId })
-      setFileInfo(fileResponse)
+      setCompleted(fileResponse?.testStatus?.isCompleted)
     } catch (e: any) {
       message.error(e?.message)
     } 
-    setLoading(false)
   }
-  console.log(isCompleted, fileInfo, '<<<<<<<<<<<isCompleted')
-  useEffect(() => {
-    if (fileInfo?.testStatus) setCompleted(fileInfo?.testStatus?.isCompleted)
-  }, [fileInfo])
 
   const getQuestionList = async (documentId: string) => {
     try {
@@ -75,8 +73,7 @@ const QuestionDrawer = (props: IProps) => {
     console.log(props)
 		props?.onCancel?.(refresh);
     form.resetFields();
-    setCompleted(false)
-    setFileInfo({})
+    setTimeout(() => setCompleted(false), 200)
   };
 
   const handleSubmitAswer = async (values: any) => {
