@@ -30,7 +30,7 @@
     "re-chart": "^1.0.0",
     "react": "~18",
     "react-dom": "~18",
-    "react-pdf": "^9.2.1",
+    "react-pdf": "9.1.0",
     "recharts": "^2.15.0",
     "security-document": "file:",
     "ts-node": "^10.9.2",

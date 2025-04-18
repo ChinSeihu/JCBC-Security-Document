@@ -21,6 +21,8 @@ export enum QUESTION_CODE_EUNM {
 	[FILE_TYPE.PDF]: 'PDF'
  } 
 
+export const primaryColor = '#1677ff'
+
  export const operateBtnProperty: ButtonProps = {
    className: 'text-xs',
    color: "primary",

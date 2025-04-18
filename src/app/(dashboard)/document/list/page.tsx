@@ -101,22 +101,29 @@ const FileUploadPage = () => {
       hideInSearch: true,
     },
     {
+      title: 'コメント',
+      dataIndex: 'description',
+      key: 'description',
+      ellipsis: true,
+      hideInSearch: true,
+    },
+    {
       title: '公開状態',
       dataIndex: 'isPublic',
       // hideInSearch: true,
       valueEnum: publicEnum,
       render: (_, record: any ) => <Badge status={record.isPublic ? 'success' : 'default'} text={record.isPublic ? '公開中' : '未公開'}/>
     },
-    {
-      title: '書類タイプ',
-      width: '12%',
-      dataIndex: 'fileType',
-      hideInSearch: true,
-      valueEnum: {
-        [FILE_TYPE_TEXT[FILE_TYPE.PDF]]: { text: 'PDF' }
-      },
-      render: (_: any, { fileType }: any) => FILE_TYPE_TEXT[fileType as FILE_TYPE]
-    },
+    // {
+    //   title: '書類タイプ',
+    //   width: '12%',
+    //   dataIndex: 'fileType',
+    //   hideInSearch: true,
+    //   valueEnum: {
+    //     [FILE_TYPE_TEXT[FILE_TYPE.PDF]]: { text: 'PDF' }
+    //   },
+    //   render: (_: any, { fileType }: any) => FILE_TYPE_TEXT[fileType as FILE_TYPE]
+    // },
     {
       title: 'サイズ',
       dataIndex: 'filesize',

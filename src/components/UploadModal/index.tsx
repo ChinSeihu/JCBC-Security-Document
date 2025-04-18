@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { post } from '@/lib';
-import { Upload,Button, UploadProps ,UploadFile, GetProp, Modal, App } from 'antd';
+import { Upload,Button, UploadProps, Input ,UploadFile, GetProp, Modal, App, Typography } from 'antd';
 import { InboxOutlined } from '@ant-design/icons'
 const { Dragger } = Upload;
 
@@ -11,6 +11,7 @@ const UploadModal = (props: any) => {
 	const [uploading, setUploading] = useState(false);
 	const [isOpen, setOpen] = useState(false);
 	const [isUploaded, setIsUploaded] = useState(false);
+	const [comment, setComment] = useState<string>()
 	const { message } = App.useApp();
 
 	useEffect(() => {
@@ -24,6 +25,7 @@ const UploadModal = (props: any) => {
 
 		const formData = new FormData();
 		formData.append('file', file as FileType);
+		formData.append('description', comment as string);
 
 		try {
 			const response = await post('/api/document/upload', formData);
@@ -31,6 +33,7 @@ const UploadModal = (props: any) => {
 				message.success('ファイルのアップロードに成功しました！');
 				setIsUploaded(true);
 				setFile(null);
+				setComment('')
 			} else {
 				message.error('ファイルのアップロードに失敗しました！');
 			}
@@ -90,6 +93,10 @@ const UploadModal = (props: any) => {
 				単一だけアップロードをサポートします。会社のデータやその他の禁止ファイルのアップロードはご遠慮ください。
 				</p>
 			</Dragger>
+			<div style={{ marginTop: 12 }}>
+				<Typography.Text>コメント：</Typography.Text>
+				<Input.TextArea onChange={e => setComment(e.target.value)} placeholder='コメントを入力ください'/>
+			</div>
 			<Button
 				type="primary"
 				onClick={handleUpload}

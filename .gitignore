@@ -37,3 +37,7 @@ yarn-error.log*
 next-env.d.ts
 
 /public/upload
+
+# lock
+pnpm-lock.yaml
+yarn.lock

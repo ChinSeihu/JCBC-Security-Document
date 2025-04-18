@@ -9,6 +9,7 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
+    const description = formData.get('description') as string;
     const user = await validateUser(request);
     
     if (!file) {
@@ -26,7 +27,8 @@ export async function POST(request: NextRequest) {
       filename: file.name,
       pathName: `${process.env.NEXT_PUBLIC_UPLOAD_DIR}/${filename}`,
       fileSize: file.size,
-      userId: user.id
+      userId: user.id,
+      description
     })
     
     // 保存到 public/upload
