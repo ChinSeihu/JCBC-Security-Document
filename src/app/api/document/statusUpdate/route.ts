@@ -1,6 +1,6 @@
 import { HttpStatusCode } from 'axios';
 import { NextRequest, NextResponse } from 'next/server';
-import { checkPublicStatus, documentStatusUpdate } from './server';
+import { documentStatusUpdate } from './server';
 import { validateUser } from '@/lib';
 
 export async function POST(request: NextRequest) {
@@ -15,18 +15,6 @@ export async function POST(request: NextRequest) {
         { error: "Missing required parameter: id" },
         { status: HttpStatusCode.BadRequest }
       );
-    }
-
-    const checkPublicExist = await checkPublicStatus()
-
-    if (checkPublicExist && isPublic) {
-      return NextResponse.json({
-        status: HttpStatusCode.Ok,
-        data: {
-          success: false,
-          message: `公開中のファイルが存在であるので、更新できません！`
-        },
-      });
     }
 
     await documentStatusUpdate({ id, isPublic, userId: user.id })

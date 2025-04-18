@@ -74,6 +74,11 @@ export async function historyList(params: ListQuestionParams): Promise<Paginated
           score: true,
           totalQuestions: true,
           completedAt: true,
+          testStatus: {
+            select: {
+              isCompleted: true
+            }
+          },
           correctAnswers: true,
           userId: true,
           documentId: true,
@@ -92,7 +97,7 @@ export async function historyList(params: ListQuestionParams): Promise<Paginated
         orderBy: { [orderBy]: orderDirection },
       })
     ])
-    
+
     const data = quizResults.map((item: any) => ({
         ...item,
         username: user?.username,

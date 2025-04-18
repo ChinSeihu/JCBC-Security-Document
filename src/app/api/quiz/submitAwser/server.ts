@@ -116,7 +116,7 @@ export async function createTestStatus(params: TestStstusParam): Promise<void> {
 
     record?.quizResultIds.push(quizResultId)
 
-    await prisma.testStatus.upsert({
+    const statusResult = await prisma.testStatus.upsert({
       create: {
         quizResultIds: record?.quizResultIds || [quizResultId],
         userId,
@@ -131,6 +131,16 @@ export async function createTestStatus(params: TestStstusParam): Promise<void> {
       },
       where: { id: record?.id, user_document_tenant: { userId, documentId } }
     })
+
+    await prisma.QuizResult.update({
+      data: {
+        testStatusId: statusResult.id
+      },
+      where: {
+        id: quizResultId
+      }
+    })
+
   } catch (error) {
     console.log('テストステータスの作成に失敗しました:', error)
     throw new Error('データ作成に失敗しました')

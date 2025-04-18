@@ -21,7 +21,7 @@ const HomePage = () => {
 	const getFileInfoList = async () => {
     setLoading(true)
 		try {
-		  const response = await get('/api/document/list', { isPublic: 'open' });
+		  const response = await get('/api/document/list', { isPublic: 'open', pageSize: 9999 });
       setDocList(response.data)
 		  return response;
 		} catch (error: any) {
@@ -54,6 +54,7 @@ const HomePage = () => {
               loading={loading}
               key={idx} 
               hoverable
+              size="small"
               onClick={handleToView}
               title={
                 <Flex align="center">

@@ -2,11 +2,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPublicFileInfo, getUserTestStatus } from './server';
 import { HttpStatusCode } from 'axios';
-import { validateUser } from '@/lib';
+import { getSearchParams, validateUser } from '@/lib';
 
 export async function GET(request: NextRequest) {
   try {
-    const fileInfo = await getPublicFileInfo();
+    const searchParams = request.nextUrl.searchParams;
+    const params = getSearchParams(searchParams);
+    console.log(params, 'params')
+    const fileInfo = await getPublicFileInfo(params.documentId);
 		const user = await validateUser(request);
     
     if (!fileInfo) {

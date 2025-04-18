@@ -39,6 +39,8 @@ services:
         npx prisma db seed &&
         npm start
       "
+    volumes:
+      - ./uploads:/app/uploads 
 
   nginx:
     image: nginx:latest

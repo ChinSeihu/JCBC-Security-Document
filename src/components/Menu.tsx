@@ -28,7 +28,7 @@ const menuItems = () => [
       {
         key: "11",
         href: "/document/view",
-        label: "ドキュメント閲覧",
+        label: "閲覧と受験",
         icon: <ReadOutlined />,
       },
       {

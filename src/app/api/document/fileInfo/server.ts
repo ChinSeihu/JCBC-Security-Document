@@ -8,7 +8,7 @@ interface FilePathResponse {
 }
 
 // ドキュメント公開状態更新
-export async function getPublicFileInfo(): Promise<FilePathResponse | null> {
+export async function getPublicFileInfo(documentId: string): Promise<FilePathResponse | null> {
 	try {
 		const result = await prisma.document.findFirst({
 			select: {
@@ -17,7 +17,8 @@ export async function getPublicFileInfo(): Promise<FilePathResponse | null> {
 				fileName: true
 			},
 			where: {
-				isPublic: true
+				isPublic: true,
+				id: documentId
 			},
 			orderBy: [{lastModifiedDate: "desc"}]
 		})

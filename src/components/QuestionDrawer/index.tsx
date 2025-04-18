@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { get, postJson } from '@/lib';
-import { App, Button, Checkbox, Drawer, Form, FormInstance, List, Radio, Row, Space, Spin, Typography } from 'antd';
+import { App, Checkbox, Form, FormInstance, List, Modal, Radio, Row, Spin, Typography } from 'antd';
 import Style from './style.module.css'
 import { QUESTION_CODE_EUNM } from '@/constants';
 import QuizResult from '../QuizResult';
@@ -20,33 +20,49 @@ interface IProps {
   documentId: string;
   isOpen: boolean;
   setOpen: (p: boolean) => void;
-  testStatus: ITestStatus;
-  onCancel?: () => void;
+  onCancel?: (refresh: boolean) => void;
 }
 
 const QuestionDrawer = (props: IProps) => {
-  const { documentId, isOpen, setOpen, testStatus } = props
+  const { documentId } = props
+  const [open, setOpen] = useState(false);
   const [questionList, setQuestionList] = useState<any>([]);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [sendLoading, setSendLoading] = useState(false)
-  const [isCompleted, setCompleted] = useState(testStatus.isCompleted);
+  const [isCompleted, setCompleted] = useState(false);
+  const [fileInfo, setFileInfo] = useState<any>({});
+  const [refresh, setRefresh] = useState(false);
   const { message } = App.useApp();
 
   useEffect(() => {
-    setCompleted(testStatus.isCompleted)
-  }, [testStatus.isCompleted])
+    setOpen(props.isOpen)
+    props.isOpen && getFileInfo(props.documentId)
+    if (props.documentId) getQuestionList(props.documentId)
+  }, [props])
 
-	useEffect(() => {
-    if (documentId) getQuestionList()
-	}, [documentId])
+  const getFileInfo = async (documentId: string) => {
+    try {
+      setLoading(true)
+      const fileResponse = await get('/api/document/fileInfo', { documentId })
+      setFileInfo(fileResponse)
+    } catch (e: any) {
+      message.error(e?.message)
+    } 
+    setLoading(false)
+  }
+  console.log(isCompleted, fileInfo, '<<<<<<<<<<<isCompleted')
+  useEffect(() => {
+    if (fileInfo?.testStatus) setCompleted(fileInfo?.testStatus?.isCompleted)
+  }, [fileInfo])
 
-  const getQuestionList = async () => {
+  const getQuestionList = async (documentId: string) => {
     try {
       setLoading(true);
       const response = await get('/api/quiz/listOfDocument', { documentId });
       console.log(response, 'getQuestionList')
       const queslist = response?.data?.sort(() => Math.random() - 0.5)
+      queslist.forEach((it: any) => it.quesOptions = it.quesOptions.sort(() => Math.random() - 0.5))
       setQuestionList(queslist || []);
     } catch (error: any) {
       console.log(error, "error>>>>")
@@ -56,9 +72,12 @@ const QuestionDrawer = (props: IProps) => {
   }
 
 	const onClose = () => {
-		setOpen(false);
-		props?.onCancel?.();
-	  };
+    console.log(props)
+		props?.onCancel?.(refresh);
+    form.resetFields();
+    setCompleted(false)
+    setFileInfo({})
+  };
 
   const handleSubmitAswer = async (values: any) => {
     try {
@@ -70,6 +89,7 @@ const QuestionDrawer = (props: IProps) => {
       })
       message.success(response?.message || "回答に成功しました")
       setCompleted(true);
+      setRefresh(true)
     } catch (e: any) {
       message.error(e?.message)
     }
@@ -87,37 +107,30 @@ const QuestionDrawer = (props: IProps) => {
 
   const handleReTest = () => {
     setCompleted(false);
-    getQuestionList()
+    getQuestionList(documentId)
   }
 
 	return (
-  <Drawer
-    title={<span style={{ float: 'left'}}>テスト</span>}
-    width={450}
-    mask={false}
-    onClose={onClose}
-    // placement="bottom"
-    getContainer={() => document.getElementsByClassName("document-view-draw-container")[0]}
-    open={isOpen}
-    extra={
-      !isCompleted && <Space>
-        <Button onClick={onClose}>キャンセル</Button>
-        <Button 
-          loading={sendLoading} 
-          onClick={handleSubmit} 
-          type="primary"
-          disabled={!questionList?.length}  
-        >送信</Button>
-      </Space>
-    }
+  <Modal
+    title={<span>テスト</span>}
+    width={750}
+    okText="送信"
+    destroyOnClose
+    maskClosable={false}
+    loading={loading}
+    okButtonProps={{ hidden: !questionList.length || isCompleted}}
+    onCancel={onClose}
+    open={open}
+    confirmLoading={sendLoading}
+    onOk={handleSubmit}
   >
-    <Spin spinning={loading}>
+    <Spin spinning={loading || sendLoading}>
     {isCompleted 
       ? <QuizResult documentId={documentId} onReTest={handleReTest}/> 
       : <RenderTestForm disabled={sendLoading} questionList={questionList} form={form}/>
     }
     </Spin>
-  </Drawer>
+  </Modal>
 	);
 };
 
@@ -168,12 +181,11 @@ interface ISelectOptionProp {
 }
 const RenderMultiple = (props: ISelectOptionProp) => {
   const { quesOptions, onChange, disabled } = props
-  const queslist = quesOptions.sort(() => Math.random() - 0.5)
   
   return (
     <Checkbox.Group style={style} onChange={onChange} disabled={disabled}>
       {
-        queslist.map((it: any, idx: number) => (
+        quesOptions.map((it: any, idx: number) => (
         <Form.Item noStyle key={idx}>
           <Row gutter={8} style={{flexWrap: 'nowrap'}}>
             <Checkbox style={{ borderRadius: '50%'}} className={Style["radio-option"]} value={it.order}>
@@ -192,12 +204,11 @@ const RenderMultiple = (props: ISelectOptionProp) => {
 
 const RenderSingle = (props: ISelectOptionProp) => {
   const { quesOptions, onChange, disabled } = props
-  const queslist = quesOptions.sort(() => Math.random() - 0.5)
 
   return (
     <Radio.Group optionType="button" style={style} onChange={onChange} disabled={disabled}>
       {
-        queslist.map((it: any, idx: number) => (
+        quesOptions.map((it: any, idx: number) => (
         <Form.Item noStyle key={idx}>
           <Row gutter={8} style={{flexWrap: 'nowrap'}}>
             <Radio.Button style={{ borderRadius: '50%'}} className={Style["radio-option"]} value={it.order}>

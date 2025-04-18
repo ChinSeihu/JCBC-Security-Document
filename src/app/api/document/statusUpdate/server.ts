@@ -32,22 +32,26 @@ export async function documentStatusUpdate(params: IUpdateParams): Promise<void>
   }
 }
 
-export async function checkPublicStatus(): Promise<boolean> {
-  try {      
-    const result = await prisma.document.findFirst({
-      select: {
-        isPublic: true,
-        fileName: true
-      },
-      where: {
-        isPublic: true
-      }
-    })
+// export async function createQuizResult(params: any) {
+//   try {
+//     const { aswerList, userId, prisma, documentId, questionOption } = params
 
-    return !!result
-  } catch (error) {
-    throw new Error('Failed to fetch documents')
-  } finally {
-    await prisma.$disconnect()
-  }
-}
+//     const mistakeList = aswerList.filter((it: any) => {
+//         const currentOption = questionOption.filter(item => item.questionId === it.questionId)
+//         return it.answer.some((answer: number) => currentOption.find(op => (op.order == answer) && !op.isCorrect))
+//       })
+
+//       // 回答結果
+//       const quizResult = await prisma.quizResult.create({
+//         data: {
+//           userId,
+//           documentId,
+//         }
+//       })
+
+//     return quizResult
+//   } catch (error) {
+//     console.log('回答結果の作成に失敗しました:' ,error)
+//     throw new Error('データ作成に失敗しました')
+//   }
+// }

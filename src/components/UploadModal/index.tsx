@@ -95,7 +95,7 @@ const UploadModal = (props: any) => {
 			</Dragger>
 			<div style={{ marginTop: 12 }}>
 				<Typography.Text>コメント：</Typography.Text>
-				<Input.TextArea onChange={e => setComment(e.target.value)} placeholder='コメントを入力ください'/>
+				<Input.TextArea value={comment} onChange={e => setComment(e.target.value)} placeholder='コメントを入力ください'/>
 			</div>
 			<Button
 				type="primary"
