@@ -90,6 +90,7 @@ const QuestionDrawer = (props: IProps) => {
     } catch (e: any) {
       message.error(e?.message)
     }
+    form.resetFields();
     setSendLoading(false);
   };
 
@@ -99,6 +100,7 @@ const QuestionDrawer = (props: IProps) => {
       handleSubmitAswer(values)
     }).catch(e => {
       console.log(e)
+      form.resetFields();
     })
   }
 
@@ -183,16 +185,12 @@ const RenderMultiple = (props: ISelectOptionProp) => {
     <Checkbox.Group style={style} onChange={onChange} disabled={disabled}>
       {
         quesOptions.map((it: any, idx: number) => (
-        <Form.Item noStyle key={idx}>
-          <Row gutter={8} style={{flexWrap: 'nowrap'}}>
+          <Row gutter={8} style={{flexWrap: 'nowrap'}} key={idx}>
             <Checkbox style={{ borderRadius: '50%'}} className={Style["radio-option"]} value={it.order}>
               {String.fromCharCode(65 + idx)}
             </Checkbox>
-            <Form.Item noStyle>
-              <Typography.Text style={{textAlign: 'left', marginLeft: 8}}>{it.content}</Typography.Text>
-            </Form.Item>
+            <Typography.Text style={{textAlign: 'left', marginLeft: 8}}>{it.content}</Typography.Text>
           </Row>
-        </Form.Item>
         ))
       }
     </Checkbox.Group>
@@ -206,16 +204,12 @@ const RenderSingle = (props: ISelectOptionProp) => {
     <Radio.Group optionType="button" style={style} onChange={onChange} disabled={disabled}>
       {
         quesOptions.map((it: any, idx: number) => (
-        <Form.Item noStyle key={idx}>
-          <Row gutter={8} style={{flexWrap: 'nowrap'}}>
+          <Row gutter={8} style={{flexWrap: 'nowrap'}} key={idx}>
             <Radio.Button style={{ borderRadius: '50%'}} className={Style["radio-option"]} value={it.order}>
               {String.fromCharCode(65 + idx)}
             </Radio.Button>
-            <Form.Item noStyle>
-              <Typography.Text style={{textAlign: 'left', marginLeft: 8}}>{it.content}</Typography.Text>
-            </Form.Item>
+            <Typography.Text style={{textAlign: 'left', marginLeft: 8}}>{it.content}</Typography.Text>
           </Row>
-        </Form.Item>
         ))
       }
     </Radio.Group>
