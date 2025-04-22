@@ -12,8 +12,9 @@ interface ListQuestionParams {
   endDate?: string
   isPublic?: PUBLIC_STATUS_ENUM
   document?: string
-  score?: string
-  userName?: string
+  status?: '0' | '1' | '2'
+  userName?: string,
+  isCompleted?: 'true' | 'false',
   // 排序参数
   orderBy?: 'createdAt' | 'updatedAt' | 'fileName' | 'fileSize'
   orderDirection?: 'asc' | 'desc'
@@ -35,47 +36,53 @@ export async function resultList(params: ListQuestionParams): Promise<PaginatedT
     const {
       page = 1,
       pageSize = 10,
-      orderBy = 'completedAt',
+      orderBy = 'createdDate',
       orderDirection = 'desc',
       startDate,
       endDate,
       isPublic,
       document = '',
-      score,
-      userName = ''
+      status,
+      userName = '',
+      isCompleted
     } = params
 
     const where: any = {
       AND: [
         { 
-          completedAt: {
-            lte: endDate ? dayjs(endDate).add(1, 'd').toISOString() : undefined,
-            gte: startDate ? dayjs(startDate).toISOString() : undefined, 
-          },
           document: {
             isPublic: isPublic && isPublic === PUBLIC_STATUS_ENUM.OPEN,
             fileName: { contains: document, mode: 'insensitive' }
           },
-          score: score ? {
-            gte: Number(score),
-            lt: score === '0' ? 1 : undefined
-          } : undefined
+          lastModifiedDate: {
+            lte: endDate ? dayjs(endDate).add(1, 'd').toISOString() : undefined,
+            gte: startDate ? dayjs(startDate).toISOString() : undefined, 
+          },
+          isCompleted: isCompleted ? isCompleted === 'true' : undefined
         },
       ].filter(Boolean)
     }
 
     // 并行查询
-    const [total, quizResults] = await Promise.all([
-      prisma.quizResult.count({ where }),
-      prisma.quizResult.findMany({
+    let [total, TestStatus] = await Promise.all([
+      prisma.testStatus.count({ where }),
+      prisma.testStatus.findMany({
         select: {
           id: true,
-          score: true,
-          totalQuestions: true,
-          completedAt: true,
-          correctAnswers: true,
+          quizResult: {
+            select: {
+              score: true,
+              totalQuestions: true,
+              completedAt: true,
+              correctAnswers: true,
+            },
+            orderBy: { completedAt: 'desc' }
+          },
           userId: true,
+          isCompleted: true,
+          quizResultIds: true,
           documentId: true,
+          lastModifiedDate: true,
           document: {
             select: {
               pathName: true,
@@ -92,9 +99,18 @@ export async function resultList(params: ListQuestionParams): Promise<PaginatedT
       })
     ])
 
+    if (status) {
+      TestStatus = TestStatus.filter(item => {
+        if (status === '1') {
+          return item.quizResult?.[0]?.score === 1
+        }
+        return item.quizResult?.[0]?.score < 1
+      })
+    }
+
     const userList = await getUserList()
 
-    const data = quizResults.map((item: any) => {
+    const data = TestStatus.map((item: any) => {
       const CurrentUser = userList.find((it: any) => it.id === item.userId)
 
       return {

@@ -103,7 +103,6 @@ const QuestionDrawer = (props: IProps) => {
       form.resetFields();
     })
   }
-
   const handleReTest = () => {
     setCompleted(false);
     getQuestionList(documentId)

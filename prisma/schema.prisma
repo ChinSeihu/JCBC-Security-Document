@@ -33,7 +33,8 @@ model TestStatus {
   documentId   String
   isCompleted  Boolean      @default(false)
   quizResultIds String[]
-
+  createdDate   DateTime     @default(now())
+  lastModifiedDate DateTime  @default(now())
   document   Document     @relation(fields: [documentId], references: [id])
   quizResult QuizResult[]
 

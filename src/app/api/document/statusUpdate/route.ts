@@ -1,7 +1,8 @@
 import { HttpStatusCode } from 'axios';
 import { NextRequest, NextResponse } from 'next/server';
-import { documentStatusUpdate } from './server';
+import { createTestStatus, documentStatusUpdate } from './server';
 import { validateUser } from '@/lib';
+import prisma from '@/lib/prisma';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,8 +18,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await documentStatusUpdate({ id, isPublic, userId: user.id })
-
+    await prisma.$transaction(async clientPrisma => {
+      await documentStatusUpdate({ id, isPublic, userId: user.id, prisma: clientPrisma })
+      if (isPublic) await createTestStatus({ documentId: id, prisma: clientPrisma })
+    })
     return NextResponse.json({
       status: HttpStatusCode.Ok,
       data: {
@@ -33,5 +36,7 @@ export async function POST(request: NextRequest) {
       { error: 'Internal Server Error' }, 
       { status: HttpStatusCode.InternalServerError }
     );
+  } finally {
+    await prisma.$disconnect()
   }
 }

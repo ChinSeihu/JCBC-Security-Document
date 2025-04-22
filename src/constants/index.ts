@@ -41,5 +41,6 @@ export const primaryColor = '#1677ff'
 
  export const resultOption = [
 	{value: 1, label: '合格'}, 
-	{value: 0, label: '不合格'}
+	{value: 0, label: '不合格'},
+	{value: 2, label: '未実施'},
 ]

@@ -127,7 +127,8 @@ export async function createTestStatus(params: TestStstusParam): Promise<void> {
         quizResultIds: record?.quizResultIds || [quizResultId],
         userId,
         documentId,
-        isCompleted: true
+        isCompleted: true,
+        lastModifiedDate: new Date()
       },
       where: { id: record?.id, user_document_tenant: { userId, documentId } }
     })

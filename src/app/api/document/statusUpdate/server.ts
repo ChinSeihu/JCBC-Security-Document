@@ -1,16 +1,18 @@
-import { validateUser } from "@/lib";
-import prisma from "@/lib/prisma"
+import { ClientPrisma } from "@/constants/type";
+import { getUserList, validateUser } from "@/lib";
 
 // 类型定义
 interface IUpdateParams {
   // 分页参数
   id: string
   isPublic: boolean,
-  userId: string
+  userId: string,
+  prisma: ClientPrisma
 }
 
 // ドキュメント公開状態更新
 export async function documentStatusUpdate(params: IUpdateParams): Promise<void> {
+  const { prisma } = params;
   try {      
     await prisma.document.update({
       data: {
@@ -27,31 +29,31 @@ export async function documentStatusUpdate(params: IUpdateParams): Promise<void>
   } catch (error) {
     console.error('更新失敗:', error)
     throw new Error('Failed to fetch documents')
-  } finally {
-    await prisma.$disconnect()
   }
 }
 
-// export async function createQuizResult(params: any) {
-//   try {
-//     const { aswerList, userId, prisma, documentId, questionOption } = params
+export async function createTestStatus(params: { documentId: string, prisma: ClientPrisma }) {
+  try {
+    const { prisma, documentId } = params
+    const userList = await getUserList()
 
-//     const mistakeList = aswerList.filter((it: any) => {
-//         const currentOption = questionOption.filter(item => item.questionId === it.questionId)
-//         return it.answer.some((answer: number) => currentOption.find(op => (op.order == answer) && !op.isCorrect))
-//       })
-
-//       // 回答結果
-//       const quizResult = await prisma.quizResult.create({
-//         data: {
-//           userId,
-//           documentId,
-//         }
-//       })
-
-//     return quizResult
-//   } catch (error) {
-//     console.log('回答結果の作成に失敗しました:' ,error)
-//     throw new Error('データ作成に失敗しました')
-//   }
-// }
+    await Promise.all(userList.map(async (user: any) => (  
+      await prisma.TestStatus.upsert({
+        create: {
+          userId: user.id,
+          documentId,
+        },
+        update: {},
+        where: {
+          user_document_tenant: {
+            userId: user.id,
+            documentId,
+          }
+        }
+      })
+    )));
+  } catch (error) {
+    console.log('テスト状态の作成に失敗しました:' ,error)
+    throw new Error('データ作成に失敗しました')
+  }
+}

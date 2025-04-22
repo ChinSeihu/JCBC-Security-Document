@@ -9,6 +9,7 @@ import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
 
 import Style from './style.module.css';
 import { ExportOutlined } from '@ant-design/icons';
+import { HttpStatusCode } from 'axios';
 
 const initPagination: TPagination = {
   page: 1,
@@ -18,28 +19,34 @@ const initPagination: TPagination = {
   showSizeChanger: true,
 }
 
-const TestResult = ({ point }: {point: number}) => {
+const TestResult = ({ point, status }: {point?: number, status?: string }) => {
   const isPassed = isPass(point)
   const colorMap = {
     passing: '#87d068',
-    failed: '#f50'
+    failed: '#f50',
+    default: ''
   }
-  return <Tag color={isPassed ? colorMap.passing : colorMap.failed}>{isPassed ? '合格': '不合格'}</Tag>
+
+  const color = status === 'default' ? colorMap.default : isPassed ? colorMap.passing : colorMap.failed
+  const text = status === 'default' ? '未実施' : isPassed ? '合格': '不合格'
+  return <Tag color={color}>{text}</Tag>
 }
 
 const TestResultList = () => {
   const [pagination, setPagination] = useState<TPagination>(initPagination);
 	const { message } = App.useApp();
   const actionRef = useRef<ActionType>();
-  const [params, setParams] = useState({})
+  const [params, setParams] = useState<any>({})
   const [exportLoading, setExportLoading] = useState(false)
   
-  const getTestResultList = async (params = {}) => {
+  const getTestResultList = async (params: any = {}) => {
     try {
       const response = await get('/api/test/resultList', {
         page: initPagination.page,
         pageSize: pagination.pageSize,
         ...params,
+        isCompleted: params?.status == 2 ? 'false' : undefined,
+        status: params?.status !== 2 ? params.status : undefined,
       });
       console.log(response, 'resultList')
       return response
@@ -93,17 +100,13 @@ const TestResultList = () => {
       render: (_, r) => <Badge status={r.document.isPublic ? 'success' : 'default'} text={r.document.isPublic ? '公開中' : '未公開'}/>
     },
     {
-      title: '正解/総計',
-      dataIndex: 'correctAnswers',
-      hideInSearch: true,
-      render: (v, record) => <Tag>{v}/{record.totalQuestions}</Tag>
-    },
-    {
       title: 'テスト結果',
-      dataIndex: 'score',
+      dataIndex: 'status',
       valueType: 'select',
       fieldProps: { options: resultOption },
-      render: (_, record) => <TestResult point={record?.score}/>
+      render: (_, record) => {
+        return record.isCompleted ? <TestResult point={record?.quizResult?.[0]?.score}/> : <TestResult status='default'/>
+      }
     },
     {
       title: '受験者',
@@ -118,7 +121,7 @@ const TestResultList = () => {
         transform: (dates) => ({startDate: dates[0], endDate: dates[1] })
       },
       width: 150,
-      render: (_, record) => dayjs(record.completedAt).format('YYYY-MM-DD HH:mm:ss')
+      render: (_, record) => record.isCompleted ? dayjs(record?.quizResult?.[0]?.completedAt).format('YYYY-MM-DD HH:mm:ss') : '-'
     },
     {
       title: '操作',
@@ -137,7 +140,7 @@ const TestResultList = () => {
             okText="はい"
             cancelText="キャンセル"
           >
-            {r?.document?.isPublic && <Button {...operateBtnProperty} style={{marginRight: 6 }} size='small'>再テスト</Button>}
+            {r?.document?.isPublic && r.isCompleted && <Button {...operateBtnProperty} style={{marginRight: 6 }} size='small'>再テスト</Button>}
           </Popconfirm>
         </div>
       )
@@ -147,14 +150,21 @@ const TestResultList = () => {
   const handleExportCsv = async () => {
     try {
       setExportLoading(true)
-      const response = await fetch('/api/test/export', params);
-      if (response.ok) {
+
+      const reqParams = {
+        ...params,
+        isCompleted: params?.status == 2 ? 'false' : undefined,
+        status: params?.status !== 2 ? params.status : undefined,
+      }
+
+      const response = await get('/api/test/export', reqParams, { _customResponse: true } );
+      console.log(response, 'export')
+      if (response.status === HttpStatusCode.Ok) {
         console.log(response, 'handleExportCsv')
-        const csvData  = await response.text();
-        const blob = new Blob([csvData], { type: 'text/csv' });
+        const blob = new Blob([response.data], { type: 'text/csv' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = 'data.csv';
+        link.download = `テスト結果_${new Date().toLocaleString()}.csv`;
         link.click();
       }
     } catch (error: any) {
@@ -164,10 +174,49 @@ const TestResultList = () => {
     setExportLoading(false)
   }
 
+  const expandedRowRender = (record: any) => {
+    const data = record?.quizResult || [];
+
+    return (
+      <ProTable
+        rowKey={Math.random().toString(16)}
+        columns={[
+          {
+            title: '正解/総計',
+            dataIndex: 'correctAnswers',
+            render: (v, record) => <Tag>{v}/{record.totalQuestions}</Tag>
+          },
+          {
+            title: 'テスト結果',
+            dataIndex: 'score',
+            valueType: 'select',
+            fieldProps: { options: resultOption },
+            render: (_, record) => <TestResult point={record?.score}/>
+          },
+          {
+            title: '実施日時',
+            dataIndex: 'completedAt',
+            valueType: 'dateRange',
+            search: {
+              transform: (dates) => ({startDate: dates[0], endDate: dates[1] })
+            },
+            width: 150,
+            render: (_, record) => dayjs(record.completedAt).format('YYYY-MM-DD HH:mm:ss')
+          },
+        ]}
+        headerTitle={false}
+        search={false}
+        options={false}
+        dataSource={data}
+        pagination={false}
+      />
+    );
+  };
+
   return (
     <div className="container">
       <ProTable
-        rowKey="idx" 
+        rowKey="id" 
         actionRef={actionRef}
         cardBordered
         request={async (params, sorter, filter) => {
@@ -186,6 +235,7 @@ const TestResultList = () => {
           });
         }}
         columns={columns}
+        expandable={{ expandedRowRender }}
         search={{
           labelWidth: 95,
           span: 8,
