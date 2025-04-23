@@ -111,17 +111,17 @@ const TestResultList = () => {
     {
       title: '受験者',
       dataIndex: 'user',
-      render: (_, r) => [r?.firstName, r?.lastName].join(' ').trim() || '-'
+      render: (_, r) => [r?.lastName, r?.firstName].join(' ').trim() || '-'
     },
     {
-      title: '実施日時',
-      dataIndex: 'completedAt',
+      title: '最終更新日時',
+      dataIndex: 'lastModifiedDate	',
       valueType: 'dateRange',
       search: {
         transform: (dates) => ({startDate: dates[0], endDate: dates[1] })
       },
       width: 150,
-      render: (_, record) => record.isCompleted ? dayjs(record?.quizResult?.[0]?.completedAt).format('YYYY-MM-DD HH:mm:ss') : '-'
+      render: (_, record) => dayjs(record?.lastModifiedDate).format('YYYY-MM-DD HH:mm:ss')
     },
     {
       title: '操作',

@@ -2,6 +2,9 @@
 
 SERVICE=app
 
+echo "📂 备份 uploads 文件夹..."
+./backup_uploads.sh
+
 echo "🛑 停止并删除 $SERVICE 容器..."
 docker-compose stop $SERVICE
 docker-compose rm -f $SERVICE

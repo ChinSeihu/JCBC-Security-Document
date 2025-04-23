@@ -64,9 +64,7 @@ export async function resultList(params: ListQuestionParams): Promise<PaginatedT
     }
 
     // 并行查询
-    let [total, TestStatus] = await Promise.all([
-      prisma.testStatus.count({ where }),
-      prisma.testStatus.findMany({
+    let TestStatus = await prisma.testStatus.findMany({
         select: {
           id: true,
           quizResult: {
@@ -93,18 +91,17 @@ export async function resultList(params: ListQuestionParams): Promise<PaginatedT
           }
         },
         where,
-        skip: (page - 1) * pageSize,
-        take: Number(pageSize),
+        // skip: (page - 1) * pageSize,
+        // take: Number(pageSize),
         orderBy: { [orderBy]: orderDirection },
       })
-    ])
 
     if (status) {
       TestStatus = TestStatus.filter(item => {
         if (status === '1') {
-          return item.quizResult?.[0]?.score === 1
+          return item.isCompleted && item.quizResult?.[0]?.score === 1
         }
-        return item.quizResult?.[0]?.score < 1
+        return item.isCompleted && item.quizResult?.[0]?.score < 1
       })
     }
 
@@ -125,10 +122,10 @@ export async function resultList(params: ListQuestionParams): Promise<PaginatedT
     return {
       data,
       pagination: {
-        total,
+        total: TestStatus?.length || 0,
         page: Number(page),
         pageSize: Number(pageSize),
-        totalPages: Math.ceil(total / pageSize)
+        totalPages: Math.ceil(TestStatus?.length || 0 / pageSize)
       }
     }
   } catch (error) {

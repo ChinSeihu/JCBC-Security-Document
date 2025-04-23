@@ -38,6 +38,8 @@ next-env.d.ts
 
 /public/upload
 
+ec2key.pem
+
 # lock
 pnpm-lock.yaml
 yarn.lock
