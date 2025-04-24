@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import { get, postJson } from '@/lib';
-import { App, Badge, Button, Popconfirm, Typography } from 'antd';
+import { App, Badge, Button, DatePicker, Input, Modal, Popconfirm, Typography } from 'antd';
 import { TPagination } from '@/constants/type'
 import { FILE_TYPE_TEXT, FILE_TYPE, operateBtnProperty, publicEnum } from '@/constants';
 import UploadModal from '@/components/UploadModal';
@@ -23,6 +23,8 @@ const initPagination: TPagination  = {
 const FileUploadPage = () => {
   const [pagination, setPagination] = useState<TPagination>(initPagination);
   const [isOpen, setOpen] = useState(false);
+  const [isEdit, setEdit] = useState(false);
+  const [current, setCurrent] = useState<any>();
   const { message } = App.useApp();
   const actionRef = useRef<ActionType>();
   
@@ -91,7 +93,7 @@ const FileUploadPage = () => {
       dataIndex: 'fileName',
       className: 'fileName-cell',
       ellipsis: true,
-      render: (name, record: any) => <a href={record.pathName} target='_blank'>{name}</a>
+      render: (name, record: any) => name
     },
     {
       title: 'ファイルId',
@@ -111,8 +113,17 @@ const FileUploadPage = () => {
       title: '公開状態',
       dataIndex: 'isPublic',
       // hideInSearch: true,
+      width: 95,
       valueEnum: publicEnum,
       render: (_, record: any ) => <Badge status={record.isPublic ? 'success' : 'default'} text={record.isPublic ? '公開中' : '未公開'}/>
+    },
+    {
+      title: '有効期限',
+      dataIndex: 'deadline	',
+      valueType: 'dateTime',
+      width:150,
+      hideInSearch: true,
+      render: (_, record) =>  dayjs(record.deadline).format('YYYY-MM-DD HH:mm:ss')
     },
     // {
     //   title: '書類タイプ',
@@ -124,13 +135,6 @@ const FileUploadPage = () => {
     //   },
     //   render: (_: any, { fileType }: any) => FILE_TYPE_TEXT[fileType as FILE_TYPE]
     // },
-    {
-      title: 'サイズ',
-      dataIndex: 'filesize',
-      hideInSearch: true,
-      width: 80,
-      render: (v: any) => v ? Math.ceil(v / 1024) + 'KB' : '-'
-    },
     {
       title: '作成日時',
       dataIndex: 'createdDate',
@@ -148,12 +152,19 @@ const FileUploadPage = () => {
       render: (_, r: any) => [r?.firstName, r?.lastName].join(' ').trim() || '-'
     },
     {
+      title: 'サイズ',
+      dataIndex: 'filesize',
+      hideInSearch: true,
+      width: 80,
+      render: (v: any) => v ? Math.ceil(v / 1024) + 'KB' : '-'
+    },
+    {
       title: '操作',
       dataIndex: 'operate',
       fixed: 'right',
       valueType: 'option',
       hideInSearch: true,
-      width: 140,
+      width: 160,
       render: (_, r: any) => (
         <div>
           <Popconfirm
@@ -186,6 +197,10 @@ const FileUploadPage = () => {
           >
             {!r.isPublic && <Button {...operateBtnProperty} size='small'>削除</Button>}
           </Popconfirm>
+          <Button onClick={() => {
+            setEdit(true)
+            setCurrent(r);
+            }} {...operateBtnProperty} style={{marginLeft: 6 }}size='small'>編集</Button>
         </div>
       )
     },
@@ -218,8 +233,9 @@ const FileUploadPage = () => {
         }}
         columns={columns}
         pagination={{ ...pagination }}
-        search={{ span: 8 }}
+        search={{ span: 8, collapseRender: (collapsed) => collapsed ? '詳細検索' : '折り畳み' }}
         bordered
+        scroll={{ x: 1300 }}
         defaultSize='small'
         toolbar={{
           actions: ([
@@ -230,8 +246,89 @@ const FileUploadPage = () => {
         }}
         headerTitle={<Typography.Title level={5}>ドキュメント一覧</Typography.Title>}
       />
+      <EditModal 
+        open={isEdit} 
+        handleCancel={() => {
+          setEdit(false)
+          setCurrent(undefined)
+        }}
+        record={current}
+        actionRef={actionRef}
+      />
     </div>
   );
 };
+
+const EditModal = (props: any) => {
+  const { open, handleCancel, record, actionRef } = props
+  const [loading, setLoading] = useState(false);
+  const [deadline, setDeadline] = useState<any>();
+  const [comment, setComment] = useState<string>();
+  const { message } = App.useApp();
+
+  const onCancel = () => {
+    setDeadline(undefined);
+    setComment(undefined);
+    setLoading(false)
+    handleCancel?.();
+  }
+
+  useEffect(() => {
+    if (!record) return;
+    setDeadline(record?.deadline ? dayjs(record?.deadline) : undefined)
+    setComment(record?.description)
+  }, [record])
+
+  const handleEditSubmit = async () => {
+    setLoading(true);
+    try {
+      const { success, message: msg} = await postJson('/api/document/update', {
+        id: record.id,
+        deadline,
+        comment
+      })
+      
+      console.log(success, msg, 'handleEditSubmit')
+
+      onCancel();
+      if (success) {
+        actionRef?.current?.reload()
+        setLoading(false);
+        return message.success(msg)
+      }
+      message.warning(msg)
+    } catch (e: any) {
+      message.error(e?.message)
+    }
+    setLoading(false);
+  }
+
+  return (
+    <Modal
+			title="アップロード" 
+			cancelText="キャンセル" 
+			open={open} 
+			onCancel={onCancel} 
+      onOk={handleEditSubmit}
+      confirmLoading={loading}
+			destroyOnClose
+			okText="確認"
+		>
+			<div style={{ marginTop: 12 }}>
+				<Typography.Text>有効期限：</Typography.Text>
+				<DatePicker
+					format="YYYY-MM-DD HH:mm:ss"
+					showTime={{ defaultValue: dayjs('00:00:00', 'HH:mm:ss') }}
+					value={deadline} onChange={(v) => setDeadline(v)}
+					placeholder='有効期限を選択ください'
+				/>
+			</div>
+			<div style={{ marginTop: 12 }}>
+				<Typography.Text>コメント：</Typography.Text>
+				<Input.TextArea style={{ marginTop: 6 }} value={comment} onChange={e => setComment(e.target.value)} placeholder='コメントを入力ください'/>
+			</div>
+		</Modal>
+  )
+}
 
 export default FileUploadPage;

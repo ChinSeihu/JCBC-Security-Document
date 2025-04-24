@@ -87,6 +87,7 @@ export async function resultList(params: ListQuestionParams): Promise<PaginatedT
               fileName: true,
               isPublic: true,
               id: true,
+              deadline: true,
             }
           }
         },
@@ -116,9 +117,8 @@ export async function resultList(params: ListQuestionParams): Promise<PaginatedT
         firstName: CurrentUser?.firstName,
         lastName: CurrentUser?.lastName
       }}
-    ).filter((item: any) => `${item.firstName} ${item.lastName}`.includes(userName))
+    ).filter((item: any) => `${item.lastName} ${item.firstName}`.includes(userName))
     
-
     return {
       data,
       pagination: {

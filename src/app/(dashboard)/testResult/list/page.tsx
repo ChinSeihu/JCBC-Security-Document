@@ -91,11 +91,12 @@ const TestResultList = () => {
         label: 'ドキュメント',
       },
       ellipsis: true,
-      render: (_, record) => <a target="_blank" href={record?.document?.pathName}>{record.document.fileName}</a>
+      render: (_, record) => record.document.fileName
     },
     {
       title: '公開状態',
       dataIndex: 'isPublic',
+      width: 95,
       valueEnum: publicEnum,
       render: (_, r) => <Badge status={r.document.isPublic ? 'success' : 'default'} text={r.document.isPublic ? '公開中' : '未公開'}/>
     },
@@ -103,6 +104,7 @@ const TestResultList = () => {
       title: 'テスト結果',
       dataIndex: 'status',
       valueType: 'select',
+      width: 100,
       fieldProps: { options: resultOption },
       render: (_, record) => {
         return record.isCompleted ? <TestResult point={record?.quizResult?.[0]?.score}/> : <TestResult status='default'/>
@@ -239,6 +241,7 @@ const TestResultList = () => {
         search={{
           labelWidth: 95,
           span: 8,
+          collapseRender: (collapsed) => collapsed ? '詳細検索' : '折り畳み'
         }}
         toolbar={{
           actions: ([

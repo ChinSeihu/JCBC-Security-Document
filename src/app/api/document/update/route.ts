@@ -1,0 +1,31 @@
+// app/api/read-pdf/route.js (App Router)
+import { NextRequest, NextResponse } from 'next/server';
+import { handleDocumentUpdate } from './server';
+import { HttpStatusCode } from 'axios';
+import { validateUser } from '@/lib';
+
+export async function POST(request: NextRequest) {
+  try {
+    const params = await request.json()
+    const { comment, deadline, id } = params;
+    const user = await validateUser(request);
+
+    await handleDocumentUpdate({
+      comment, deadline, id, userId: user.id
+    });
+
+    return NextResponse.json({
+      status: HttpStatusCode.Ok,
+      data: {
+        success: true,
+        message: 'ドキュメントの修正に成功しました'
+      },
+    });
+
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: HttpStatusCode.InternalServerError }
+    );
+  }
+}

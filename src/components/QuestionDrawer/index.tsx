@@ -87,10 +87,10 @@ const QuestionDrawer = (props: IProps) => {
       message.success(response?.message || "回答に成功しました")
       setCompleted(true);
       setRefresh(true)
+      form.resetFields();
     } catch (e: any) {
       message.error(e?.message)
     }
-    form.resetFields();
     setSendLoading(false);
   };
 
@@ -98,9 +98,10 @@ const QuestionDrawer = (props: IProps) => {
     console.log(form.getFieldsValue(), 'handleSubmit')
     form.validateFields().then(values => {
       handleSubmitAswer(values)
+      form.resetFields();
     }).catch(e => {
       console.log(e)
-      form.resetFields();
+      message.error(e?.message || '回答をごチェックください')
     })
   }
   const handleReTest = () => {

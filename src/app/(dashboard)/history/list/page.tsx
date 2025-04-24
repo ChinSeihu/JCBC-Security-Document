@@ -8,6 +8,7 @@ import {  isPass, operateBtnProperty, PUBLIC_STATUS_ENUM, publicEnum, resultOpti
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
 
 import './style.module.css';
+import { useRouter } from 'next/navigation';
 
 const initPagination: TPagination = {
   page: 1,
@@ -30,6 +31,7 @@ const TestHistoryList = () => {
   const [pagination, setPagination] = useState<TPagination>(initPagination);
 	const { message } = App.useApp();
   const actionRef = useRef<ActionType>();
+  const router = useRouter();
 
   const getTestHistoryList = async (params = {}) => {
     try {
@@ -68,6 +70,10 @@ const TestHistoryList = () => {
     }
   }
 
+  const handleToTest = () => {
+    router.push('/document/view')
+  }
+
   const columns: ProColumns[] = [
     {
       title: 'ID',
@@ -87,12 +93,14 @@ const TestHistoryList = () => {
     {
       title: '公開状態',
       dataIndex: 'isPublic',
+      width: 95,
       valueEnum: publicEnum,
       render: (_:any, r: any) => <Badge status={r.document.isPublic ? 'success' : 'default'} text={r.document.isPublic ? '公開中' : '未公開'}/>
     },
     {
       title: '正解/総計',
       dataIndex: 'correctAnswers',
+      width: 95,
       hideInSearch: true,
       render: (v, record: any) => <Tag>{v}/{record.totalQuestions}</Tag>
     },
@@ -100,8 +108,20 @@ const TestHistoryList = () => {
       title: 'テスト結果',
       dataIndex: 'score',
       valueType: 'select',
-      fieldProps: { options: resultOption },
+      width: 100,
+      fieldProps: { options: resultOption.slice(0, 2) },
       render: (_, record) => <TestResult point={record.score}/>
+    },
+    {
+      title: 'テスト状態',
+      dataIndex: 'testStatus',
+      width: 95,
+      hideInSearch: true,
+      render: (_, record) => {
+        const isCompleted = record?.testStatus?.isCompleted
+
+        return isCompleted  ? '完了' : '対応中' 
+      }
     },
     {
       title: '実施日時',
@@ -129,8 +149,9 @@ const TestHistoryList = () => {
             okText="はい"
             cancelText="キャンセル"
           >
-            {r?.document?.isPublic && <Button {...operateBtnProperty} type='primary' style={{marginRight: 6 }} size='small'>再テスト</Button>}
+            {r?.document?.isPublic && r?.testStatus?.isCompleted && <Button {...operateBtnProperty} type='primary' style={{marginRight: 6 }} size='small'>再テスト</Button>}
           </Popconfirm>
+          {!r?.testStatus?.isCompleted && <Button onClick={handleToTest} {...operateBtnProperty} type='primary' style={{marginRight: 6 }} size='small'>受験</Button>}
         </div>
       )
     },
@@ -159,6 +180,7 @@ const TestHistoryList = () => {
         search={{
           labelWidth: 95,
           span: 8,
+          collapseRender: (collapsed) => collapsed ? '詳細検索' : '折り畳み'
         }}
         pagination={{ ...pagination }}
         bordered

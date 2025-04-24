@@ -77,7 +77,8 @@ const QuestionList = () => {
       formItemProps: {
         label: 'ドキュメント',
       },
-      render: (_, record) => <a target="_blank" href={record?.document?.pathName}>{record.document.fileName}</a>    },
+      render: (_, record) => record.document.fileName   
+    },
     {
       title: 'ドキュメントID',
       dataIndex: 'documentId',
@@ -177,6 +178,7 @@ const QuestionList = () => {
         search={{
           labelWidth: 95,
           span: 8,
+          collapseRender: (collapsed) => collapsed ? '詳細検索' : '折り畳み'
         }}
         toolbar={{
           actions: ([

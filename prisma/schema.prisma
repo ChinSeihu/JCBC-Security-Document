@@ -15,6 +15,7 @@ model Document {
   filesize         Int
   description      String?   @db.Text
   isPublic         Boolean   @default(false)
+  deadline         DateTime?  
   delFlag          Boolean   @default(false)
   createdAt        String
   createdDate      DateTime  @default(now())

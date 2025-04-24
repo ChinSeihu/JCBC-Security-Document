@@ -3,7 +3,8 @@
 import { operateBtnProperty, primaryColor } from "@/constants";
 import { get } from "@/lib";
 import { FileTextOutlined } from "@ant-design/icons";
-import { App, Button, Card, Flex, List, Spin, Typography } from "antd";
+import { App, Button, Card, Flex, List, Spin, Tag, Typography } from "antd";
+import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
@@ -44,32 +45,45 @@ const HomePage = () => {
       <Flex vertical style={{width: '44%'}}>
       <List
         size="small"
-        header={<div>公開中のドキュメント</div>}
+        header={<div>テスト情報</div>}
         // footer={<div>Footer</div>}
         bordered
         dataSource={docList}
-        renderItem={(item: any, idx) => 
-          <List.Item>
-            <Card 
-              loading={loading}
-              key={idx} 
-              hoverable
-              size="small"
-              onClick={handleToView}
-              title={
-                <Flex align="center">
-                  <FileTextOutlined style={{ color: primaryColor, marginRight: 4 }}/>
-                  <span style={{ textOverflow: 'ellipsis', width: '92%', overflow: 'hidden', display:'inline-block' }}>{item?.fileName}</span>
-                </Flex>
-              } 
-              extra={
-                <Button disabled={loading} size="small" style={{ marginLeft: 12 }} { ...operateBtnProperty } onClick={handleToView}>閲覧</Button>
-              } 
-              style={{ width: '100%' }}
-            >
-              {item.description}
-            </Card>
-          </List.Item>}
+        renderItem={(item: any, idx) => {
+          const deadlineDiff = dayjs(item?.deadline).diff(dayjs());
+          
+          return (
+            <List.Item>
+              <Card 
+                loading={loading}
+                key={idx} 
+                hoverable
+                size="small"
+                onClick={handleToView}
+                title={
+                  <Flex align="center">
+                    <FileTextOutlined style={{ color: primaryColor, marginRight: 4 }}/>
+                    <span style={{ textOverflow: 'ellipsis', width: '92%', overflow: 'hidden', display:'inline-block' }}>{item?.fileName}</span>
+                  </Flex>
+                } 
+                extra={
+                  <Button disabled={loading} size="small" style={{ marginLeft: 12 }} { ...operateBtnProperty } onClick={handleToView}>閲覧</Button>
+                } 
+                style={{ width: '100%' }}
+                actions={[
+                  <div key="deadline" style={{ textAlign: 'start', padding: '0 12px', fontSize: 12}}>
+                    受験期限：
+                    <Tag bordered={false} color={deadlineDiff < 86400000 * 3 ? "error" : "blue"}>
+                      {item?.deadline ? dayjs(item?.deadline).format('YYYY-MM-DD HH:mm:ss') : '無期限'}
+                    </Tag>
+                    までに完了してください
+                  </div>
+                ]}
+              >
+                {item.description}
+              </Card>
+            </List.Item>)}
+        }
       />
         {/* {docList.map((it: any, idx: number) => (
           

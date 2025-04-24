@@ -1,13 +1,15 @@
 import { FILE_TYPE } from "@/constants";
 import { validateUser } from "@/lib";
 import prisma from "@/lib/prisma";
+import dayjs from "dayjs";
 
 interface DocumentParams {
 	filename: string;
 	pathName: string
 	fileSize: number;
 	description?: string;
-  userId: string
+  userId: string,
+  deadline?: string
 }
 
 export const documentCreate = async (params: DocumentParams) => {
@@ -24,7 +26,8 @@ export const documentCreate = async (params: DocumentParams) => {
         lastModifiedAt: params.userId,
         lastModifiedDate: new Date(),
         createdAt: params.userId,
-        createdDate: new Date()
+        createdDate: new Date(),
+        deadline: params.deadline ? dayjs(params.deadline).toISOString() : null
       }
     })
 

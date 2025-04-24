@@ -88,6 +88,7 @@ export async function historyList(params: ListQuestionParams): Promise<Paginated
               pathName: true,
               fileName: true,
               isPublic: true,
+              deadline: true,
             }
           }
         },

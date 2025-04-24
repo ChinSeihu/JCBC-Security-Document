@@ -78,6 +78,7 @@ export async function listDocuments(params: ListDocumentsParams): Promise<Pagina
           fileType: true,
           filesize: true,
           description: true,
+          deadline: true,
           isPublic: true,
           lastModifiedAt: true,
           lastModifiedDate: true,

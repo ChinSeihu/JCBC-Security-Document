@@ -62,6 +62,7 @@ const SideMenu = () => {
   console.log(roles, 'role>>>>>>>')
 
   useEffect(() => {
+    if (!roles) return;
     const menu = getMenu([...(roles || []), 'employee']); //デフォルトで社員権限に設定
     setMenu(menu);
   }, [roles])
@@ -123,6 +124,7 @@ const SideMenu = () => {
         onClick={handleMenuClick} 
         mode="inline" 
         defaultSelectedKeys={selectedKey}
+        selectedKeys={selectedKey}
         items={viewMenu}
         inlineIndent={16}
         defaultOpenKeys={openKey}

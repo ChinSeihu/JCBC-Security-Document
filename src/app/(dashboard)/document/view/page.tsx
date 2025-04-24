@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { get } from '@/lib';
-import { App, Badge, Button, Card, Flex, List } from 'antd';
+import { App, Badge, Button, Card, Flex, List, Tag } from 'antd';
 import { FileTextOutlined } from '@ant-design/icons';
 import { operateBtnProperty, primaryColor, SCORE_LINE } from '@/constants';
 import ViewModal from './ViewModal';
 import QuestionDrawer from '@/components/QuestionDrawer';
+import dayjs from 'dayjs';
 
 export default function PDFViewList() {
     const { message } = App.useApp();
@@ -82,6 +83,7 @@ export default function PDFViewList() {
           renderItem={(item: any, idx) => {
             const currentHistory = history.find((it: any) => it.documentId === item.id)
             const isPass = currentHistory?.testStatus?.isCompleted && currentHistory.score === SCORE_LINE;
+            const deadlineDiff = dayjs(item?.deadline).diff(dayjs());
             return (
               <List.Item>
                   <Card
@@ -96,6 +98,12 @@ export default function PDFViewList() {
                       </Flex>
                     } 
                     extra={[
+                      <span key="deadline">
+                        受験期限：
+                        <Tag bordered={false} color={deadlineDiff < 86400000 * 3 ? "error" : "blue"}>
+                          {item?.deadline ? dayjs(item?.deadline).format('YYYY-MM-DD HH:mm:ss') : '無期限'}
+                        </Tag>
+                      </span>,
                       <Button 
                         onClick={() => hancleOpenDoc(item)} 
                         disabled={loading} 
@@ -104,14 +112,16 @@ export default function PDFViewList() {
                         style={{ marginLeft: 12 }} 
                         { ...operateBtnProperty }
                       >閲覧</Button>,
-                      <Button 
-                        key="test"
-                        onClick={() => hancleOpenTest(item)} 
-                        disabled={loading} 
-                        size="small" 
-                        style={{ marginLeft: 12 }} 
-                        { ...operateBtnProperty }
-                      >受験</Button>
+                      item?.deadline && deadlineDiff > 0 
+                        ? <Button 
+                            key="test"
+                            onClick={() => hancleOpenTest(item)} 
+                            disabled={loading} 
+                            size="small" 
+                            style={{ marginLeft: 12 }} 
+                            { ...operateBtnProperty }
+                          >受験</Button> 
+                        : null
                     ]} 
                     style={{ width: '100%' }}
                   >        
