@@ -4,13 +4,14 @@ import dayjs from 'dayjs';
 import { get, postJson } from '@/lib';
 import { App, Badge, Button, DatePicker, Input, Modal, Popconfirm, Typography } from 'antd';
 import { TPagination } from '@/constants/type'
-import { FILE_TYPE_TEXT, FILE_TYPE, operateBtnProperty, publicEnum } from '@/constants';
+import { operateBtnProperty, publicEnum } from '@/constants';
 import UploadModal from '@/components/UploadModal';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
-import { LightFilter, ProFormSelect, ProTable } from '@ant-design/pro-components';
+import { ProTable } from '@ant-design/pro-components';
 
 import './style.css';
 import { UploadOutlined } from '@ant-design/icons';
+import SpecifyModal from './SpecifyModal';
 
 const initPagination: TPagination  = {
   page: 1,
@@ -24,6 +25,7 @@ const FileUploadPage = () => {
   const [pagination, setPagination] = useState<TPagination>(initPagination);
   const [isOpen, setOpen] = useState(false);
   const [isEdit, setEdit] = useState(false);
+  const [isSpecify, setSpecify] = useState(false);
   const [current, setCurrent] = useState<any>();
   const { message } = App.useApp();
   const actionRef = useRef<ActionType>();
@@ -123,7 +125,7 @@ const FileUploadPage = () => {
       valueType: 'dateTime',
       width:150,
       hideInSearch: true,
-      render: (_, record) =>  dayjs(record.deadline).format('YYYY-MM-DD HH:mm:ss')
+      render: (_, record) =>  record.deadline ? dayjs(record.deadline).format('YYYY-MM-DD HH:mm:ss') : '期限無し'
     },
     // {
     //   title: '書類タイプ',
@@ -167,16 +169,15 @@ const FileUploadPage = () => {
       width: 160,
       render: (_, r: any) => (
         <div>
-          <Popconfirm
-            title="ファイル公開"
-            description="当該のファイルを公開しますか?"
-            onConfirm={() => {handleOperation(r, true)}}
-            onCancel={() => {}}
-            okText="はい"
-            cancelText="キャンセル"
-          >
-            {!r.isPublic && <Button {...operateBtnProperty} style={{marginRight: 6 }} size='small'>公開</Button>}
-          </Popconfirm>
+          {!r.isPublic && <Button
+            {...operateBtnProperty} 
+            style={{marginRight: 6 }} 
+            onClick={() => {
+              setSpecify(true);
+              setCurrent(r);
+            }}
+            size='small'
+          >公開</Button>}
           <Popconfirm
             title="ファイルの公開を取り下げ"
             description="公開中のファイルを取り下げますか?"
@@ -255,6 +256,15 @@ const FileUploadPage = () => {
         record={current}
         actionRef={actionRef}
       />
+      <SpecifyModal 
+        open={isSpecify}
+        handleCancel={() => {
+          setSpecify(false)
+          setCurrent(undefined)
+        }}
+        actionRef={actionRef}
+        record={current}
+      />
     </div>
   );
 };
@@ -305,7 +315,7 @@ const EditModal = (props: any) => {
 
   return (
     <Modal
-			title="アップロード" 
+			title="編集" 
 			cancelText="キャンセル" 
 			open={open} 
 			onCancel={onCancel} 

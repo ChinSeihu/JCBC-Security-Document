@@ -12,7 +12,7 @@ const UploadModal = (props: any) => {
 	const [uploading, setUploading] = useState(false);
 	const [isOpen, setOpen] = useState(false);
 	const [isUploaded, setIsUploaded] = useState(false);
-	const [comment, setComment] = useState<string>()
+	const [comment, setComment] = useState<string>('')
 	const [deadline, setDeadline] = useState<string>()
 	const { message } = App.useApp();
 

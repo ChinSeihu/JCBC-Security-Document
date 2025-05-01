@@ -27,8 +27,8 @@ export default function PDFViewList() {
       const getFileInfoList = async () => {
       setLoading(true)
           try {
-            const response = await get('/api/document/list', { isPublic: 'open', pageSize: 9999 });
-            setDocList(response.data)
+            const response = await get('/api/document/viewList');
+            setDocList(response)
             return response;
           } catch (error: any) {
             console.log(error, "error>>>>")
@@ -101,7 +101,7 @@ export default function PDFViewList() {
                       <span key="deadline">
                         受験期限：
                         <Tag bordered={false} color={deadlineDiff < 86400000 * 3 ? "error" : "blue"}>
-                          {item?.deadline ? dayjs(item?.deadline).format('YYYY-MM-DD HH:mm:ss') : '無期限'}
+                          {item?.deadline ? dayjs(item?.deadline).format('YYYY-MM-DD HH:mm:ss') : '期限無し'}
                         </Tag>
                       </span>,
                       <Button 
@@ -112,7 +112,7 @@ export default function PDFViewList() {
                         style={{ marginLeft: 12 }} 
                         { ...operateBtnProperty }
                       >閲覧</Button>,
-                      item?.deadline && deadlineDiff > 0 
+                      !item?.deadline || (item?.deadline && deadlineDiff > 0) 
                         ? <Button 
                             key="test"
                             onClick={() => hancleOpenTest(item)} 

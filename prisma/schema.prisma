@@ -36,8 +36,9 @@ model TestStatus {
   quizResultIds String[]
   createdDate   DateTime     @default(now())
   lastModifiedDate DateTime  @default(now())
-  document   Document     @relation(fields: [documentId], references: [id])
-  quizResult QuizResult[]
+  document     Document     @relation(fields: [documentId], references: [id])
+  quizResult   QuizResult[]
+  delFlag      Boolean   @default(false)
 
   @@unique([userId, documentId], name: "user_document_tenant")
 }

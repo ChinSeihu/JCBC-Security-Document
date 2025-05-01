@@ -60,6 +60,9 @@ export async function resultList(params: ListQuestionParams): Promise<PaginatedT
           },
           isCompleted: isCompleted ? isCompleted === 'true' : undefined
         },
+        {
+          delFlag: false
+        }
       ].filter(Boolean)
     }
 

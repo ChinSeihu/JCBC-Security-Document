@@ -3,13 +3,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createTestStatus, documentStatusUpdate } from './server';
 import { validateUser } from '@/lib';
 import prisma from '@/lib/prisma';
+import { ClientPrisma } from '@/constants/type';
 
 export async function POST(request: NextRequest) {
   try {
     const params = await request.json()
     const user = await validateUser(request);
     
-    const { id, isPublic } = params;
+    const { id, isPublic, targetIds } = params;
 
     if (!id) {
       return NextResponse.json(
@@ -18,9 +19,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await prisma.$transaction(async clientPrisma => {
+    await prisma.$transaction(async (clientPrisma: ClientPrisma) => {
       await documentStatusUpdate({ id, isPublic, userId: user.id, prisma: clientPrisma })
-      if (isPublic) await createTestStatus({ documentId: id, prisma: clientPrisma })
+      if (isPublic) await createTestStatus({ documentId: id, prisma: clientPrisma, targetIds })
     })
     return NextResponse.json({
       status: HttpStatusCode.Ok,

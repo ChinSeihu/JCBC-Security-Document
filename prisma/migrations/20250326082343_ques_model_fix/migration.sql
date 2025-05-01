@@ -1,0 +1,9 @@
+-- AlterTable
+ALTER TABLE "Question" ADD COLUMN     "createdAt" TEXT,
+ADD COLUMN     "createdDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN     "delFlag" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN     "lastModifiedAt" TEXT,
+ADD COLUMN     "lastModifiedDate" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP;
+
+-- AddForeignKey
+ALTER TABLE "Question" ADD CONSTRAINT "Question_createdAt_fkey" FOREIGN KEY ("createdAt") REFERENCES "User"("userId") ON DELETE SET NULL ON UPDATE CASCADE;

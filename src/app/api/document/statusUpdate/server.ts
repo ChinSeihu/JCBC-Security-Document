@@ -1,6 +1,5 @@
 import { ClientPrisma } from "@/constants/type";
-import { getUserList, validateUser } from "@/lib";
-
+import prisma from "@/lib/prisma";
 // 类型定义
 interface IUpdateParams {
   // 分页参数
@@ -21,7 +20,8 @@ export async function documentStatusUpdate(params: IUpdateParams): Promise<void>
         lastModifiedDate: new Date(),
       },
       where: {
-        id: params.id
+        id: params.id,
+        delFlag: false
       }
     })
 
@@ -32,21 +32,45 @@ export async function documentStatusUpdate(params: IUpdateParams): Promise<void>
   }
 }
 
-export async function createTestStatus(params: { documentId: string, prisma: ClientPrisma }) {
+export async function createTestStatus(params: { documentId: string, prisma: ClientPrisma, targetIds: string[] }) {
   try {
-    const { prisma, documentId } = params
-    const userList = await getUserList()
+    const { prisma: clientPrisma, documentId, targetIds } = params
+    const publiced = (await prisma.testStatus.findMany({
+      select: { userId: true },
+      where: { documentId }
+    }))?.map?.((it: any) => it.userId)
 
-    await Promise.all(userList.map(async (user: any) => (  
-      await prisma.TestStatus.upsert({
-        create: {
-          userId: user.id,
-          documentId,
+    const cancelUsers = filterUnique(publiced, targetIds) || [];
+    console.log(documentId, publiced, 'publiced')
+    console.log(cancelUsers, 'cancelUsers')
+    await Promise.all(cancelUsers.map(async (userId: any) => (  
+      await clientPrisma.TestStatus.update({
+        data: {
+          delFlag: true,
+          lastModifiedDate: new Date()
         },
-        update: {},
         where: {
           user_document_tenant: {
-            userId: user.id,
+            userId: userId,
+            documentId,
+          }
+        }
+      })
+    )));
+
+    await Promise.all(targetIds.map(async (userId: any) => (  
+      await clientPrisma.TestStatus.upsert({
+        create: {
+          userId: userId,
+          documentId,
+        },
+        update: {
+          delFlag: false,
+          lastModifiedDate: new Date()
+        },
+        where: {
+          user_document_tenant: {
+            userId: userId,
             documentId,
           }
         }
@@ -56,4 +80,9 @@ export async function createTestStatus(params: { documentId: string, prisma: Cli
     console.log('テスト状态の作成に失敗しました:' ,error)
     throw new Error('データ作成に失敗しました')
   }
+}
+
+const filterUnique = (source: string[], target: string[]): string[] => {
+  const sourceSet = new Set(source);
+  return Array.from(sourceSet.difference(new Set(target)));
 }

@@ -22,8 +22,8 @@ const HomePage = () => {
 	const getFileInfoList = async () => {
     setLoading(true)
 		try {
-		  const response = await get('/api/document/list', { isPublic: 'open', pageSize: 9999 });
-      setDocList(response.data)
+		  const response = await get('/api/document/viewList');
+      setDocList(response)
 		  return response;
 		} catch (error: any) {
 		  console.log(error, "error>>>>")
@@ -74,7 +74,7 @@ const HomePage = () => {
                   <div key="deadline" style={{ textAlign: 'start', padding: '0 12px', fontSize: 12}}>
                     受験期限：
                     <Tag bordered={false} color={deadlineDiff < 86400000 * 3 ? "error" : "blue"}>
-                      {item?.deadline ? dayjs(item?.deadline).format('YYYY-MM-DD HH:mm:ss') : '無期限'}
+                      {item?.deadline ? dayjs(item?.deadline).format('YYYY-MM-DD HH:mm:ss') : '期限無し'}
                     </Tag>
                     までに完了してください
                   </div>
