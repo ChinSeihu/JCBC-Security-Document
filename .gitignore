@@ -38,7 +38,7 @@ next-env.d.ts
 
 /public/upload
 
-ec2key.pem
+Ec2Key.pem
 
 # lock
 pnpm-lock.yaml
