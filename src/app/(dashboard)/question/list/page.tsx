@@ -80,10 +80,10 @@ const QuestionList = () => {
       render: (_, record) => record.document.fileName   
     },
     {
-      title: 'ドキュメントID',
-      dataIndex: 'documentId',
-      hideInSearch: true,
-      ellipsis: true
+      title: 'テーマ',
+      dataIndex: 'theme',
+      ellipsis: true,
+      render: (_, record) => record.document.theme
     },
     {
       title: '問題タイプ',

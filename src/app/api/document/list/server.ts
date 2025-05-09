@@ -13,6 +13,7 @@ interface ListDocumentsParams {
   endDate?: string
   isPublic?: PUBLIC_STATUS_ENUM
   fileName?: string
+  theme?: string
   // 排序参数
   orderBy?: 'createdAt' | 'updatedAt' | 'fileName' | 'fileSize'
   orderDirection?: 'asc' | 'desc'
@@ -59,6 +60,10 @@ export async function listDocuments(params: ListDocumentsParams): Promise<Pagina
             contains: params.fileName, 
             mode: 'insensitive',
           },
+          theme: {
+            contains: params.theme, 
+            mode: 'insensitive',
+          },
         },
         { delFlag: false } // 默认过滤已删除
       ].filter(Boolean)
@@ -76,6 +81,7 @@ export async function listDocuments(params: ListDocumentsParams): Promise<Pagina
           fileName: true,
           pathName: true,
           fileType: true,
+          theme: true,
           filesize: true,
           description: true,
           deadline: true,

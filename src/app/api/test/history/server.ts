@@ -12,6 +12,7 @@ interface ListQuestionParams {
   startDate?: string
   endDate?: string
   document?: string
+  theme?: string
   score?: string
   // 排序参数
   orderBy?: 'createdAt' | 'updatedAt' | 'fileName' | 'fileSize'
@@ -42,6 +43,7 @@ export async function historyList(params: ListQuestionParams): Promise<Paginated
       startDate,
       endDate,
       document,
+      theme,
       score,
     } = params
 
@@ -55,7 +57,8 @@ export async function historyList(params: ListQuestionParams): Promise<Paginated
           },
           document: {
             isPublic: isPublic && isPublic === PUBLIC_STATUS_ENUM.OPEN,
-            fileName: { contains: document, mode: 'insensitive' }
+            fileName: { contains: document, mode: 'insensitive' },
+            theme: { contains: theme, mode: 'insensitive' }
           },
           score: score ? {
             gte: Number(score),
@@ -87,6 +90,7 @@ export async function historyList(params: ListQuestionParams): Promise<Paginated
               id: true,
               pathName: true,
               fileName: true,
+              theme: true,
               isPublic: true,
               deadline: true,
             }

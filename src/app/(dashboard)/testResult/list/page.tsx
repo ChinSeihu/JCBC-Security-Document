@@ -83,15 +83,12 @@ const TestResultList = () => {
       render: (_, __, index: number) => (pagination.page - 1) * pagination.pageSize + index + 1
     },
     {
-      title: '関連ドキュメント',
-      dataIndex: 'document',
+      title: '関連試験',
+      dataIndex: 'theme',
       valueType: 'text',
       className: Style['fileName-cell'],
-      formItemProps: {
-        label: 'ドキュメント',
-      },
       ellipsis: true,
-      render: (_, record) => record.document.fileName
+      render: (_, record) => record.document.theme
     },
     {
       title: '公開状態',

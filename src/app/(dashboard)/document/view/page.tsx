@@ -94,7 +94,7 @@ export default function PDFViewList() {
                     title={
                       <Flex align="center">
                         <FileTextOutlined style={{ color: primaryColor, marginRight: 4 }}/>
-                        <span style={{ textOverflow: 'ellipsis', width: '92%', overflow: 'hidden', display:'inline-block' }}>{item?.fileName}</span>
+                        <span style={{ textOverflow: 'ellipsis', width: '92%', overflow: 'hidden', display:'inline-block' }}>{item?.theme}</span>
                       </Flex>
                     } 
                     extra={[

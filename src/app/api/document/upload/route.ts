@@ -11,6 +11,7 @@ export async function POST(request: NextRequest) {
     const file = formData.get('file') as File;
     const description = formData.get('description') as string;
     const deadline = formData.get('deadline') as string;
+    const theme = formData.get('theme') as string;
     const user = await validateUser(request);
     
     if (!file) {
@@ -30,7 +31,8 @@ export async function POST(request: NextRequest) {
       fileSize: file.size,
       userId: user.id,
       description,
-      deadline
+      deadline,
+      theme
     })
     
     // 保存到 public/upload

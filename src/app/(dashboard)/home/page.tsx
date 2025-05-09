@@ -7,6 +7,7 @@ import { App, Button, Card, Flex, List, Spin, Tag, Typography } from "antd";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import Style from './style.module.css';
 
 const HomePage = () => {
 	console.log('HomePage.......')
@@ -47,6 +48,7 @@ const HomePage = () => {
         size="small"
         header={<div>テスト情報</div>}
         // footer={<div>Footer</div>}
+        className={Style['list-container']}
         bordered
         dataSource={docList}
         renderItem={(item: any, idx) => {
@@ -62,8 +64,7 @@ const HomePage = () => {
                 onClick={handleToView}
                 title={
                   <Flex align="center">
-                    <FileTextOutlined style={{ color: primaryColor, marginRight: 4 }}/>
-                    <span style={{ textOverflow: 'ellipsis', width: '92%', overflow: 'hidden', display:'inline-block' }}>{item?.fileName}</span>
+                    <span style={{ width: '92%', padding: '4px 0', whiteSpace: 'pre-wrap', overflow: 'hidden', display:'inline-block' }}><FileTextOutlined style={{ color: primaryColor, marginRight: 4 }}/>{item?.theme}</span>
                   </Flex>
                 } 
                 extra={

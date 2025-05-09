@@ -12,6 +12,7 @@ interface ListQuestionParams {
   endDate?: string
   isPublic?: PUBLIC_STATUS_ENUM
   document?: string
+  theme?: string
   status?: '0' | '1' | '2'
   userName?: string,
   isCompleted?: 'true' | 'false',
@@ -43,6 +44,7 @@ export async function resultList(params: ListQuestionParams): Promise<PaginatedT
       isPublic,
       document = '',
       status,
+      theme,
       userName = '',
       isCompleted
     } = params
@@ -52,7 +54,8 @@ export async function resultList(params: ListQuestionParams): Promise<PaginatedT
         { 
           document: {
             isPublic: isPublic && isPublic === PUBLIC_STATUS_ENUM.OPEN,
-            fileName: { contains: document, mode: 'insensitive' }
+            fileName: { contains: document, mode: 'insensitive' },
+            theme: { contains: theme, mode: 'insensitive' }
           },
           lastModifiedDate: {
             lte: endDate ? dayjs(endDate).add(1, 'd').toISOString() : undefined,
@@ -88,6 +91,7 @@ export async function resultList(params: ListQuestionParams): Promise<PaginatedT
             select: {
               pathName: true,
               fileName: true,
+              theme: true,
               isPublic: true,
               id: true,
               deadline: true,

@@ -12,6 +12,7 @@ model Document {
   fileName         String    @db.VarChar(255)
   pathName         String    @unique
   fileType         String    @db.VarChar(255)
+  theme            String    @db.VarChar(255) @unique
   filesize         Int
   description      String?   @db.Text
   isPublic         Boolean   @default(false)

@@ -17,6 +17,7 @@ export async function listFromTestStatus(userId: string): Promise<Prisma.Documen
           filesize: true,
           description: true,
           deadline: true,
+          theme: true,
           isPublic: true,
           lastModifiedAt: true,
           lastModifiedDate: true,

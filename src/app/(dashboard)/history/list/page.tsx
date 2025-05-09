@@ -4,11 +4,11 @@ import dayjs from 'dayjs';
 import { get, postJson } from '@/lib';
 import { App, Button, Popconfirm, Tag, Typography, Badge } from 'antd';
 import { TPagination } from '@/constants/type'
-import {  isPass, operateBtnProperty, PUBLIC_STATUS_ENUM, publicEnum, resultOption } from '@/constants';
+import {  isPass, operateBtnProperty, publicEnum, resultOption } from '@/constants';
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
+import { useRouter } from 'next/navigation';
 
 import './style.module.css';
-import { useRouter } from 'next/navigation';
 
 const initPagination: TPagination = {
   page: 1,
@@ -83,12 +83,11 @@ const TestHistoryList = () => {
       render: (_:any, __:any, index: number) => (pagination.page - 1) * pagination.pageSize + index + 1
     },
     {
-      title: '関連ドキュメント',
-      dataIndex: 'document',
+      title: '関連試験',
+      dataIndex: 'theme',
       valueType: 'text',
       ellipsis: true,
-      formItemProps: { label: 'ドキュメント' },
-      render: (_,record) => record?.document?.fileName || '-'
+      render: (_,record) => record?.document?.theme || '-'
     },
     {
       title: '公開状態',

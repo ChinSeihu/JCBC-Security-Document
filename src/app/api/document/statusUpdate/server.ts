@@ -41,8 +41,7 @@ export async function createTestStatus(params: { documentId: string, prisma: Cli
     }))?.map?.((it: any) => it.userId)
 
     const cancelUsers = filterUnique(publiced, targetIds) || [];
-    console.log(documentId, publiced, 'publiced')
-    console.log(cancelUsers, 'cancelUsers')
+
     await Promise.all(cancelUsers.map(async (userId: any) => (  
       await clientPrisma.TestStatus.update({
         data: {

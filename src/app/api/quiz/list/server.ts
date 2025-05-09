@@ -11,6 +11,7 @@ interface ListQuestionParams {
   startDate?: string
   questionType?: string
   document?: string
+  theme?: string
   content?: string
   userName?: string
   // 排序参数
@@ -36,6 +37,7 @@ export async function listQuestion(params: ListQuestionParams): Promise<Paginate
       pageSize = 10,
       orderBy = 'lastModifiedDate',
       orderDirection = 'desc',
+      theme = '',
       endDate,
       startDate,
       questionType,
@@ -61,6 +63,10 @@ export async function listQuestion(params: ListQuestionParams): Promise<Paginate
                   contains: document, 
                   mode: 'insensitive',
                 },
+                theme: {
+                  contains: theme, 
+                  mode: 'insensitive',
+                },
               },
             },
             { delFlag: false } // 默认过滤已删除
@@ -80,7 +86,8 @@ export async function listQuestion(params: ListQuestionParams): Promise<Paginate
           documentId: true,
           document: {
             select: {
-              fileName: true
+              fileName: true,
+              theme: true,
             }
           }
         },

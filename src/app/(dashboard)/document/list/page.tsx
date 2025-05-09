@@ -98,11 +98,10 @@ const FileUploadPage = () => {
       render: (name, record: any) => name
     },
     {
-      title: 'ファイルId',
-      dataIndex: 'id',
-      key: 'id',
+      title: 'テーマ',
+      dataIndex: 'theme',
+      key: 'theme',
       ellipsis: true,
-      hideInSearch: true,
     },
     {
       title: 'コメント',

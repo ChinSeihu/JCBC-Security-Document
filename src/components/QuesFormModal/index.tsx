@@ -151,10 +151,10 @@ const QuesFormModal = (props: any) => {
         initialValue={detail?.documentId}
       >
 				<Select loading={slectLoading}>
-				{documentList.map(({id, fileName}: any) => (
+				{documentList.map(({id, fileName, theme}: any) => (
 					<Select.Option key={id} value={id}>
-            {fileName}
-            <Typography.Text type="secondary" className="ml-3 opacity-20">{id}</Typography.Text></Select.Option>
+            {theme}
+            <Typography.Text type="secondary" className="ml-3 opacity-20">{fileName}</Typography.Text></Select.Option>
 				))}
 				</Select>
 			</Form.Item>

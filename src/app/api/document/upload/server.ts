@@ -9,7 +9,8 @@ interface DocumentParams {
 	fileSize: number;
 	description?: string;
   userId: string,
-  deadline?: string
+  deadline?: string,
+  theme: string;
 }
 
 export const documentCreate = async (params: DocumentParams) => {
@@ -27,6 +28,7 @@ export const documentCreate = async (params: DocumentParams) => {
         lastModifiedDate: new Date(),
         createdAt: params.userId,
         createdDate: new Date(),
+        theme: params.theme,
         deadline: params.deadline ? dayjs(params.deadline).toISOString() : null
       }
     })
