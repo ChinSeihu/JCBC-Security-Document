@@ -32,7 +32,7 @@ const UploadModal = (props: any) => {
 			const { deadline, theme, description } = form.getFieldsValue();
 			const formData = new FormData();
 			formData.append('file', file as FileType);
-			formData.append('description', description);
+			formData.append('description', description || '');
 			!!deadline ? formData.append('deadline', deadline) : null;
 			formData.append('theme', theme);
 
