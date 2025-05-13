@@ -91,17 +91,17 @@ const FileUploadPage = () => {
       render: (_:any, __:any, index: number) => (pagination.page - 1) * pagination.pageSize + index + 1
     },
     {
+      title: 'テーマ',
+      dataIndex: 'theme',
+      key: 'theme',
+      ellipsis: true,
+    },
+    {
       title: 'ファイル名',
       dataIndex: 'fileName',
       className: 'fileName-cell',
       ellipsis: true,
       render: (name, record: any) => name
-    },
-    {
-      title: 'テーマ',
-      dataIndex: 'theme',
-      key: 'theme',
-      ellipsis: true,
     },
     {
       title: 'コメント',
