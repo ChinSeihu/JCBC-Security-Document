@@ -168,6 +168,10 @@ const QuestionList = () => {
 
   const handleExportCsv = async () => {
     try {
+      if (!pagination.total) {
+        return message.warning('データを見つけないので、ご確認ください。');
+      }
+
       setExportLoading(true)
 
       const reqParams = {

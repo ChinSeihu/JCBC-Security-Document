@@ -15,23 +15,28 @@ export async function POST(request: NextRequest) {
     const csvDatas = await parseCsv(buffer)
     console.log(csvDatas, '<<<<<<<<<<<<<<,csvDatas')
 
-    prisma.$transaction(async (runPrisma: ClientPrisma) => {
-      const user = await validateUser(request);
-      const documentIdSet = new Set(csvDatas.map((it: any) => it.documentId))
-      // 4. 检查关联 document 是否存在
-      const quizExists = await runPrisma.document.findMany({
-        where: { 
-          id: {
-            in: Array.from(documentIdSet)
-          },
-          delFlag: false 
+    const documentIdSet = new Set(csvDatas.map((it: any) => it.documentId))
+    // 4. 检查关联 document 是否存在
+    const quizExists = await prisma.document.findMany({
+      where: { 
+        id: {
+          in: Array.from(documentIdSet) as string[]
         },
-        select: { id: true }
+        delFlag: false 
+      },
+      select: { id: true }
     })
 
-      if (quizExists.length !== documentIdSet.size) {
-        return NextResponse.json({ data:{ message: '存在ないドキュメントIDがあります' }}, { status: HttpStatusCode.NotFound })
-      }
+    if (quizExists.length !== documentIdSet.size) {
+      return NextResponse.json(
+        { 
+          status: HttpStatusCode.NotFound,
+          message: '存在しないドキュメントIDがあります'
+        })
+    }
+
+    prisma.$transaction(async (runPrisma: ClientPrisma) => {
+      const user = await validateUser(request);
 
       const processData: any = handleProcess(csvDatas);
       console.log(processData, '<<<<<<<<<<<<<processData')
