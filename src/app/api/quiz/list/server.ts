@@ -84,10 +84,20 @@ export async function listQuestion(params: ListQuestionParams): Promise<Paginate
           createdDate: true,
           createdAt: true,
           documentId: true,
+          lastModifiedAt: true,
+          lastModifiedDate: true,
           document: {
             select: {
               fileName: true,
               theme: true,
+            }
+          },
+          quesOptions: {
+            select: {
+              id: true,
+              content: true,
+              isCorrect: true,
+              order: true
             }
           }
         },
@@ -102,12 +112,13 @@ export async function listQuestion(params: ListQuestionParams): Promise<Paginate
 
     const data = documents.map((item: any) => {
       const CurrentUser = userList.find((it: any) => it.id === item.createdAt)
-
+      const modifiedUser = userList.find((it: any) => it.id === item.lastModifiedAt)
       return {
         ...item,
         username: CurrentUser?.username,
         firstName: CurrentUser?.firstName,
-        lastName: CurrentUser?.lastName
+        lastName: CurrentUser?.lastName,
+        modifiedAt: ((modifiedUser?.lastName || '') + '　' + (modifiedUser?.firstName || '')).trim()
       }}
     ).filter((item: any) => `${item.firstName} ${item.lastName}`.includes(userName))
 

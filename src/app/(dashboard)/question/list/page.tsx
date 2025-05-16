@@ -9,7 +9,9 @@ import QuesFormModal from '@/components/QuesFormModal';
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
 
 import Style from './style.module.css';
-import { PlusOutlined } from '@ant-design/icons';
+import { ExportOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import UploadQuesModal from './UploadQuesModal';
+import { HttpStatusCode } from 'axios';
 
 const initPagination: TPagination  = {
   page: 1,
@@ -22,10 +24,13 @@ const initPagination: TPagination  = {
 const QuestionList = () => {
   const [pagination, setPagination] = useState<TPagination>(initPagination);
   const [isOpen, setOpen] = useState(false);
+  const [uploadOpen, setUploadOpen] = useState(false);
   const actionRef = useRef<ActionType>();
 	const { message } = App.useApp();
   const [isEdit, setEdit] = useState(false)
   const [record, setRecord] = useState<any>()
+  const [exportLoading, setExportLoading] = useState(false)
+  const [params, setParams] = useState<any>({})
 
   const getQuestionList = async (params = {}) => {
     try {
@@ -112,6 +117,19 @@ const QuestionList = () => {
       render: (_, r: any) => [r?.firstName, r?.lastName].join(' ').trim() || '-'
     },
     {
+      title: '最後更新日時',
+      dataIndex: 'lastModifiedDate',
+      valueType: 'dateTime',
+      width: 150,
+      hideInSearch: true,
+      // render: (_, record) => dayjs(record?.createdDate).format('YYYY-MM-DD HH:mm:ss')
+    },
+    {
+      title: '最後更新者',
+      dataIndex: 'modifiedAt',
+      hideInSearch: true,
+    },
+    {
       title: '操作',
       dataIndex: 'operate',
       fixed: 'right',
@@ -148,6 +166,38 @@ const QuestionList = () => {
     setRecord(record || {});
   }
 
+  const handleExportCsv = async () => {
+    try {
+      setExportLoading(true)
+
+      const reqParams = {
+        ...params,
+        isCompleted: params?.status == 2 ? 'false' : undefined,
+        status: params?.status !== 2 ? params.status : undefined,
+      }
+
+      const response = await get('/api/quiz/export', reqParams, { _customResponse: true } );
+      console.log(response, 'export')
+      if (response.status === HttpStatusCode.Ok) {
+        console.log(response, 'handleExportCsv')
+        const blob = new Blob([response.data], { type: 'text/csv' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `問題集_${new Date().toLocaleString()}.csv`;
+        link.click();
+      }
+    } catch (error: any) {
+      console.log(error, "error>>>>")
+      message.error(error.message);
+    }
+    setExportLoading(false)
+  }
+
+  const handleUploadCancel = (isUploaded: boolean) => {
+    if (isUploaded) actionRef.current?.reload();
+    setUploadOpen(false);
+  }
+
   return (
     <div className="container">
       <QuesFormModal 
@@ -157,6 +207,7 @@ const QuestionList = () => {
         isEdit={isEdit}
         questionId={record?.id}
       />
+      <UploadQuesModal onCancel={handleUploadCancel} isOpen={uploadOpen}/>
       <ProTable
         rowKey="idx" 
         actionRef={actionRef}
@@ -168,6 +219,7 @@ const QuestionList = () => {
             page: params.current
           }) || {}
           setPagination({...pagination, ...(resPagination || {})})
+          setParams(params)
           return ({
             data: data || [],
             success: true,
@@ -175,6 +227,7 @@ const QuestionList = () => {
           });
         }}
         columns={columns}
+        scroll={{ x: 1300 }}
         search={{
           labelWidth: 95,
           span: 8,
@@ -184,7 +237,15 @@ const QuestionList = () => {
           actions: ([
             <Button key='add' type="primary" onClick={() => handleModalOpen(false)} icon={<PlusOutlined />}>
               新規追加
+            </Button>,
+            <Button key='upload' type="primary" onClick={() => setUploadOpen(true)} icon={<UploadOutlined />}>
+              アップロード
+            </Button>,
+            [
+            <Button loading={exportLoading} key='export' type="primary" onClick={handleExportCsv} icon={<ExportOutlined />}>
+              エクスポート
             </Button>
+          ]
           ]),
         }}
         pagination={{ ...pagination }}

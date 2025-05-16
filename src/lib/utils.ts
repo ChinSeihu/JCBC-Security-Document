@@ -1,3 +1,5 @@
+import { parse as parseSync  } from 'csv-parse/sync'
+
 export const formatFileSize = (size: number) => {
   const kb = size / 1024
   
@@ -29,3 +31,12 @@ export const pick = <
 
   return result;
 };
+
+export const parseCsv = async (csvData: Buffer) => {
+  const data = csvData.toString('utf8'); // Buffer 转字符串
+  const results = parseSync(data, {
+      columns: true, // 第一行为表头
+      skip_empty_lines: true
+  });
+  return results;
+}

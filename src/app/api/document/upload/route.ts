@@ -50,8 +50,15 @@ export async function POST(request: NextRequest) {
       },
     });
 
-  } catch (error) {
-    console.error('Upload error:', error);
+  } catch (error: any ) {
+    console.error('Upload error:', error.code);
+    if (error?.code == 'P2002') {
+      return NextResponse.json({
+        status: HttpStatusCode.BadRequest,
+        message: 'テーマが重複されました、ご確認ください。',
+      });
+    }
+
     return NextResponse.json(
       { error: 'Internal Server Error' }, 
       { status: HttpStatusCode.InternalServerError }

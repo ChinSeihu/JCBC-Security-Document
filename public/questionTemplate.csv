@@ -1,0 +1,7 @@
+"id","content","documentId","questionType","optionContent","optionOrder","optionCorrect"
+"1","テスト２","dbd8eada-42e9-4fab-a63d-f203a2ba3758","MULTIPLE_CHOICE","選択肢１",0,true
+"1","テスト２","dbd8eada-42e9-4fab-a63d-f203a2ba3758","MULTIPLE_CHOICE","選択肢２",1,true
+"1","テスト２","dbd8eada-42e9-4fab-a63d-f203a2ba3758","MULTIPLE_CHOICE","選択肢3",2,false
+"2","テスト","dbd8eada-42e9-4fab-a63d-f203a2ba3758","SINGLE_CHOICE","選択肢１",0,false
+"2","テスト","dbd8eada-42e9-4fab-a63d-f203a2ba3758","SINGLE_CHOICE","選択肢２",1,true
+"3","テスト3","dbd8eada-42e9-4fab-a63d-f203a2ba3758","SINGLE_CHOICE","選択肢２",0,true

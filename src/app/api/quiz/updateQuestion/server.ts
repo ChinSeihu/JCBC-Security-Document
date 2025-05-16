@@ -34,7 +34,8 @@ export const updateQuestionItem = async ({
           documentId,
           content,
           questionType,
-          lastModifiedAt: userId
+          lastModifiedAt: userId,
+          lastModifiedDate: new Date(),
         },
         where: {
           id: questionId,
