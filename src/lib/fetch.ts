@@ -39,7 +39,7 @@ async function request(config: any = {}) {
 
   return axios(config)
     .then(response => {
-      const { status, data, message: msg } = response.data || {}
+      const { status, data, message: msg, error } = response.data || {}
       // console.log(response.data, 'response')
       // 接受一个可定制响应的方式
       if (config._customResponse) return response
@@ -47,17 +47,14 @@ async function request(config: any = {}) {
       if (status === HttpStatusCode.Ok) {
         return data
       } else {
-        throw new Error(msg || 'request error')
+        console.log(response, error, msg, 'response/////')
+        throw new Error(error || msg || 'request error')
       }
     })
-    // .catch(err => {
-    //   console.log(new Error(err.message || 'request error'))
-    //   // if (messageMap[err.message]) {
-    //   //   message.error(messageMap[err.message])
-    //   // } else {
-    //   //   message.error(err.message)
-    //   // }
-    // })
+    .catch(err => {
+      const { message: msg, error = err.message } = err?.response?.data || {}
+      throw new Error(error || msg || 'request error')
+    })
 }
 
 // https://github.com/axios/axios/blob/master/lib/core/Axios.js

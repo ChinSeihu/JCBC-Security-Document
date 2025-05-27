@@ -1,5 +1,4 @@
 import { useSession, signOut } from "next-auth/react";
-import Image from "next/image";
 import { LogoutOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Avatar, Dropdown } from 'antd';
@@ -8,7 +7,8 @@ import { useRouter } from "next/navigation";
 const ColorList = ['#f56a00', '#7265e6', '#ffbf00', '#00a2ae'];
 const color = ColorList[Math.ceil(Math.random() * 10) % 4]
 const Navbar = () => {
-  const { data: session } = useSession({ required: true });
+  const { data: session } = useSession<any>({ required: true });
+  console.log(session, 'session>>>')
   const router = useRouter()
   const items: MenuProps['items'] = [
     {
@@ -24,6 +24,8 @@ const Navbar = () => {
   useEffect(() => {
     if (!session) router.push('/auth')
   }, [router, session])
+
+  const user: any = session?.user;
   
   return (
     <div className="flex items-center justify-between p-3">
@@ -39,17 +41,15 @@ const Navbar = () => {
           </div>
         </div> */}
         <div className="flex flex-col items-end">
-          <span className="text-xs leading-3 font-medium">{session?.user?.name}</span>
+          <span className="text-xs leading-3 font-medium">{user?.name}</span>
           <span className="text-[10px] text-gray-500 text-right leading-none" >
-            {session?.user?.email}
+            {user?.email}
           </span>
         </div>
         <></>
-        {/* <UserButton /> */}
         <Dropdown menu={{ items }}>
-          <Avatar style={{ cursor: 'pointer',backgroundColor: color, verticalAlign: 'middle' }}>{session?.user?.name?.slice(0,2)}</Avatar>
+          <Avatar style={{ cursor: 'pointer',backgroundColor: color, verticalAlign: 'middle' }}>{user?.family_name}</Avatar>
         </Dropdown>
-        {/* {signOut()} */}
       </div>
     </div>
   );

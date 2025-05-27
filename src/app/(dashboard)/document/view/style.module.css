@@ -37,3 +37,8 @@
 	display: flex;
 	justify-content: center;
 }
+
+.pdf-page-content canvas, .pdf-page-content canvas ~ div {
+	width: 100% !important;
+	height: 100% !important;
+}

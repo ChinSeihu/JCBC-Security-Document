@@ -1,14 +1,17 @@
 // app/api/read-pdf/route.js (App Router)
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import { getPublicFileInfo } from './server';
+import { getFileInfo } from './server';
 import { HttpStatusCode } from 'axios';
 import { readFile } from 'fs/promises';
+import { getSearchParams } from '@/lib';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const fileInfo = await getPublicFileInfo();
+    const searchParams = request.nextUrl.searchParams;
+    const params = getSearchParams(searchParams);
+    const fileInfo = await getFileInfo(params.documentId);
     // 构建文件路径
     const filePath = path.join(
       process.cwd(), 

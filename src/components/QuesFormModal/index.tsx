@@ -196,9 +196,8 @@ const QuesFormModal = (props: any) => {
                     required={false}
                     style={{ height: 32 }}
                     name={[name, "order"]}
-                    initialValue={index}
                   >
-                    <Input hidden/>
+                    <Input hidden value={name}/>
                   </Form.Item>
                   <Form.Item
                     {...restField}
@@ -235,7 +234,10 @@ const QuesFormModal = (props: any) => {
                     <MinusCircleOutlined
                       style={{ height: 32 }}
                       className={Style["dynamic-delete-button"]}
-                      onClick={() => remove(name)}
+                      onClick={() => {
+                        remove(name)
+                        form.getFieldValue('quesOptions')?.forEach((it: any, idx: number) => it.order = idx)
+                      }}
                     />
                   ) : null}
                 </Row>
@@ -243,7 +245,10 @@ const QuesFormModal = (props: any) => {
               <Form.Item>
                 <Button
                   type="dashed"
-                  onClick={() => add()}
+                  onClick={() => {
+                    form.getFieldValue('quesOptions')?.forEach((it: any, idx: number) => it.order = idx)
+                    add({ order: fields.length })}
+                  }
                   style={{ width: '60%' }}
                   icon={<PlusOutlined />}
                 >

@@ -4,7 +4,7 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import Style from './style.module.css'
-import { App, Empty, FloatButton, Modal, Pagination, Spin } from 'antd';
+import { App, Empty, Modal, Pagination, Spin } from 'antd';
 
 // 配置 PDF worker
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.min.mjs`;
@@ -53,6 +53,7 @@ const ViewModal = (props: any) => {
 
   const handleModalCancel = () => {
     setOpen(false);
+    setPageNumber(1)
     props?.onCancel?.()
   }
 
@@ -71,7 +72,6 @@ const ViewModal = (props: any) => {
                 <Page
                     className={Style["pdf-page-content"]}
                     pageNumber={pageNumber} 
-                    width={795}
                     loading={<div>Loading page...</div>}
                 />
                 </Document>
@@ -81,7 +81,7 @@ const ViewModal = (props: any) => {
         <div className="document-view-draw-container"/>
         {numPages && (
             <div className={Style["pagination"]}>
-            <Pagination onChange={handlePageChange} total={numPages} showSizeChanger={false} pageSize={1}/>
+            <Pagination onChange={handlePageChange} total={numPages} current={pageNumber} showSizeChanger={false} pageSize={1}/>
             {/* <Button onClick={handleToTest} type="primary" size="small" className="ml-4px mr-4px text-xs">試験</Button> */}
             </div>
         )}

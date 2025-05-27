@@ -35,6 +35,7 @@ export const upsertQuestionMany = async (params: DocumentParams) => {
         }
       })
       item.quesOptions.forEach(it => it.questionId = data.id)
+      return data;
     }))
 
     console.log("作成成功:", result)
@@ -50,7 +51,13 @@ export const upsertQuesOptionsMany = async ({ runPrisma, processData }: {
     processData: any[]
 }) => {
     const result = await Promise.all(processData.map(async (item: any) => {
+      const orderMap: any = {}
       return await Promise.all(item.quesOptions.map(async (it: any) => {
+        if (orderMap[it.order]) {
+          console.log('選択肢オーダー番号が重複されました')
+          throw '選択肢オーダー番号が重複されました';
+        }
+        orderMap[it.order] = true;
         return await runPrisma.quesOption.upsert({
           update: it,
           create: it,

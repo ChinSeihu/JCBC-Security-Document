@@ -53,20 +53,14 @@ export const updateQuesOptions = async ({ runPrisma, questionId, quesOptions }: 
     quesOptions: any[]
 }) => {
   try {
+    await runPrisma.quesOption.deleteMany({
+      where: { questionId }
+    })
+
     const updateList = quesOptions.map(item => {
-      if (item?.id) {
-        return runPrisma.quesOption.update({
-          data: item,
-          where: {
-            id: item?.id,
-            questionId
-          }
-        })
-      } else {
-        return runPrisma.quesOption.create({
-         data: { ...item, questionId }
-       })
-      }
+      return runPrisma.quesOption.create({
+        data: { ...item, questionId }
+      })
     })
     
     prisma.$transaction(updateList)

@@ -1,4 +1,3 @@
-import { validateUser } from "@/lib";
 import prisma from "@/lib/prisma"
 
 interface FilePathResponse {
@@ -8,7 +7,7 @@ interface FilePathResponse {
 }
 
 // ドキュメント公開状態更新
-export async function getPublicFileInfo(): Promise<FilePathResponse | null> {
+export async function getFileInfo(documentId: string): Promise<FilePathResponse | null> {
 	try {
 		const result = await prisma.document.findFirst({
 			select: {
@@ -17,9 +16,9 @@ export async function getPublicFileInfo(): Promise<FilePathResponse | null> {
 				fileName: true
 			},
 			where: {
-				isPublic: true
-			},
-			orderBy: [{lastModifiedDate: "desc"}]
+				isPublic: true,
+				id: documentId
+			}
 		})
 
 		console.log("取得に成功:", result?.id)

@@ -84,11 +84,19 @@ const FileUploadPage = () => {
 
   const columns: ProColumns[] = [
     {
-      title: 'ID',
+      title: '順番',
       dataIndex: 'index',
       width: 40,
       hideInSearch: true,
       render: (_:any, __:any, index: number) => (pagination.page - 1) * pagination.pageSize + index + 1
+    },
+    {
+      title: 'ドキュメントID',
+      dataIndex: 'id',
+      width: 150,
+      ellipsis: true,
+      copyable: true,
+      hideInSearch: true,
     },
     {
       title: 'テーマ',

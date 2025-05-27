@@ -35,21 +35,25 @@ export async function POST(request: NextRequest) {
         })
     }
 
-    prisma.$transaction(async (runPrisma: ClientPrisma) => {
-      const user = await validateUser(request);
-
-      const processData: any = handleProcess(csvDatas);
-      console.log(processData, '<<<<<<<<<<<<<processData')
-
-      // 5. 创建问题
-      await upsertQuestionMany({
+    await prisma.$transaction(async (runPrisma: ClientPrisma) => {
+      try {
+        const user = await validateUser(request);
+        
+        const processData: any = handleProcess(csvDatas);
+        console.log(processData, '<<<<<<<<<<<<<processData')
+        
+        // 5. 创建问题
+        const question = await upsertQuestionMany({
           questions: processData,
           runPrisma,
           userId: user.id as string
-      })
-
-      await upsertQuesOptionsMany({ runPrisma, processData })
-
+        })
+        if (!question) return;
+        await upsertQuesOptionsMany({ runPrisma, processData })
+        
+      } catch (e) {
+        throw e
+      }
     })
 
     return NextResponse.json({
@@ -62,7 +66,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Upload error:', error);
     return NextResponse.json(
-      { error: 'Internal Server Error' }, 
+      { error: error || 'Internal Server Error' }, 
       { status: HttpStatusCode.InternalServerError }
     );
   } finally {
