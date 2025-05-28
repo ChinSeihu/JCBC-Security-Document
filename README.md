@@ -2,9 +2,7 @@
 
 ## Getting Started
 
-First, run the development server:
-
-ローカル環境で起動する
+ローカル環境で起動する(データベース設定済みかつ初期化されたの場合)
 ```bash
 
 npm i 
@@ -27,7 +25,7 @@ npm run dev
 npm run build
 // or  yarn build
 
-// script起動
+// script起動，./uploadsフォルダを削除するので、自分でプロジェクトフォルダ以外でバックアップしてください。
 ./deploy.sh 
 ```
 
