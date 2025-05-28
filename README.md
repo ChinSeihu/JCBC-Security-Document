@@ -4,19 +4,37 @@
 
 First, run the development server:
 
+ローカル環境で起動する
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+npm i 
+// or  yarn install
+
+npx prisma generate
+
+env.env.local　　rename⇒　.env.local
+
+npm run dev 
+// or yarn dev
+
+./uploads ファイル作成
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+ローカルからデプロイ
+```bash
+.env.local　　rename⇒　env.env.local
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+npm run build
+// or  yarn build
+
+// script起動
+./deploy.sh 
+```
+
+本番環境で実施して、デプロイ完了
+```bash
+./rebuild-compose.sh
+```
 
 ## Learn More
 
