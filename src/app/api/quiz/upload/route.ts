@@ -6,6 +6,8 @@ import prisma from '@/lib/prisma';
 import { ClientPrisma } from '@/constants/type';
 import { upsertQuesOptionsMany, upsertQuestionMany } from './server';
 
+const CSV_HEADERS = ["id","content","documentId","questionType","optionContent","optionOrder","optionCorrect"]
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -14,7 +16,7 @@ export async function POST(request: NextRequest) {
 
     const csvDatas = await parseCsv(buffer)
     console.log(csvDatas, '<<<<<<<<<<<<<<,csvDatas')
-
+    checkHeaders(csvDatas);
     const documentIdSet = new Set(csvDatas.map((it: any) => it.documentId))
     // 4. 检查关联 document 是否存在
     const quizExists = await prisma.document.findMany({
@@ -81,7 +83,7 @@ const handleProcess = (csvData: any[]) => {
       id: item.optionId,
       questionId: item.id,
       content: item.optionContent,
-      isCorrect: item.optionCorrect === 'true',
+      isCorrect: String(item.optionCorrect || '').toLocaleLowerCase() === 'true',
       order: Number(item.optionOrder || 0)
     }
 
@@ -96,4 +98,11 @@ const handleProcess = (csvData: any[]) => {
     }
   })
   return Object.values(obj)
+}
+
+const checkHeaders = (csvData: any[]) => {
+  const csvHeader =  Object.keys(csvData[0]);
+  const isHeaderValid = CSV_HEADERS.every(it => csvHeader.includes(it))
+
+  if (!isHeaderValid) throw 'CSVファイルのヘッダーチェック失敗になりました、ご確認ください。'
 }

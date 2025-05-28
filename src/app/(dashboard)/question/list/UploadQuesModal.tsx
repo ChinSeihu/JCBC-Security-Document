@@ -29,7 +29,7 @@ const UploadQuesModal = (props: any) => {
 			if (response?.success) {
 				message.success('更新に成功しました！');
 				setIsUploaded(true);
-				handleReset();
+				handleCancel();
 			} else {
 				message.error('更新に失敗しました！');
 			}
