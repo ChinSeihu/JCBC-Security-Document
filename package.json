@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "cp .env.development .env.local && next dev",
     "prebuild": "rm -rf ./uploads",
-    "build": "next build ",
+    "build": "cp .env.production .env.local && next build",
     "start": "next start",
     "lint": "next lint",
     "prisma:generate": "npx prisma generate",

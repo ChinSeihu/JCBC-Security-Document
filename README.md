@@ -10,8 +10,6 @@ npm i
 
 npx prisma generate
 
-env.env.local　　rename⇒　.env.local
-
 npm run dev 
 // or yarn dev
 
@@ -20,8 +18,6 @@ npm run dev
 
 ローカルからデプロイ
 ```bash
-.env.local　　rename⇒　env.env.local
-
 npm run build
 // or  yarn build
 
