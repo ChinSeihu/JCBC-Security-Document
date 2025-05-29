@@ -14,7 +14,7 @@ export async function getPublicList(documentId: string){
 			}
 		})
 
-		console.log("公開リストの取得に成功:", result?.id)
+		console.log("公開リストの取得に成功:")
 		return result
 	} catch (error) {
 		console.error('公開リストの取得に失敗:', error)
