@@ -235,7 +235,7 @@ const QuestionList = () => {
         search={{
           labelWidth: 95,
           span: 8,
-          collapseRender: (collapsed) => collapsed ? '詳細検索' : '折り畳み'
+          collapseRender: (collapsed: boolean) => collapsed ? '詳細検索' : '折り畳み'
         }}
         toolbar={{
           actions: ([

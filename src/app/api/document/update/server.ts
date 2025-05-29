@@ -1,10 +1,11 @@
+import { ClientPrisma } from "@/constants/type"
 import prisma from "@/lib/prisma"
 
 export async function handleDocumentUpdate({
-	id, deadline, comment, userId
-}: {id: string, deadline: string, comment: string, userId: string}): Promise<void> {
+	clientPrisma, id, deadline, comment, userId
+}: {clientPrisma: ClientPrisma,id: string, deadline: string, comment: string, userId: string}): Promise<void> {
 	try {
-		const result = await prisma.document.update({
+		const result = await clientPrisma.document.update({
 			data: {
 				deadline,
 				description: comment,

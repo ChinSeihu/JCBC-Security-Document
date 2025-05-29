@@ -19,11 +19,13 @@ export default function SpecifyModal(props: any) {
     const onCancel = () => {
       setLoading(false)
       handleCancel?.();
+      setSelectedRowKeys([])
     }
   
     useEffect(() => {
       if (!record) return;
       getAllUsers();
+      getPublishedList();
     }, [record])
   
     const handleSpecifySubmit = async () => {
@@ -52,8 +54,25 @@ export default function SpecifyModal(props: any) {
     }
 
     const getAllUsers = async () => {
+      try {
+        setLoading(true);
         const userList = await get('/api/auth/userList');
         setUserList(userList);
+      } catch (e: any) {
+        message.error(e?.message)
+      }
+      setLoading(false);
+    }
+
+    const getPublishedList = async () => {
+      try {
+        setLoading(true);
+        const publicList = await get('/api/document/publicList', { documentId: record.id });
+        setSelectedRowKeys(publicList?.data?.map?.((it: any) => it.userId) || []);
+      } catch (e: any) {
+        message.error(e?.message)
+      }
+      setLoading(false);
     }
 
     const columns: TableColumnsType<any> = [
@@ -97,6 +116,7 @@ export default function SpecifyModal(props: any) {
             <Table<DataType>
                 rowKey="id"
                 bordered
+                loading={loading}
                 size="small"
                 style={{
                     height: 390

@@ -173,7 +173,7 @@ const FileUploadPage = () => {
       fixed: 'right',
       valueType: 'option',
       hideInSearch: true,
-      width: 160,
+      width: 200,
       render: (_, r: any) => (
         <div>
           {!r.isPublic && <Button
@@ -184,6 +184,7 @@ const FileUploadPage = () => {
               setCurrent(r);
             }}
             size='small'
+            color='cyan'
           >公開</Button>}
           <Popconfirm
             title="ファイルの公開を取り下げ"
@@ -193,7 +194,7 @@ const FileUploadPage = () => {
             okText="はい"
             cancelText="キャンセル"
           >
-            {r.isPublic && <Button {...operateBtnProperty} size='small'>取り下げ</Button>}
+            {r.isPublic && <Button {...operateBtnProperty} color='danger' size='small'>取り下げ</Button>}
           </Popconfirm>
           <Popconfirm
             title="ファイルの削除"
@@ -209,6 +210,15 @@ const FileUploadPage = () => {
             setEdit(true)
             setCurrent(r);
             }} {...operateBtnProperty} style={{marginLeft: 6 }}size='small'>編集</Button>
+          {r.isPublic && (
+            <Button 
+              {...operateBtnProperty} 
+              style={{marginLeft: 6 }} 
+              onClick={() => {
+                setSpecify(true)
+                setCurrent(r)
+              }}  
+              size='small'>公開対象</Button>)}
         </div>
       )
     },
@@ -241,7 +251,7 @@ const FileUploadPage = () => {
         }}
         columns={columns}
         pagination={{ ...pagination }}
-        search={{ span: 8, collapseRender: (collapsed) => collapsed ? '詳細検索' : '折り畳み' }}
+        search={{ span: 8, collapseRender: (collapsed: boolean) => collapsed ? '詳細検索' : '折り畳み' }}
         bordered
         scroll={{ x: 1300 }}
         defaultSize='small'
