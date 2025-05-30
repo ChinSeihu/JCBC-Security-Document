@@ -2,7 +2,7 @@
 
 ## Getting Started
 
-ローカル環境で起動する(データベース設定済みかつ初期化されたの場合)
+ローカル環境で起動する(データベース(postgre)設定済みかつ初期化されたの場合)
 ```bash
 
 npm i 
@@ -15,16 +15,19 @@ npx prisma db seed
 npm run dev 
 // or yarn dev
 
-./uploads ファイル作成
 ```
 
 ローカルからデプロイ
 ```bash
 npm run build
 // or  yarn build
+// script起動したら、./uploadsフォルダを削除するので、必要があれば、自分でプロジェクトフォルダ以外でバックアップしてください。
 
-// script起動，./uploadsフォルダを削除するので、自分でプロジェクトフォルダ以外でバックアップしてください。
-./deploy.sh 
+
+//サーバー管理者からec2のkeyを取って、./Ec2key.pemをリネームして、ルート(./)に置いてください
+
+./deploy.sh
+ 
 //deploy.sh コマンドが常に実行失敗するので、keyファイルをコピーして、powerShellで実行しましょう
 ```
 

@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "cp .env.development .env.local && next dev",
-    "prebuild": "rm -rf ./uploads",
-    "build": "cp .env.production .env.local && next build",
+    "predev": "node scripts/predev.js",
+    "dev": "next dev",
+    "prebuild": "node scripts/prebuild.js",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "prisma:generate": "npx prisma generate",

@@ -131,9 +131,9 @@ export default function PDFViewList() {
                         style={{ display: 'node', marginRight: '-12px', marginTop: "-5px" }} 
                         text={isPass ? '合格' : '未合格'}
                       >
-                        {item.description}
+                        {item.description || '-'}
                       </Badge.Ribbon>)
-                      : item.description
+                      : item.description || '-'
                     }
                   </Card>
               </List.Item>

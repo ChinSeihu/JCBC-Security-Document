@@ -3,8 +3,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { handleDocumentUpdate } from './server';
 import { HttpStatusCode } from 'axios';
 import { validateUser } from '@/lib';
-import prisma from '@/lib/prisma';
-import { ClientPrisma } from '@/constants/type';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,11 +10,9 @@ export async function POST(request: NextRequest) {
     const { comment, deadline, id } = params;
     const user = await validateUser(request);
 
-    await prisma.$transaction(async (clientPrisma: ClientPrisma) => {
-      await handleDocumentUpdate({
-        clientPrisma, comment, deadline, id, userId: user.id
-      });
-    })
+    await handleDocumentUpdate({
+      comment, deadline, id, userId: user.id
+    });
 
     return NextResponse.json({
       status: HttpStatusCode.Ok,
